@@ -1,0 +1,151 @@
+PODS:
+  - FMDB (2.7.5):
+    - FMDB/standard (= 2.7.5)
+  - FMDB/standard (2.7.5)
+  - LemonBigOldFile (0.1.0):
+    - LemonFileManager
+    - Masonry (= 1.1.0)
+    - QMCoreFunction
+    - QMUICommon
+  - LemonDuplicateFile (0.1.0):
+    - FMDB (= 2.7.5)
+    - LemonFileManager
+    - LemonStat
+    - Masonry (= 1.1.0)
+    - QMCoreFunction
+    - QMUICommon
+  - LemonFileManager (0.1.0):
+    - QMCoreFunction
+  - LemonFileMove (0.1.0):
+    - LemonFileManager
+    - Masonry (= 1.1.0)
+    - QMCoreFunction
+    - QMUICommon
+  - LemonHardware (0.1.0):
+    - Masonry (~> 1.1.0)
+    - QMCoreFunction
+    - QMUICommon
+  - LemonLoginItemManager (0.1.0):
+    - FMDB (= 2.7.5)
+    - Masonry (= 1.1.0)
+    - QMAppLoginItemManage
+    - QMCoreFunction
+    - QMUICommon
+  - LemonNetSpeed (0.1.0):
+    - LemonStat
+    - Masonry (= 1.1.0)
+    - QMCoreFunction
+    - QMUICommon
+  - LemonPhotoClean (0.1.0):
+    - FMDB (= 2.7.5)
+    - LemonFileManager
+    - LemonStat
+    - Masonry (= 1.1.0)
+    - QMCoreFunction
+    - QMUICommon
+  - LemonPrivacyClean (0.1.0):
+    - FMDB (= 2.7.5)
+    - Masonry (= 1.1.0)
+    - QMCoreFunction
+    - QMUICommon
+  - LemonSpaceAnalyse (0.1.0):
+    - Masonry (= 1.1.0)
+    - QMCoreFunction
+    - QMUICommon
+    - YMTreeMap (= 1.2.0)
+  - LemonStat (0.1.0)
+  - LemonUninstaller (0.1.0):
+    - FMDB (= 2.7.5)
+    - LemonStat
+    - Masonry (= 1.1.0)
+    - QMCoreFunction
+    - QMUICommon
+  - Masonry (1.1.0)
+  - QMAppLoginItemManage (0.1.0)
+  - QMCoreFunction (0.1.0):
+    - LemonStat
+  - QMUICommon (0.1.0):
+    - Masonry (= 1.1.0)
+    - QMCoreFunction
+  - YMTreeMap (1.2.0)
+
+DEPENDENCIES:
+  - FMDB (= 2.7.5)
+  - LemonBigOldFile (from `./localPod/LemonBigOldFile`)
+  - LemonDuplicateFile (from `./localPod/LemonDuplicateFile`)
+  - LemonFileManager (from `./localPod/LemonFileManager`)
+  - LemonFileMove (from `./localPod/LemonFileMove`)
+  - LemonHardware (from `./localPod/LemonHardware`)
+  - LemonLoginItemManager (from `./localPod/LemonLoginItemManager`)
+  - LemonNetSpeed (from `./localPod/LemonNetSpeed`)
+  - LemonPhotoClean (from `./localPod/LemonPhotoClean`)
+  - LemonPrivacyClean (from `./localPod/LemonPrivacyClean`)
+  - LemonSpaceAnalyse (from `./localPod/LemonSpaceAnalyse`)
+  - LemonStat (from `./localPod/LemonStat`)
+  - LemonUninstaller (from `./localPod/LemonUninstaller`)
+  - Masonry (= 1.1.0)
+  - QMAppLoginItemManage (from `./localPod/QMAppLoginItemManage`)
+  - QMCoreFunction (from `./localPod/QMCoreFunction`)
+  - QMUICommon (from `./localPod/QMUICommon`)
+
+SPEC REPOS:
+  trunk:
+    - FMDB
+    - Masonry
+    - YMTreeMap
+
+EXTERNAL SOURCES:
+  LemonBigOldFile:
+    :path: "./localPod/LemonBigOldFile"
+  LemonDuplicateFile:
+    :path: "./localPod/LemonDuplicateFile"
+  LemonFileManager:
+    :path: "./localPod/LemonFileManager"
+  LemonFileMove:
+    :path: "./localPod/LemonFileMove"
+  LemonHardware:
+    :path: "./localPod/LemonHardware"
+  LemonLoginItemManager:
+    :path: "./localPod/LemonLoginItemManager"
+  LemonNetSpeed:
+    :path: "./localPod/LemonNetSpeed"
+  LemonPhotoClean:
+    :path: "./localPod/LemonPhotoClean"
+  LemonPrivacyClean:
+    :path: "./localPod/LemonPrivacyClean"
+  LemonSpaceAnalyse:
+    :path: "./localPod/LemonSpaceAnalyse"
+  LemonStat:
+    :path: "./localPod/LemonStat"
+  LemonUninstaller:
+    :path: "./localPod/LemonUninstaller"
+  QMAppLoginItemManage:
+    :path: "./localPod/QMAppLoginItemManage"
+  QMCoreFunction:
+    :path: "./localPod/QMCoreFunction"
+  QMUICommon:
+    :path: "./localPod/QMUICommon"
+
+SPEC CHECKSUMS:
+  FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  LemonBigOldFile: 23a8fa63d1879a3661e5c5e53105a23852f021c5
+  LemonDuplicateFile: 269e87a73e550360346db58312c8f98e7c5f3241
+  LemonFileManager: 2837545ea76cd9d8dac11268726b88c1431936e7
+  LemonFileMove: 4d873b4a25b37540fea299a3f28a18b8118cc420
+  LemonHardware: 937f110c748ddc648b9531658b8273b78eda75b0
+  LemonLoginItemManager: eae42bb1112158a3cc013ce94d8cac83248b1f46
+  LemonNetSpeed: 680c12b57d993b0ea4da49b4e81e35a02af34826
+  LemonPhotoClean: b9f3cd9a627b0317af02fd3437a97804129d5f75
+  LemonPrivacyClean: 857478f320ce4cf6ad1f4525688341a52b17e494
+  LemonSpaceAnalyse: cb6c4ffbbb1772cdeffb685ae6474030548c19f9
+  LemonStat: ef56b4f1d8f30ef8f168aaecb905baa2691c20c9
+  LemonUninstaller: 8c6d0a92143865ec33e256b794629ce8447d2cdf
+  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  QMAppLoginItemManage: 39466a767ec150dabb85f44cd2c2c3e23e82fd3d
+  QMCoreFunction: 82ba263c6f289bd6287b4968dfd25bb71bd1e0f5
+  QMUICommon: c38f28f16bcc8516facbecae343bf5b71e9ce585
+  YMTreeMap: 8bd766573bc5005cf6b6f5d2674e4225ee734f6e
+
+PODFILE CHECKSUM: 44c73a74bedfbc15514e594f034640be2f7aabb6
+
+COCOAPODS: 1.17.0

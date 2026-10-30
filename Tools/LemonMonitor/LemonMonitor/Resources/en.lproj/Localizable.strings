@@ -1,0 +1,100 @@
+/*
+ Localizable.strings
+ LemonMonitor
+ 
+ 
+ Copyright © 2019 Tencent. All rights reserved.
+ */
+"LEMON_LANGUAGE" = "EN";
+
+"打开 Lemon" = "Launch cleaner";
+"打开 cleaner" = "Launch cleaner";
+"检查更新..." = "Check for Updates...";
+"关于 cleaner" = "About cleaner";
+"关于腾讯柠檬清理" = "About cleaner";
+//"关于腾讯柠檬清理" = "About cleaner";
+//"腾讯公司 版权所有" = "Copyright©2020 cleaner. All Rights Reserved.";
+//"Copyright©2020年 Tencent. All Rights Reserved" = "Copyright©2020 cleaner. All Rights Reserved";
+"语言设置" = "Language settings";
+"关闭状态栏后，所有功能（包括自动检测卸载残留，摄像头使用提醒等）都不再生效。确定关闭吗？" = "After you quit, device access alert and leftover detection features will not work any more. Do you still want to quit?";
+"系统功能" = "System";
+"垃圾可清理" = " can be recovered";
+"清理" = "Clean";
+"正在清理中..." = "Cleaning...";
+"垃圾已清理" = "space recovered";
+"本次清理 %@" = "Recovered %@";
+"你的电脑很干净" = "Your Mac is very clean!";
+"继续保持哦" = "Keep Mac as clean as new";
+"正在扫描中..." = "Scanning...";
+"请等待一会" = " Wait a second please";
+"内存占用" = "Memory usage";
+"释放" = "Release";
+"正在释放内存" = "Releasing memory...";
+"已释放" = "Released";
+"内存" = "Memory";
+"监控中" = "Monitoring";
+"未开启" = "Off";
+"暂不支持11.3系统" = "Not supported for 11.3";
+
+"监控中" = "Monitoring";
+"未开启" = "Off";
+"正在研究，请等更新" = "Working on update";
+
+"网络测速" = "Test speed";
+"摄像头隐私保护" = "Camera Privacy Protection";
+"系统音频隐私保护" = "System Audio Access Protection";
+"CPU温度" = "CPU";
+"CPU占用" = "CPU Usage";
+"风扇转速" = "Fan speed";
+"磁盘占用" = "Disk usage";
+"关闭" = "Close";
+"关闭将直接退出程序，请先保存重要数据" = "Tips: Save your files before closing it.";
+
+"清理释放" = "FreeUp";
+"关于 Lemon Cleaner" = "About cleaner";
+"版本更新" = "Update";
+"偏好设置" = "Preferences";
+"退出状态栏" = "Quit";
+"取消" = "Cancel";
+"退出状态栏" = "Quit";
+"硬件详情" = "More info";
+"可用" ="Left";
+"共" ="Total";
+"cleaner" = "cleaner";
+"腾讯柠檬清理" = "cleaner";
+
+"废纸篓垃圾已占用 %@" = "There are %@ junks in the trash.";
+"是否清空废纸篓？" = "Would you like to empty the trash?";
+"废纸篓垃圾已超过 %@" = "There are over %@ junks in the trash.";
+"正在清理，请稍候..." = "Removing……";
+"已清空废纸篓" = "The trash has been cleaned up.";
+
+"暂不清理" = "Clean later";
+"清空" = "Yes";
+"取消" = "Cancel";
+"完成" = "Done";
+
+"检测到当前有新版本，更新以获取更好的清理体验" = "New version detected, you will get better cleaning experience after update";
+"当前版本: %@" = "Current version: %@";
+"最新版本: %@" = "Latest version: %@";
+"立即升级" = "Upgrade";
+
+"状态栏可能被刘海屏遮挡，尝试显示更少的图标或关闭其余不使用的状态栏图标" = "The status bar may be obscured by the camera. Try displaying fewer icons or turning off the rest of the unused status bar icons.";
+"好的" = "OK";
+"偏好设置" = "Preferences";
+
+"当前无网络" = "NO network";
+
+"去开启" = "Turn on";
+"未开启" = "Not enabled";
+"一键开启" = "Enable";
+"开启" = "Enable";
+"升级守护，全场景保护设备隐私" = "Full-Scenario Protection for Device Privacy";
+"新增自动操作提示，监控电脑不明使用" = "New auto-operation prompts to monitor unauthorized PC usage";
+"屏幕信息保护" = "Screen Privacy Protection";
+"自动操作提示" = "Automation Alert";
+
+
+"服务协议" = "Services Agreement";
+"隐私政策" = "Privacy Policy";
+"官网网站" = "Website";

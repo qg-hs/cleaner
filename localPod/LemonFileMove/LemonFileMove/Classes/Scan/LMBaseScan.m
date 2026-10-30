@@ -1,0 +1,213 @@
+//
+//  LMBaseScan.m
+//  LemonFileMove
+//
+//
+
+#import "LMBaseScan.h"
+#import "NSString+Extension.h"
+#import <QMCoreFunction/QMShellExcuteHelper.h>
+#import "LMFileHelper.h"
+
+@implementation LMBaseScan
+
+- (void)start {
+    self.cancel = NO;
+}
+
+//过滤90天/90天后
+- (NSArray *)filterPathArray:(NSArray *)pathArray
+                   parentDir:(NSString *)parentDir
+                continueExec:(BOOL(^)(NSString *path))continueExec
+                      before:(BOOL)before {
+      NSMutableArray *resultArr = [NSMutableArray new];
+      for (NSString *_path in pathArray) {
+          @autoreleasepool {
+              if (self.cancel) {
+                  break;
+              }
+              NSString *path = _path;
+              if (parentDir) {
+                  path = [parentDir stringByAppendingPathComponent:path];
+              }
+              
+              if (continueExec && !continueExec(path)) {
+                  continue;
+              }
+              BOOL isDirectory = NO;
+              if ([LMFileHelper isEmptyDirectory:path filterHiddenItem:YES isDirectory:&isDirectory] || !isDirectory) {
+                  continue;
+              }
+              
+              NSDictionary* attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+              NSTimeInterval createTime = [[attr objectForKey:NSFileCreationDate] timeIntervalSince1970];
+              NSTimeInterval nowInterval = [[NSDate date] timeIntervalSince1970];
+              NSTimeInterval extraIntervalCreate = nowInterval - createTime;
+              if(before == YES) {
+                  if ((extraIntervalCreate > 90 * 24 * 60 * 60)) {
+                      [resultArr addObject:path];
+                  }
+              } else {
+                  if ((extraIntervalCreate <= 90 * 24 * 60 * 60)) {
+                      [resultArr addObject:path];
+                  }
+              }
+              
+          }
+      }
+    return resultArr.copy;
+}
+
+- (void)callbackResultArray:(NSArray *)resultArray
+                    appType:(LMAppCategoryItemType)appType
+                       type:(LMFileMoveScanType)type
+                     before:(BOOL)before
+                 completion:(void(^)(LMResultItem *resultItem))completion {
+    for (int i = 0; i <[resultArray count]; i ++) {
+        NSString *result = [resultArray objectAtIndex:i];
+        LMResultItem * resultItem = [[LMResultItem alloc] init];
+        resultItem.path = result;
+        resultItem.appType = appType;
+        resultItem.fileType = type;
+
+        NSArray *titleArr = [result componentsSeparatedByString:@"/"];
+        if (titleArr && titleArr.count > 0) {
+            resultItem.title = titleArr.lastObject;
+        }
+        if (before) {
+            resultItem.selecteState = NSControlStateValueOn;
+        } else {
+            resultItem.selecteState = NSControlStateValueOff;
+        }
+        // 添加结果
+        if (resultItem.fileSize == 0) {
+            resultItem = nil;
+        } else if (completion) {
+            completion(resultItem);
+        }
+        
+        if (self.cancel) {
+            break;
+        }
+    }
+}
+
+// 获取相关目录
+- (NSArray *)getPath:(NSString *)path
+         shellString:(NSString *)shellString
+             keyword:(NSString *)keyWord {
+    NSMutableArray *resultArray = [NSMutableArray new];
+    path = [path stringByReplacingOccurrencesOfString:@"~" withString:[NSString getUserHomePath]];
+    
+    NSString *cmd = [NSString stringWithFormat:shellString, path];
+    NSString *retPath = [QMShellExcuteHelper excuteCmd:cmd];
+    if ([retPath isKindOfClass:[NSNull class]]) {
+        return nil;
+    }
+    if ((retPath == nil) || ([retPath isEqualToString:@""])) {
+        return nil;
+    }
+    NSArray *retArray = [retPath componentsSeparatedByString:@"\n"];
+    for (NSString *resultPath in retArray) {
+        if ([resultPath containsString:keyWord]) {
+            [resultArray addObject:resultPath];
+        }
+        if (self.cancel) {
+            break;
+        }
+    }
+    return resultArray;
+}
+
+- (NSArray *)enumerateSubdirectoriesAtPath:(NSString *)path destinationLevel:(NSInteger)destinationLevel isMatching:(BOOL (^)(NSString *, NSInteger))isMatching {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtPath:path];
+    
+    NSMutableArray *subdirectories = [NSMutableArray array];
+    NSString *subPath;
+    while ((subPath = [enumerator nextObject])) {
+        NSString *fullPath = [path stringByAppendingPathComponent:subPath];
+        BOOL isDirectory;
+        [fileManager fileExistsAtPath:fullPath isDirectory:&isDirectory];
+        if (!isDirectory) {
+            /// 非文件夹
+            continue;
+        }
+        /// 路径层级level，从1开始
+        NSInteger currentLevel = enumerator.level;
+        if (isMatching && isMatching(fullPath, currentLevel) ) {
+            if (currentLevel == destinationLevel) {
+                [subdirectories addObject:fullPath];
+                [enumerator skipDescendants];
+            }
+        } else {
+            [enumerator skipDescendants];
+        }
+        if (self.cancel) {
+            break;
+        }
+    }
+    return subdirectories.copy;
+}
+
+// 带过滤条件的版本
+- (NSArray *)findSubdirectoriesFromPaths:(NSArray *)pathArray
+                                maxDepth:(NSInteger)maxDepth
+                           filterBlock:(BOOL(^)(NSString *path, NSInteger depth))filterBlock {
+    NSMutableArray *subdirectories = [NSMutableArray array];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    for (NSString *path in pathArray) {
+        @autoreleasepool {
+            if (self.cancel) {
+                break;
+            }
+            
+            NSString *expandedPath = [path stringByExpandingTildeInPath];
+            
+            NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtPath:expandedPath];
+            
+            NSString *subPath;
+            while ((subPath = [enumerator nextObject])) {
+                if (self.cancel) {
+                    break;
+                }
+
+                NSInteger currentDepth = enumerator.level;
+                // 如果超过最大深度，跳过
+                if (currentDepth > maxDepth) {
+                    [enumerator skipDescendants];
+                    continue;
+                }
+                
+                NSString *fullPath = [expandedPath stringByAppendingPathComponent:subPath];
+                
+                BOOL isDirectory;
+                if ([fileManager fileExistsAtPath:fullPath isDirectory:&isDirectory] && isDirectory) {
+                    // 过滤隐藏文件夹
+                    if (![[subPath lastPathComponent] hasPrefix:@"."]) {
+                        // 应用自定义过滤条件
+                        if (!filterBlock || filterBlock(fullPath, currentDepth)) {
+                            [subdirectories addObject:fullPath];
+                        }
+                    } else {
+                        // 隐藏文件夹跳过子目录
+                        [enumerator skipDescendants];
+                        continue;
+                    }
+                    
+                    // 如果已经达到最大深度，跳过子目录
+                    if (currentDepth == maxDepth) {
+                        [enumerator skipDescendants];
+                        continue;
+                    }
+                }
+            }
+        }
+    }
+    
+    return [subdirectories copy];
+}
+
+@end

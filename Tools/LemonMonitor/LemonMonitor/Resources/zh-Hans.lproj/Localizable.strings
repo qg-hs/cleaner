@@ -1,0 +1,11 @@
+/* 
+  Localizable.strings
+  LemonMonitor
+
+  
+  Copyright © 2019 Tencent. All rights reserved.
+*/
+"LEMON_LANGUAGE" = "中文";
+"打开 Lemon" = "打开 cleaner";
+"打开 cleaner" = "打开 cleaner";
+"检查更新..." = "检查更新...";

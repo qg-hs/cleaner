@@ -1,0 +1,731 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1163F6B30B6FB82202ADD85C /* Pods_PrivacyProtect.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36273651694F1319C6620B60 /* Pods_PrivacyProtect.framework */; };
+		2A2853E92DCAF8F7004DD03D /* OwlListPlaceHolderView.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A2853E72DCAF8F7004DD03D /* OwlListPlaceHolderView.h */; };
+		2A2853EA2DCAF8F7004DD03D /* OwlListPlaceHolderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A2853E82DCAF8F7004DD03D /* OwlListPlaceHolderView.m */; };
+		339CCC692D97D95D00F8C67A /* Owl2Manager.m in Sources */ = {isa = PBXBuildFile; fileRef = 339CCC682D97D95D00F8C67A /* Owl2Manager.m */; };
+		339CCC6A2D97D95D00F8C67A /* Owl2Manager.h in Headers */ = {isa = PBXBuildFile; fileRef = 339CCC672D97D95D00F8C67A /* Owl2Manager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		52289FA62D9BD561006FF54E /* Owl2Manager+Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 52289FA52D9BD561006FF54E /* Owl2Manager+Database.m */; };
+		52289FA72D9BD561006FF54E /* Owl2Manager+Database.h in Headers */ = {isa = PBXBuildFile; fileRef = 52289FA42D9BD561006FF54E /* Owl2Manager+Database.h */; };
+		52289FC02D9D4A8B006FF54E /* Owl2Manager+Notification.m in Sources */ = {isa = PBXBuildFile; fileRef = 52289FBF2D9D4A8B006FF54E /* Owl2Manager+Notification.m */; };
+		52289FC12D9D4A8B006FF54E /* Owl2Manager+Notification.h in Headers */ = {isa = PBXBuildFile; fileRef = 52289FBE2D9D4A8B006FF54E /* Owl2Manager+Notification.h */; };
+		52FDDEDC2DD2EDB000EFDD73 /* PrivacyProtect-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 52FDDEDB2DD2EDB000EFDD73 /* PrivacyProtect-Prefix.pch */; };
+		B70400372E1669AB000E9A62 /* Owl2WlAppItem.h in Headers */ = {isa = PBXBuildFile; fileRef = B70400352E1669AB000E9A62 /* Owl2WlAppItem.h */; };
+		B70400382E1669AB000E9A62 /* Owl2WlAppItem.m in Sources */ = {isa = PBXBuildFile; fileRef = B70400362E1669AB000E9A62 /* Owl2WlAppItem.m */; };
+		B71E86032DB22F3E000DB7C0 /* Owl2Manager+Guide.h in Headers */ = {isa = PBXBuildFile; fileRef = B71E86012DB22F3E000DB7C0 /* Owl2Manager+Guide.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B71E86042DB22F3E000DB7C0 /* Owl2Manager+Guide.m in Sources */ = {isa = PBXBuildFile; fileRef = B71E86022DB22F3E000DB7C0 /* Owl2Manager+Guide.m */; };
+		B7520AC72E15094A0060123F /* OwlWhitelistCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B7520AC62E15094A0060123F /* OwlWhitelistCell.m */; };
+		B7520AC82E15094A0060123F /* OwlWhitelistCell.h in Headers */ = {isa = PBXBuildFile; fileRef = B7520AC52E15094A0060123F /* OwlWhitelistCell.h */; };
+		B7520AD72E161F1F0060123F /* OwlWhitelistFoldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B7520AD62E161F1F0060123F /* OwlWhitelistFoldCell.m */; };
+		B7520AD82E161F1F0060123F /* OwlWhitelistFoldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = B7520AD52E161F1F0060123F /* OwlWhitelistFoldCell.h */; };
+		B7520ADB2E161F4C0060123F /* OwlWhitelistExpandCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B7520ADA2E161F4C0060123F /* OwlWhitelistExpandCell.m */; };
+		B7520ADC2E161F4C0060123F /* OwlWhitelistExpandCell.h in Headers */ = {isa = PBXBuildFile; fileRef = B7520AD92E161F4C0060123F /* OwlWhitelistExpandCell.h */; };
+		B77131BE2DE5D9D20074302E /* NSAlert+OwlExtend.h in Headers */ = {isa = PBXBuildFile; fileRef = B77131BC2DE5D9D20074302E /* NSAlert+OwlExtend.h */; };
+		B77131BF2DE5D9D20074302E /* NSAlert+OwlExtend.m in Sources */ = {isa = PBXBuildFile; fileRef = B77131BD2DE5D9D20074302E /* NSAlert+OwlExtend.m */; };
+		B77E9C0F2DD31F050050712D /* Owl2AppItem.m in Sources */ = {isa = PBXBuildFile; fileRef = B77E9C0E2DD31F050050712D /* Owl2AppItem.m */; };
+		B77E9C102DD31F050050712D /* Owl2AppItem.h in Headers */ = {isa = PBXBuildFile; fileRef = B77E9C0D2DD31F050050712D /* Owl2AppItem.h */; };
+		B77E9C132DD31F620050712D /* Owl2LogProcessItem.m in Sources */ = {isa = PBXBuildFile; fileRef = B77E9C122DD31F620050712D /* Owl2LogProcessItem.m */; };
+		B77E9C142DD31F620050712D /* Owl2LogProcessItem.h in Headers */ = {isa = PBXBuildFile; fileRef = B77E9C112DD31F620050712D /* Owl2LogProcessItem.h */; };
+		B78CE37E2DD329EE00043976 /* Owl2NotificationItem.m in Sources */ = {isa = PBXBuildFile; fileRef = B78CE37D2DD329EE00043976 /* Owl2NotificationItem.m */; };
+		B78CE37F2DD329EE00043976 /* Owl2NotificationItem.h in Headers */ = {isa = PBXBuildFile; fileRef = B78CE37C2DD329EE00043976 /* Owl2NotificationItem.h */; };
+		B795DBF22DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.m in Sources */ = {isa = PBXBuildFile; fileRef = B795DBF12DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.m */; };
+		B795DBF32DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.h in Headers */ = {isa = PBXBuildFile; fileRef = B795DBF02DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.h */; };
+		B7AE642F2DB8896C006F128C /* OwlSelectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B7AE642E2DB8896C006F128C /* OwlSelectViewController.m */; };
+		B7AE64302DB8896C006F128C /* OwlSelectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B7AE642D2DB8896C006F128C /* OwlSelectViewController.h */; };
+		B7BDBD022DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = B7BDBD012DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.m */; };
+		B7BDBD032DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = B7BDBD002DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.h */; };
+		B7BDBD242DB851CF00FB5ADF /* Owl2Manager+LocaFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B7BDBD232DB851CF00FB5ADF /* Owl2Manager+LocaFile.m */; };
+		B7BDBD252DB851CF00FB5ADF /* Owl2Manager+LocaFile.h in Headers */ = {isa = PBXBuildFile; fileRef = B7BDBD222DB851CF00FB5ADF /* Owl2Manager+LocaFile.h */; };
+		B7D5A8A72DD5A49800635656 /* Owl2SelectAppItem.m in Sources */ = {isa = PBXBuildFile; fileRef = B7D5A8A62DD5A49800635656 /* Owl2SelectAppItem.m */; };
+		B7D5A8A82DD5A49800635656 /* Owl2SelectAppItem.h in Headers */ = {isa = PBXBuildFile; fileRef = B7D5A8A52DD5A49800635656 /* Owl2SelectAppItem.h */; };
+		B7D8F5572DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B7D8F5562DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.m */; };
+		B7D8F5582DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B7D8F5552DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.h */; };
+		B7FCD2412C2AB88D00351D31 /* QMUserNotificationCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = D49FA51B21DDA626004A416E /* QMUserNotificationCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C056A793D8556494C303D17F /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		C4B3172B26458232006FC154 /* AVMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3172226458232006FC154 /* AVMonitor.h */; };
+		C4B3172C26458232006FC154 /* Client.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3172326458232006FC154 /* Client.h */; };
+		C4B3172D26458232006FC154 /* utilities.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3172426458232006FC154 /* utilities.h */; };
+		C4B3172E26458232006FC154 /* LogMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B3172526458232006FC154 /* LogMonitor.m */; };
+		C4B3172F26458232006FC154 /* Client.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B3172626458232006FC154 /* Client.m */; };
+		C4B3173026458232006FC154 /* AVMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B3172726458232006FC154 /* AVMonitor.m */; };
+		C4B3173126458232006FC154 /* LogMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3172826458232006FC154 /* LogMonitor.h */; };
+		C4B3173226458232006FC154 /* utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B3172926458232006FC154 /* utilities.m */; };
+		C4B3173326458232006FC154 /* consts.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3172A26458232006FC154 /* consts.h */; };
+		D49FA45221DDA0F2004A416E /* PrivacyProtect.h in Headers */ = {isa = PBXBuildFile; fileRef = D49FA45021DDA0F2004A416E /* PrivacyProtect.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D49FA4F821DDA5D9004A416E /* owlAsset.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D49FA4D421DDA5D9004A416E /* owlAsset.xcassets */; };
+		D49FA4FA21DDA5D9004A416E /* OwlConstant.h in Headers */ = {isa = PBXBuildFile; fileRef = D49FA4D721DDA5D9004A416E /* OwlConstant.h */; };
+		D49FA50321DDA5D9004A416E /* OwlLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D49FA4E221DDA5D9004A416E /* OwlLogViewController.m */; };
+		D49FA50521DDA5D9004A416E /* OwlTableRowView.m in Sources */ = {isa = PBXBuildFile; fileRef = D49FA4E421DDA5D9004A416E /* OwlTableRowView.m */; };
+		D49FA50821DDA5D9004A416E /* OwlWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D49FA4E721DDA5D9004A416E /* OwlWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D49FA50921DDA5D9004A416E /* OwlViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D49FA4E821DDA5D9004A416E /* OwlViewController.h */; };
+		D49FA50C21DDA5D9004A416E /* OwlWhiteListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D49FA4EB21DDA5D9004A416E /* OwlWhiteListViewController.m */; };
+		D49FA50E21DDA5D9004A416E /* OwlTableRowView.h in Headers */ = {isa = PBXBuildFile; fileRef = D49FA4ED21DDA5D9004A416E /* OwlTableRowView.h */; };
+		D49FA51121DDA5D9004A416E /* OwlLogViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D49FA4F021DDA5D9004A416E /* OwlLogViewController.h */; };
+		D49FA51421DDA5D9004A416E /* OwlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D49FA4F321DDA5D9004A416E /* OwlViewController.m */; };
+		D49FA51521DDA5D9004A416E /* OwlWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D49FA4F421DDA5D9004A416E /* OwlWindowController.m */; };
+		D49FA51721DDA5D9004A416E /* OwlWhiteListViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D49FA4F621DDA5D9004A416E /* OwlWhiteListViewController.h */; };
+		D49FA52421DDA73D004A416E /* QMMobileConnNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = D49FA51A21DDA626004A416E /* QMMobileConnNotification.m */; };
+		D49FA52521DDA73D004A416E /* QMUserNotificationCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = D49FA51C21DDA626004A416E /* QMUserNotificationCenter.m */; };
+		D4ACC033221D76C500DF0B7B /* LemonDaemonConst.h in Headers */ = {isa = PBXBuildFile; fileRef = D4ACC032221D76C500DF0B7B /* LemonDaemonConst.h */; };
+		D5F5FA78264A377200A499BE /* Event.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F5FA76264A377200A499BE /* Event.h */; };
+		D5F5FA79264A377200A499BE /* Event.m in Sources */ = {isa = PBXBuildFile; fileRef = D5F5FA77264A377200A499BE /* Event.m */; };
+		F87C5AD92243341600619DCE /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F87C5ADB2243341600619DCE /* Localizable.strings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2A2853E72DCAF8F7004DD03D /* OwlListPlaceHolderView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OwlListPlaceHolderView.h; sourceTree = "<group>"; };
+		2A2853E82DCAF8F7004DD03D /* OwlListPlaceHolderView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OwlListPlaceHolderView.m; sourceTree = "<group>"; };
+		339CCC672D97D95D00F8C67A /* Owl2Manager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Owl2Manager.h; sourceTree = "<group>"; };
+		339CCC682D97D95D00F8C67A /* Owl2Manager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Owl2Manager.m; sourceTree = "<group>"; };
+		36273651694F1319C6620B60 /* Pods_PrivacyProtect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivacyProtect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		52289FA42D9BD561006FF54E /* Owl2Manager+Database.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Owl2Manager+Database.h"; sourceTree = "<group>"; };
+		52289FA52D9BD561006FF54E /* Owl2Manager+Database.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Owl2Manager+Database.m"; sourceTree = "<group>"; };
+		52289FBE2D9D4A8B006FF54E /* Owl2Manager+Notification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Owl2Manager+Notification.h"; sourceTree = "<group>"; };
+		52289FBF2D9D4A8B006FF54E /* Owl2Manager+Notification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Owl2Manager+Notification.m"; sourceTree = "<group>"; };
+		52FDDEDB2DD2EDB000EFDD73 /* PrivacyProtect-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PrivacyProtect-Prefix.pch"; sourceTree = "<group>"; };
+		84ABFFA76FCAA860B1D880C4 /* Pods-PrivacyProtect.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivacyProtect.debug.xcconfig"; path = "../../Pods/Target Support Files/Pods-PrivacyProtect/Pods-PrivacyProtect.debug.xcconfig"; sourceTree = "<group>"; };
+		B3B01B25E9CCD907438AA8D3 /* Pods-PrivacyProtect.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivacyProtect.release.xcconfig"; path = "../../Pods/Target Support Files/Pods-PrivacyProtect/Pods-PrivacyProtect.release.xcconfig"; sourceTree = "<group>"; };
+		B70400352E1669AB000E9A62 /* Owl2WlAppItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Owl2WlAppItem.h; sourceTree = "<group>"; };
+		B70400362E1669AB000E9A62 /* Owl2WlAppItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Owl2WlAppItem.m; sourceTree = "<group>"; };
+		B71E86012DB22F3E000DB7C0 /* Owl2Manager+Guide.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Owl2Manager+Guide.h"; sourceTree = "<group>"; };
+		B71E86022DB22F3E000DB7C0 /* Owl2Manager+Guide.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Owl2Manager+Guide.m"; sourceTree = "<group>"; };
+		B7520AC52E15094A0060123F /* OwlWhitelistCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OwlWhitelistCell.h; sourceTree = "<group>"; };
+		B7520AC62E15094A0060123F /* OwlWhitelistCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OwlWhitelistCell.m; sourceTree = "<group>"; };
+		B7520AD52E161F1F0060123F /* OwlWhitelistFoldCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OwlWhitelistFoldCell.h; sourceTree = "<group>"; };
+		B7520AD62E161F1F0060123F /* OwlWhitelistFoldCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OwlWhitelistFoldCell.m; sourceTree = "<group>"; };
+		B7520AD92E161F4C0060123F /* OwlWhitelistExpandCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OwlWhitelistExpandCell.h; sourceTree = "<group>"; };
+		B7520ADA2E161F4C0060123F /* OwlWhitelistExpandCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OwlWhitelistExpandCell.m; sourceTree = "<group>"; };
+		B77131BC2DE5D9D20074302E /* NSAlert+OwlExtend.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSAlert+OwlExtend.h"; sourceTree = "<group>"; };
+		B77131BD2DE5D9D20074302E /* NSAlert+OwlExtend.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSAlert+OwlExtend.m"; sourceTree = "<group>"; };
+		B77E9C0D2DD31F050050712D /* Owl2AppItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Owl2AppItem.h; sourceTree = "<group>"; };
+		B77E9C0E2DD31F050050712D /* Owl2AppItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Owl2AppItem.m; sourceTree = "<group>"; };
+		B77E9C112DD31F620050712D /* Owl2LogProcessItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Owl2LogProcessItem.h; sourceTree = "<group>"; };
+		B77E9C122DD31F620050712D /* Owl2LogProcessItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Owl2LogProcessItem.m; sourceTree = "<group>"; };
+		B78CE37C2DD329EE00043976 /* Owl2NotificationItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Owl2NotificationItem.h; sourceTree = "<group>"; };
+		B78CE37D2DD329EE00043976 /* Owl2NotificationItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Owl2NotificationItem.m; sourceTree = "<group>"; };
+		B795DBF02DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Owl2DeviceProtectionSwitchView.h; sourceTree = "<group>"; };
+		B795DBF12DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Owl2DeviceProtectionSwitchView.m; sourceTree = "<group>"; };
+		B7AE642D2DB8896C006F128C /* OwlSelectViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OwlSelectViewController.h; sourceTree = "<group>"; };
+		B7AE642E2DB8896C006F128C /* OwlSelectViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OwlSelectViewController.m; sourceTree = "<group>"; };
+		B7BDBD002DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSUserNotification+QMExtensions.h"; sourceTree = "<group>"; };
+		B7BDBD012DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSUserNotification+QMExtensions.m"; sourceTree = "<group>"; };
+		B7BDBD222DB851CF00FB5ADF /* Owl2Manager+LocaFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Owl2Manager+LocaFile.h"; sourceTree = "<group>"; };
+		B7BDBD232DB851CF00FB5ADF /* Owl2Manager+LocaFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Owl2Manager+LocaFile.m"; sourceTree = "<group>"; };
+		B7D5A8A52DD5A49800635656 /* Owl2SelectAppItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Owl2SelectAppItem.h; sourceTree = "<group>"; };
+		B7D5A8A62DD5A49800635656 /* Owl2SelectAppItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Owl2SelectAppItem.m; sourceTree = "<group>"; };
+		B7D8F5552DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OwlNotificationPermissionViewController.h; sourceTree = "<group>"; };
+		B7D8F5562DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OwlNotificationPermissionViewController.m; sourceTree = "<group>"; };
+		C4B3172226458232006FC154 /* AVMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVMonitor.h; sourceTree = "<group>"; };
+		C4B3172326458232006FC154 /* Client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Client.h; sourceTree = "<group>"; };
+		C4B3172426458232006FC154 /* utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utilities.h; sourceTree = "<group>"; };
+		C4B3172526458232006FC154 /* LogMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogMonitor.m; sourceTree = "<group>"; };
+		C4B3172626458232006FC154 /* Client.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Client.m; sourceTree = "<group>"; };
+		C4B3172726458232006FC154 /* AVMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVMonitor.m; sourceTree = "<group>"; };
+		C4B3172826458232006FC154 /* LogMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogMonitor.h; sourceTree = "<group>"; };
+		C4B3172926458232006FC154 /* utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = utilities.m; sourceTree = "<group>"; };
+		C4B3172A26458232006FC154 /* consts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = consts.h; sourceTree = "<group>"; };
+		D49FA44D21DDA0F2004A416E /* PrivacyProtect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PrivacyProtect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D49FA45021DDA0F2004A416E /* PrivacyProtect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrivacyProtect.h; sourceTree = "<group>"; };
+		D49FA45121DDA0F2004A416E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D49FA4D421DDA5D9004A416E /* owlAsset.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = owlAsset.xcassets; sourceTree = "<group>"; };
+		D49FA4D721DDA5D9004A416E /* OwlConstant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OwlConstant.h; sourceTree = "<group>"; };
+		D49FA4E221DDA5D9004A416E /* OwlLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OwlLogViewController.m; sourceTree = "<group>"; };
+		D49FA4E421DDA5D9004A416E /* OwlTableRowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OwlTableRowView.m; sourceTree = "<group>"; };
+		D49FA4E721DDA5D9004A416E /* OwlWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OwlWindowController.h; sourceTree = "<group>"; };
+		D49FA4E821DDA5D9004A416E /* OwlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OwlViewController.h; sourceTree = "<group>"; };
+		D49FA4EB21DDA5D9004A416E /* OwlWhiteListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OwlWhiteListViewController.m; sourceTree = "<group>"; };
+		D49FA4ED21DDA5D9004A416E /* OwlTableRowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OwlTableRowView.h; sourceTree = "<group>"; };
+		D49FA4F021DDA5D9004A416E /* OwlLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OwlLogViewController.h; sourceTree = "<group>"; };
+		D49FA4F321DDA5D9004A416E /* OwlViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OwlViewController.m; sourceTree = "<group>"; };
+		D49FA4F421DDA5D9004A416E /* OwlWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OwlWindowController.m; sourceTree = "<group>"; };
+		D49FA4F621DDA5D9004A416E /* OwlWhiteListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OwlWhiteListViewController.h; sourceTree = "<group>"; };
+		D49FA51921DDA626004A416E /* QMMobileConnNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMMobileConnNotification.h; sourceTree = "<group>"; };
+		D49FA51A21DDA626004A416E /* QMMobileConnNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QMMobileConnNotification.m; sourceTree = "<group>"; };
+		D49FA51B21DDA626004A416E /* QMUserNotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUserNotificationCenter.h; sourceTree = "<group>"; };
+		D49FA51C21DDA626004A416E /* QMUserNotificationCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QMUserNotificationCenter.m; sourceTree = "<group>"; };
+		D4ACC032221D76C500DF0B7B /* LemonDaemonConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LemonDaemonConst.h; path = ../../LemonDaemon/LemonDaemon/LemonDaemonConst.h; sourceTree = "<group>"; };
+		D5F5FA76264A377200A499BE /* Event.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
+		D5F5FA77264A377200A499BE /* Event.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Event.m; sourceTree = "<group>"; };
+		F87C5ADA2243341600619DCE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F87C5ADC2243342400619DCE /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D49FA44921DDA0F2004A416E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C056A793D8556494C303D17F /* (null) in Frameworks */,
+				1163F6B30B6FB82202ADD85C /* Pods_PrivacyProtect.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		26A375270F1C94AAB3201F06 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				36273651694F1319C6620B60 /* Pods_PrivacyProtect.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6C05F832021AFF15029E6F7F /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				84ABFFA76FCAA860B1D880C4 /* Pods-PrivacyProtect.debug.xcconfig */,
+				B3B01B25E9CCD907438AA8D3 /* Pods-PrivacyProtect.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		B77E9C022DD31D0D0050712D /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				B77E9C112DD31F620050712D /* Owl2LogProcessItem.h */,
+				B77E9C122DD31F620050712D /* Owl2LogProcessItem.m */,
+				B77E9C0D2DD31F050050712D /* Owl2AppItem.h */,
+				B77E9C0E2DD31F050050712D /* Owl2AppItem.m */,
+				B7D5A8A52DD5A49800635656 /* Owl2SelectAppItem.h */,
+				B7D5A8A62DD5A49800635656 /* Owl2SelectAppItem.m */,
+				B70400352E1669AB000E9A62 /* Owl2WlAppItem.h */,
+				B70400362E1669AB000E9A62 /* Owl2WlAppItem.m */,
+				B78CE37C2DD329EE00043976 /* Owl2NotificationItem.h */,
+				B78CE37D2DD329EE00043976 /* Owl2NotificationItem.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		B795DBED2DDD78C1005A0C2E /* View */ = {
+			isa = PBXGroup;
+			children = (
+				B795DBF02DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.h */,
+				B795DBF12DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.m */,
+				B77131BC2DE5D9D20074302E /* NSAlert+OwlExtend.h */,
+				B77131BD2DE5D9D20074302E /* NSAlert+OwlExtend.m */,
+				B7520AC52E15094A0060123F /* OwlWhitelistCell.h */,
+				B7520AC62E15094A0060123F /* OwlWhitelistCell.m */,
+				B7520AD52E161F1F0060123F /* OwlWhitelistFoldCell.h */,
+				B7520AD62E161F1F0060123F /* OwlWhitelistFoldCell.m */,
+				B7520AD92E161F4C0060123F /* OwlWhitelistExpandCell.h */,
+				B7520ADA2E161F4C0060123F /* OwlWhitelistExpandCell.m */,
+				D49FA4ED21DDA5D9004A416E /* OwlTableRowView.h */,
+				D49FA4E421DDA5D9004A416E /* OwlTableRowView.m */,
+				2A2853E72DCAF8F7004DD03D /* OwlListPlaceHolderView.h */,
+				2A2853E82DCAF8F7004DD03D /* OwlListPlaceHolderView.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		C4B3172126458232006FC154 /* Owl2 */ = {
+			isa = PBXGroup;
+			children = (
+				B795DBED2DDD78C1005A0C2E /* View */,
+				D49FA4E121DDA5D9004A416E /* Controller */,
+				B77E9C022DD31D0D0050712D /* Model */,
+				C4B3172226458232006FC154 /* AVMonitor.h */,
+				C4B3172726458232006FC154 /* AVMonitor.m */,
+				C4B3172326458232006FC154 /* Client.h */,
+				C4B3172626458232006FC154 /* Client.m */,
+				C4B3172A26458232006FC154 /* consts.h */,
+				C4B3172826458232006FC154 /* LogMonitor.h */,
+				C4B3172526458232006FC154 /* LogMonitor.m */,
+				C4B3172426458232006FC154 /* utilities.h */,
+				C4B3172926458232006FC154 /* utilities.m */,
+				D5F5FA76264A377200A499BE /* Event.h */,
+				D5F5FA77264A377200A499BE /* Event.m */,
+				339CCC672D97D95D00F8C67A /* Owl2Manager.h */,
+				339CCC682D97D95D00F8C67A /* Owl2Manager.m */,
+				52289FBE2D9D4A8B006FF54E /* Owl2Manager+Notification.h */,
+				52289FBF2D9D4A8B006FF54E /* Owl2Manager+Notification.m */,
+				52289FA42D9BD561006FF54E /* Owl2Manager+Database.h */,
+				52289FA52D9BD561006FF54E /* Owl2Manager+Database.m */,
+				B71E86012DB22F3E000DB7C0 /* Owl2Manager+Guide.h */,
+				B71E86022DB22F3E000DB7C0 /* Owl2Manager+Guide.m */,
+				B7BDBD222DB851CF00FB5ADF /* Owl2Manager+LocaFile.h */,
+				B7BDBD232DB851CF00FB5ADF /* Owl2Manager+LocaFile.m */,
+			);
+			path = Owl2;
+			sourceTree = "<group>";
+		};
+		D49FA44321DDA0F1004A416E = {
+			isa = PBXGroup;
+			children = (
+				D49FA44F21DDA0F2004A416E /* PrivacyProtect */,
+				D49FA44E21DDA0F2004A416E /* Products */,
+				6C05F832021AFF15029E6F7F /* Pods */,
+				26A375270F1C94AAB3201F06 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		D49FA44E21DDA0F2004A416E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D49FA44D21DDA0F2004A416E /* PrivacyProtect.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D49FA44F21DDA0F2004A416E /* PrivacyProtect */ = {
+			isa = PBXGroup;
+			children = (
+				D49FA4D321DDA5D9004A416E /* PrivacyProtect */,
+				D49FA51D21DDA626004A416E /* MobileNotification */,
+				D49FA45021DDA0F2004A416E /* PrivacyProtect.h */,
+				D4ACC032221D76C500DF0B7B /* LemonDaemonConst.h */,
+				52FDDEDB2DD2EDB000EFDD73 /* PrivacyProtect-Prefix.pch */,
+				D49FA45121DDA0F2004A416E /* Info.plist */,
+				F87C5AD62243340A00619DCE /* Resources */,
+			);
+			path = PrivacyProtect;
+			sourceTree = "<group>";
+		};
+		D49FA4D321DDA5D9004A416E /* PrivacyProtect */ = {
+			isa = PBXGroup;
+			children = (
+				D49FA4D721DDA5D9004A416E /* OwlConstant.h */,
+				C4B3172126458232006FC154 /* Owl2 */,
+				D49FA4D421DDA5D9004A416E /* owlAsset.xcassets */,
+			);
+			path = PrivacyProtect;
+			sourceTree = "<group>";
+		};
+		D49FA4E121DDA5D9004A416E /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				D49FA4E721DDA5D9004A416E /* OwlWindowController.h */,
+				D49FA4F421DDA5D9004A416E /* OwlWindowController.m */,
+				D49FA4E821DDA5D9004A416E /* OwlViewController.h */,
+				D49FA4F321DDA5D9004A416E /* OwlViewController.m */,
+				D49FA4F621DDA5D9004A416E /* OwlWhiteListViewController.h */,
+				D49FA4EB21DDA5D9004A416E /* OwlWhiteListViewController.m */,
+				D49FA4F021DDA5D9004A416E /* OwlLogViewController.h */,
+				D49FA4E221DDA5D9004A416E /* OwlLogViewController.m */,
+				B7D8F5552DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.h */,
+				B7D8F5562DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.m */,
+				B7AE642D2DB8896C006F128C /* OwlSelectViewController.h */,
+				B7AE642E2DB8896C006F128C /* OwlSelectViewController.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		D49FA51D21DDA626004A416E /* MobileNotification */ = {
+			isa = PBXGroup;
+			children = (
+				D49FA51921DDA626004A416E /* QMMobileConnNotification.h */,
+				D49FA51A21DDA626004A416E /* QMMobileConnNotification.m */,
+				D49FA51B21DDA626004A416E /* QMUserNotificationCenter.h */,
+				D49FA51C21DDA626004A416E /* QMUserNotificationCenter.m */,
+				B7BDBD002DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.h */,
+				B7BDBD012DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.m */,
+			);
+			name = MobileNotification;
+			path = ../../../Lemon/MobileNotification;
+			sourceTree = "<group>";
+		};
+		F87C5AD62243340A00619DCE /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F87C5ADB2243341600619DCE /* Localizable.strings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D49FA44A21DDA0F2004A416E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C4B3172D26458232006FC154 /* utilities.h in Headers */,
+				B7520ADC2E161F4C0060123F /* OwlWhitelistExpandCell.h in Headers */,
+				B77E9C102DD31F050050712D /* Owl2AppItem.h in Headers */,
+				B7BDBD252DB851CF00FB5ADF /* Owl2Manager+LocaFile.h in Headers */,
+				B77E9C062DD31E450050712D /* Owl2Manager+QMReport.h in Headers */,
+				D49FA50821DDA5D9004A416E /* OwlWindowController.h in Headers */,
+				2A2853E92DCAF8F7004DD03D /* OwlListPlaceHolderView.h in Headers */,
+				339CCC6A2D97D95D00F8C67A /* Owl2Manager.h in Headers */,
+				B77E9C142DD31F620050712D /* Owl2LogProcessItem.h in Headers */,
+				B77131BE2DE5D9D20074302E /* NSAlert+OwlExtend.h in Headers */,
+				B71E86032DB22F3E000DB7C0 /* Owl2Manager+Guide.h in Headers */,
+				B7FCD2412C2AB88D00351D31 /* QMUserNotificationCenter.h in Headers */,
+				B7520AD82E161F1F0060123F /* OwlWhitelistFoldCell.h in Headers */,
+				D49FA50921DDA5D9004A416E /* OwlViewController.h in Headers */,
+				C4B3172C26458232006FC154 /* Client.h in Headers */,
+				D4ACC033221D76C500DF0B7B /* LemonDaemonConst.h in Headers */,
+				52FDDEDC2DD2EDB000EFDD73 /* PrivacyProtect-Prefix.pch in Headers */,
+				52289FC12D9D4A8B006FF54E /* Owl2Manager+Notification.h in Headers */,
+				C4B3173126458232006FC154 /* LogMonitor.h in Headers */,
+				52289FA72D9BD561006FF54E /* Owl2Manager+Database.h in Headers */,
+				D49FA4FA21DDA5D9004A416E /* OwlConstant.h in Headers */,
+				B70400372E1669AB000E9A62 /* Owl2WlAppItem.h in Headers */,
+				D5F5FA78264A377200A499BE /* Event.h in Headers */,
+				B795DBF32DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.h in Headers */,
+				C4B3172B26458232006FC154 /* AVMonitor.h in Headers */,
+				B7D8F5582DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.h in Headers */,
+				B7520AC82E15094A0060123F /* OwlWhitelistCell.h in Headers */,
+				C4B3173326458232006FC154 /* consts.h in Headers */,
+				D49FA45221DDA0F2004A416E /* PrivacyProtect.h in Headers */,
+				B78CE37F2DD329EE00043976 /* Owl2NotificationItem.h in Headers */,
+				D49FA51721DDA5D9004A416E /* OwlWhiteListViewController.h in Headers */,
+				D49FA50E21DDA5D9004A416E /* OwlTableRowView.h in Headers */,
+				B7D5A8A82DD5A49800635656 /* Owl2SelectAppItem.h in Headers */,
+				B7AE64302DB8896C006F128C /* OwlSelectViewController.h in Headers */,
+				B7BDBD032DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.h in Headers */,
+				D49FA51121DDA5D9004A416E /* OwlLogViewController.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D49FA44C21DDA0F2004A416E /* PrivacyProtect */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D49FA45521DDA0F2004A416E /* Build configuration list for PBXNativeTarget "PrivacyProtect" */;
+			buildPhases = (
+				B46BFB60BD53FD314DEC6AD2 /* [CP] Check Pods Manifest.lock */,
+				D49FA44821DDA0F2004A416E /* Sources */,
+				D49FA44921DDA0F2004A416E /* Frameworks */,
+				D49FA44A21DDA0F2004A416E /* Headers */,
+				D49FA44B21DDA0F2004A416E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PrivacyProtect;
+			productName = PrivacyProtect;
+			productReference = D49FA44D21DDA0F2004A416E /* PrivacyProtect.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D49FA44421DDA0F1004A416E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0930;
+				ORGANIZATIONNAME = Tencent;
+				TargetAttributes = {
+					D49FA44C21DDA0F2004A416E = {
+						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 1620;
+					};
+				};
+			};
+			buildConfigurationList = D49FA44721DDA0F1004A416E /* Build configuration list for PBXProject "PrivacyProtect" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+			);
+			mainGroup = D49FA44321DDA0F1004A416E;
+			productRefGroup = D49FA44E21DDA0F2004A416E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D49FA44C21DDA0F2004A416E /* PrivacyProtect */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D49FA44B21DDA0F2004A416E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D49FA4F821DDA5D9004A416E /* owlAsset.xcassets in Resources */,
+				F87C5AD92243341600619DCE /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B46BFB60BD53FD314DEC6AD2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PrivacyProtect-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D49FA44821DDA0F2004A416E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D49FA52421DDA73D004A416E /* QMMobileConnNotification.m in Sources */,
+				B70400382E1669AB000E9A62 /* Owl2WlAppItem.m in Sources */,
+				B7AE642F2DB8896C006F128C /* OwlSelectViewController.m in Sources */,
+				D49FA52521DDA73D004A416E /* QMUserNotificationCenter.m in Sources */,
+				B77131BF2DE5D9D20074302E /* NSAlert+OwlExtend.m in Sources */,
+				B77E9C0F2DD31F050050712D /* Owl2AppItem.m in Sources */,
+				D49FA51521DDA5D9004A416E /* OwlWindowController.m in Sources */,
+				D49FA50321DDA5D9004A416E /* OwlLogViewController.m in Sources */,
+				B77E9C132DD31F620050712D /* Owl2LogProcessItem.m in Sources */,
+				B7520AD72E161F1F0060123F /* OwlWhitelistFoldCell.m in Sources */,
+				B7BDBD242DB851CF00FB5ADF /* Owl2Manager+LocaFile.m in Sources */,
+				52289FA62D9BD561006FF54E /* Owl2Manager+Database.m in Sources */,
+				C4B3172E26458232006FC154 /* LogMonitor.m in Sources */,
+				B7BDBD022DB77C1B00FB5ADF /* NSUserNotification+QMExtensions.m in Sources */,
+				C4B3173226458232006FC154 /* utilities.m in Sources */,
+				C4B3172F26458232006FC154 /* Client.m in Sources */,
+				52289FC02D9D4A8B006FF54E /* Owl2Manager+Notification.m in Sources */,
+				B7520AC72E15094A0060123F /* OwlWhitelistCell.m in Sources */,
+				D49FA51421DDA5D9004A416E /* OwlViewController.m in Sources */,
+				339CCC692D97D95D00F8C67A /* Owl2Manager.m in Sources */,
+				D5F5FA79264A377200A499BE /* Event.m in Sources */,
+				D49FA50C21DDA5D9004A416E /* OwlWhiteListViewController.m in Sources */,
+				2A2853EA2DCAF8F7004DD03D /* OwlListPlaceHolderView.m in Sources */,
+				B78CE37E2DD329EE00043976 /* Owl2NotificationItem.m in Sources */,
+				B7520ADB2E161F4C0060123F /* OwlWhitelistExpandCell.m in Sources */,
+				B71E86042DB22F3E000DB7C0 /* Owl2Manager+Guide.m in Sources */,
+				B7D5A8A72DD5A49800635656 /* Owl2SelectAppItem.m in Sources */,
+				B795DBF22DDD7AC5005A0C2E /* Owl2DeviceProtectionSwitchView.m in Sources */,
+				D49FA50521DDA5D9004A416E /* OwlTableRowView.m in Sources */,
+				B7D8F5572DB5E2AF00D5D00E /* OwlNotificationPermissionViewController.m in Sources */,
+				C4B3173026458232006FC154 /* AVMonitor.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		F87C5ADB2243341600619DCE /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F87C5ADA2243341600619DCE /* en */,
+				F87C5ADC2243342400619DCE /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D49FA45321DDA0F2004A416E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		D49FA45421DDA0F2004A416E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		D49FA45621DDA0F2004A416E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 84ABFFA76FCAA860B1D880C4 /* Pods-PrivacyProtect.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application: Tencent Technology (Shenzhen) Company Limited (88L2Q4487U)";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/PrivacyProtect/PrivacyProtect-Prefix.pch";
+				INFOPLIST_FILE = PrivacyProtect/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.PrivacyProtect;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		D49FA45721DDA0F2004A416E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B3B01B25E9CCD907438AA8D3 /* Pods-PrivacyProtect.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application: Tencent Technology (Shenzhen) Company Limited (88L2Q4487U)";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/PrivacyProtect/PrivacyProtect-Prefix.pch";
+				INFOPLIST_FILE = PrivacyProtect/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.PrivacyProtect;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D49FA44721DDA0F1004A416E /* Build configuration list for PBXProject "PrivacyProtect" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D49FA45321DDA0F2004A416E /* Debug */,
+				D49FA45421DDA0F2004A416E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D49FA45521DDA0F2004A416E /* Build configuration list for PBXNativeTarget "PrivacyProtect" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D49FA45621DDA0F2004A416E /* Debug */,
+				D49FA45721DDA0F2004A416E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D49FA44421DDA0F1004A416E /* Project object */;
+}

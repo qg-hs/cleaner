@@ -1,0 +1,9 @@
+/* 
+  Localizable.strings
+  LemonLoginItemManager
+
+  
+  Copyright © 2020 Tencent. All rights reserved.
+*/
+
+"搜索到以下多个开机自启项:" = "搜索到以下 %d 个开机自启项:";

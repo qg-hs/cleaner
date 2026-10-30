@@ -1,0 +1,31 @@
+/* 
+  Localizable.strings
+  LemonLoginItemManager
+
+  
+  Copyright © 2020 Tencent. All rights reserved.
+*/
+
+"开机启动项管理" = "Startup items";
+
+"加载中，请耐心等待..." = "Loading... Please wait a moment";
+"搜索" = "Search";
+"搜索到以下 %d 个开机自启项:" = "%d result match:";
+"搜索到以下多个开机自启项:" = "%d result matches:";
+
+"暂未搜索到相关结果" = "No matching results";
+"未找到开机启动项" = "No startup items on your Mac.";
+
+"应用程序" = "Applications";
+"启用状态" = "Status";
+"设置启动项" = "Option";
+"开机自启项" = "Items";
+"全部开启" = "All open";
+"部分开启" = "Partially open";
+"全部关闭" = "All closed";
+"已禁止" = "Disabled";
+"%ld 项" = "%ld items";
+
+"应用启动项" = "Login items";
+"后台服务项" = "Launch agents";
+"未知应用" = "Unknown applicaions";

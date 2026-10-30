@@ -1,0 +1,39 @@
+{
+  "name": "LemonHardware",
+  "version": "0.1.0",
+  "summary": "A short description of LemonHardware.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/lemon/LemonHardware",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "lemon": "lemon@tencent.com"
+  },
+  "source": {
+    "git": "https://github.com/lemon/LemonHardware.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "osx": "10.11"
+  },
+  "source_files": "LemonHardware/Classes/**/*",
+  "resources": [
+    "LemonHardware/Assets/**/*"
+  ],
+  "public_header_files": [
+    "LemonHardware/Classes/Controller/LemonHardwareWindowController.h",
+    "LemonHardware/Classes/Model/DiskModel.h",
+    "LemonHardware/Classes/Model/BaseModel.h",
+    "LemonHardware/Classes/Model/MachineModel.h",
+    "LemonHardware/Classes/Model/HardwareHeader.h"
+  ],
+  "dependencies": {
+    "Masonry": [
+      "~> 1.1.0"
+    ],
+    "QMCoreFunction": [],
+    "QMUICommon": []
+  }
+}

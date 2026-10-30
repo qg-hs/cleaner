@@ -1,0 +1,11 @@
+/* 
+  InfoPlist.strings
+  Lemon
+
+  
+  Copyright © 2019 Tencent. All rights reserved.
+*/
+"CFBundleDisplayName" = "cleaner";
+"CFBundleName" = "cleaner";
+"NSAppleEventsUsageDescription" = "cleaner cannot delete photos in photo library directly. The similar photos will be moved to a new folder. Please grant cleaner permission to create the new folder. ";
+"NSPhotoLibraryUsageDescription" = "Please grant cleaner permission to scan photos in photo library. ";

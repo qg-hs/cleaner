@@ -1,0 +1,117 @@
+/*
+ Localizable.strings
+ PrivacyProtect
+ 
+ 
+ Copyright © 2019 Tencent. All rights reserved.
+ */
+
+"正在使用摄像头" = "Is using your webcam";
+"正在使用麦克风" = "Is using your mic";
+
+"允许" = "Allow";
+"阻止" = "Block";
+"关闭" = "Close";
+"App会被强制退出，以防继续使用摄像头" = "Quit Apps to Prevent Webcam Access";
+"App会被强制退出，以防继续使用麦克风" = "Quit Apps to Prevent Mic Access";
+"App会被强制退出，以防继续使用扬声器" = "Quit Apps to Prevent Speaker Audio Access";
+"App会被强制退出，以防继续使用屏幕内容" = "Quit Apps to Prevent Screen Access";
+"App会被强制退出，以防继续自动操作电脑" = "Quit Apps to Prevent Computer Control";
+"确定要阻止吗？" = "Are you sure to block it？";
+"是否要始终允许（加入白名单）？" = "Always allow it to use your webcam and mic（add it to whitelist）?";
+"若始终允许，以后该进程使用时将不再提示" = "If always allow, you'll not get notifications when it access your webcam or mic";
+"时间" = "Time";
+"事件" = "Event";
+"取消" = "Cancel";
+"确定" = "Yes";
+"确认" = "OK";
+"已勾选 %d 款" = " %d Apps selected";
+"摄像头" = "Cam";
+"麦克风" = "Mic";
+"屏幕内容" = "Screen";
+"移除" = "Remove";
+"截屏&录屏" = "Screenshot&Recording";
+"系统应用" = "Build-in app";
+"第三方应用" = "Third-party app";
+"都取消信任会把app移出白名单。需要移除吗？" = "It will be removed from whitelist if you deny access to all. Are you sure to remove？";
+"保留" = "Cancel";
+"添加" = "Add";
+"白名单" = "Whitelist";
+"应用类型" = "Type";
+"正在初始化数据..." = "Initializing...";
+
+"摄像头保护" = "Camera Access Alert";
+"系统音频保护" = "Audio Access Alert";
+"屏幕保护" = "Screen Access Alert";
+"屏幕信息保护" = "Screen Access Alert";
+"自动操作提示" = "Automation Alert";
+"自动化接口被调用时提示，接口可操作电脑和访问隐私数据" = "Notify on Automation APIs Request (May Control Computer or Access Private Data)";
+
+"软件调用摄像头时提示" = "Notify on Cam Access Request";
+"软件调用麦克风或录制音频时提示" = "Notify on Mic and System Audio Recording Access Request";
+"软件截取或录制屏幕信息时提示" = "Notify on Screen Recording Request";
+
+"监控日志" = "Activity log";
+"白名单（%lu）" = "Whitelist（%lu）";
+"麦克风保护已开启" = "Mic access alert enabled";
+"将在麦克风被调用时提醒你哦！" = "You'll get notifications when your mic is accessed.";
+"关闭" = "Close";
+"始终允许" = "Always allow";
+"仅本次允许" = "Allow once";
+"摄像头保护已开启" = "Webcam access alert is enabled.";
+"将在摄像头被调用时提醒你哦！" = "You'll get notifications when your webcam is accessed.";
+
+"请开启通知提醒权限" = "Enable Notification Permissions";
+"若存在摄像头、麦克风或扬声器等隐私设备被调用情况，将发送通知告知隐私保护的情况" = "Notifications will alert you when a privacy device (e.g., camera, microphone, or speaker) is accessed";
+"步骤：\n【系统设置】——【通知】——【应用程序通知】——开启【LemonMonitor】" = "Path:\n [System Settings] → [Notifications] → [Application Notifications] → Enable [LemonMonitor]";
+"取消" = "Cancel";
+"操作" = "Operation";
+"软件进程" = "Software Process";
+"操作记录" = "Operation Log";
+"本次允许" = "Allow Once";
+"默认允许" = "Default Allow";
+"永久允许" = "Always Allow";
+"阻止" = "Block";
+"隐私保护提示" = "Privacy Protection Alert";
+"隐私保护" = "Privacy Protection";
+"设备隐私保护" = "Device Privacy Protection";
+
+"开始使用" = "Start Using ";
+"结束使用" = "Stop Using ";
+"停止使用摄像头" = "Stop using cam";
+"停止使用麦克风" = "Stop using mic";
+"录制音频" = "Record Audio";
+"开始录制扬声器音频" = "Start audio capture";
+"结束录制扬声器音频" = "Stop audio capture";
+"已截取屏幕内容" = "Start capture screen";
+"开始录制屏幕内容" = "Start recording screen";
+"结束录制屏幕内容" = "Stop recording screen";
+"开始录制" = "Start Capture ";
+"结束录制" = "Stop Capture ";
+"已截取" = "Captured ";
+
+"系统应用" = "Build-in app";
+"第三方应用" = "Third-party app";
+"应用类型" = "Type";
+"添加应用" = "Add App";
+"应用列表" = "Application List";
+
+"暂无可添加应用" = "No Apps Available to Add";
+"暂无白名单应用" = "No Apps in Allow List";
+
+"请开启通知权限以接收隐私保护提示" = "Please grant notification permissions to receive privacy protection alerts";
+"查看详情" = "More details";
+
+"屏幕信息保护仅支持15.0及以上macOS版本，建议版本升级后继续开启。" = "Upgrade to macOS 15.0 or later to enable Screen Privacy Protection.
+";
+
+"项" = " items";
+"自动操作" = "Automation";
+"允许权限管理" = "Manage A. P.";
+"权限类型" = "Permission Types";
+"已允许权限类型" = "Allowed Permissions";
+"自动操作电脑" = "Control Computer";
+"正在自动操作电脑" = " is controlling your computer";
+"可能修改设置或访问隐私数据" = "May modify settings or access private data";
+"开启" = "Enable";
+"未开启" = "Not enabled";
