@@ -1,4 +1,4 @@
-<garbage version="2024.03.21.1">
+<garbage version="2026.10.31.1">
     <filters>
         <!--临时目录下的缓存过滤-->
         <filter id="1" column="filename" relation="is" value="com.apple.dock" action="exclude"/>
@@ -266,7 +266,162 @@
                 <title><![CDATA[Sketch Cache Data]]></title>
                 <path type="abs" level="0" value="/.DocumentRevisions-V100/"/>
             </action>
-        </item>        
+        </item>
+        <!-- Full-Stack Developer Toolchains & Modern Apps (Mole Integration) -->
+        <item id="2201" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[Node.js Caches]]></title>
+            <tips><![CDATA[npm, pnpm, Yarn, and Bun package caches]]></tips>
+            <action id="22011" type="file" recommend="YES">
+                <title><![CDATA[npm Cache]]></title>
+                <path type="abs" level="1" value="~/.npm/_cacache/"/>
+                <path type="abs" level="1" value="~/.npm/_logs/"/>
+            </action>
+            <action id="22012" type="file" recommend="YES">
+                <title><![CDATA[pnpm Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/pnpm/"/>
+                <path type="abs" level="1" value="~/Library/pnpm/store/"/>
+            </action>
+            <action id="22013" type="file" recommend="YES">
+                <title><![CDATA[Yarn Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/Yarn/"/>
+                <path type="abs" level="1" value="~/.yarn/berry/cache/"/>
+            </action>
+            <action id="22014" type="file" recommend="YES">
+                <title><![CDATA[Bun / Turbo Cache]]></title>
+                <path type="abs" level="1" value="~/.bun/install/cache/"/>
+                <path type="abs" level="1" value="~/.cache/corepack/"/>
+                <path type="abs" level="1" value="~/Library/Caches/turbo/"/>
+            </action>
+        </item>
+        <item id="2202" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[Python Caches]]></title>
+            <tips><![CDATA[pip, uv, Poetry, and Conda package caches]]></tips>
+            <action id="22021" type="file" recommend="YES">
+                <title><![CDATA[pip Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/pip/"/>
+                <path type="abs" level="1" value="~/.cache/pip/"/>
+            </action>
+            <action id="22022" type="file" recommend="YES">
+                <title><![CDATA[uv Cache]]></title>
+                <path type="abs" level="1" value="~/.cache/uv/"/>
+                <path type="abs" level="1" value="~/Library/Caches/uv/"/>
+            </action>
+            <action id="22023" type="file" recommend="YES">
+                <title><![CDATA[Poetry / Conda Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/pypoetry/"/>
+                <path type="abs" level="1" value="~/.conda/pkgs/cache/"/>
+            </action>
+        </item>
+        <item id="2203" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[Rust & Go Caches]]></title>
+            <tips><![CDATA[Cargo archives and Go build caches]]></tips>
+            <action id="22031" type="file" recommend="YES">
+                <title><![CDATA[Cargo Cache]]></title>
+                <path type="abs" level="1" value="~/.cargo/registry/cache/"/>
+            </action>
+            <action id="22032" type="file" recommend="YES">
+                <title><![CDATA[Go Build Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/go-build/"/>
+            </action>
+        </item>
+        <item id="2204" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[Package Managers]]></title>
+            <tips><![CDATA[Homebrew, CocoaPods, and Gradle caches]]></tips>
+            <action id="22041" type="file" recommend="YES">
+                <title><![CDATA[Homebrew Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/Homebrew/downloads/"/>
+                <path type="abs" level="1" value="~/Library/Logs/Homebrew/"/>
+            </action>
+            <action id="22042" type="file" recommend="YES">
+                <title><![CDATA[CocoaPods Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/CocoaPods/"/>
+            </action>
+            <action id="22043" type="file" recommend="NO">
+                <title><![CDATA[Gradle Cache]]></title>
+                <path type="abs" level="1" value="~/.gradle/caches/build-cache-1/"/>
+                <path type="abs" level="1" value="~/.gradle/daemon/"/>
+            </action>
+        </item>
+        <item id="2205" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="com.microsoft.VSCode">
+            <title><![CDATA[VS Code]]></title>
+            <tips><![CDATA[Render caches, VSIX backups, and logs]]></tips>
+            <action id="22051" type="file" recommend="YES">
+                <title><![CDATA[Runtime & Extension Caches]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/CachedData/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/GPUCache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/CachedExtensionVSIXs/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.microsoft.VSCode/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.microsoft.VSCode.ShipIt/"/>
+            </action>
+            <action id="22052" type="file" recommend="YES">
+                <title><![CDATA[Logs]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/logs/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/Crashpad/completed/"/>
+            </action>
+        </item>
+        <item id="2206" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="com.todesktop.230313mzl4w4u92">
+            <title><![CDATA[Cursor]]></title>
+            <tips><![CDATA[Editor caches and logs]]></tips>
+            <action id="22061" type="file" recommend="YES">
+                <title><![CDATA[Runtime & Extension Caches]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/CachedData/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/GPUCache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/CachedExtensionVSIXs/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.todesktop.230313mzl4w4u92/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.todesktop.230313mzl4w4u92.ShipIt/"/>
+            </action>
+            <action id="22062" type="file" recommend="YES">
+                <title><![CDATA[Logs]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/logs/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/Crashpad/completed/"/>
+            </action>
+        </item>
+        <item id="2207" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[JetBrains IDE]]></title>
+            <tips><![CDATA[IDEA / PyCharm / GoLand caches and logs]]></tips>
+            <action id="22071" type="file" recommend="YES">
+                <title><![CDATA[Logs]]></title>
+                <path type="abs" level="1" value="~/Library/Logs/JetBrains/"/>
+            </action>
+            <action id="22072" type="file" recommend="NO">
+                <title><![CDATA[Local Caches]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/JetBrains/"/>
+            </action>
+        </item>
+        <item id="2208" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[Feishu / Lark]]></title>
+            <tips><![CDATA[Web and GPU rendering caches]]></tips>
+            <action id="22081" type="file" recommend="YES">
+                <title><![CDATA[Render Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/com.electron.lark/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.bytedance.lark/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/LarkShell/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/LarkShell/GPUCache/"/>
+            </action>
+        </item>
+        <item id="2209" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="notion.id">
+            <title><![CDATA[Notion]]></title>
+            <tips><![CDATA[Web and GPU rendering caches]]></tips>
+            <action id="22091" type="file" recommend="YES">
+                <title><![CDATA[Render Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Notion/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Notion/Code Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Notion/GPUCache/"/>
+                <path type="abs" level="1" value="~/Library/Caches/notion.id/"/>
+                <path type="abs" level="1" value="~/Library/Caches/notion.id.ShipIt/"/>
+            </action>
+        </item>
+        <item id="2210" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="com.lemon.lvpro">
+            <title><![CDATA[Jianying Pro]]></title>
+            <tips><![CDATA[Temporary render and media caches]]></tips>
+            <action id="22101" type="file" recommend="YES">
+                <title><![CDATA[Jianying Cache]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/com.lemon.lvpro/"/>
+                <path type="abs" level="1" value="~/Library/Containers/com.lemon.lvpro/Data/Library/Caches/"/>
+            </action>
+        </item>
     </category>
     
     <category id="3">
@@ -345,6 +500,26 @@
             <!--Internet Cache-->
             <action id="3111" type="file" recommend="YES">
                 <path type="abs" level="0" value="~/Library/Caches/Microsoft Edge/Default/Cache/"/>
+            </action>
+        </item>
+        <item id="313" recommend="YES" showresult="YES" fastmode="NO" bundleid="company.thebrowser.Browser">
+            <title><![CDATA[Arc]]></title>
+            <tips><![CDATA[Webpages and GPU resources cached by Arc Browser]]></tips>
+            <action id="3131" type="file" recommend="YES">
+                <path type="abs" level="1" value="~/Library/Caches/Arc/"/>
+                <path type="abs" level="1" value="~/Library/Caches/company.thebrowser.Browser/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/Default/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/Default/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/Default/GPUCache/"/>
+            </action>
+        </item>
+        <item id="314" recommend="YES" showresult="YES" fastmode="NO" bundleid="com.brave.Browser">
+            <title><![CDATA[Brave]]></title>
+            <tips><![CDATA[Webpages and static resources cached by Brave Browser]]></tips>
+            <action id="3141" type="file" recommend="YES">
+                <path type="abs" level="0" value="~/Library/Caches/BraveSoftware/Brave-Browser/Default/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/Default/GPUCache/"/>
             </action>
         </item>
         <item id="312" recommend="YES" fastmode="NO">

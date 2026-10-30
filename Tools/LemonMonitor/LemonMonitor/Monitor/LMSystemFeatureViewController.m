@@ -68,6 +68,7 @@ static NSString * const kPidKey = @"pid";
 @property (nonatomic, strong) LMPPSmallComponentView * audioComponentView;
 @property (nonatomic, strong) LMPPSmallComponentView * screenComponentView;
 @property (nonatomic, strong) LMPPSmallComponentView * automaticComponentView;
+@property (nonatomic, weak) NSButton *flushDNSButton;
 
 @end
 
@@ -302,6 +303,13 @@ static NSString * const kPidKey = @"pid";
     downSpeedKbLable.stringValue = @"KB/s";
     [infoContainerView addSubview:downSpeedKbLable];
     self.downSpeedKbLabel = downSpeedKbLable;
+
+    NSString *dnsBtnTitle = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeChinese) ? @"刷新DNS" : @"Flush DNS";
+    NSButton *flushDNSBtn = [LMViewHelper createNormalTextButton:12 title:dnsBtnTitle textColor:[NSColor colorWithHex:0x1A83F7]];
+    flushDNSBtn.target = self;
+    flushDNSBtn.action = @selector(clickFlushDNSButton);
+    [infoContainerView addSubview:flushDNSBtn];
+    self.flushDNSButton = flushDNSBtn;
     
     [diskContainerView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self.view).offset(105);
@@ -368,6 +376,58 @@ static NSString * const kPidKey = @"pid";
         make.centerY.equalTo(downSpeedLabel);
         make.left.equalTo(downSpeedLabel.mas_right).offset(3);
     }];
+
+    [flushDNSBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(infoContainerView);
+        make.right.equalTo(infoContainerView).offset(-20);
+    }];
+}
+
+- (void)clickFlushDNSButton {
+    if (!self.flushDNSButton.isEnabled) {
+        return;
+    }
+    self.flushDNSButton.enabled = NO;
+    BOOL isZh = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeChinese);
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        BOOL ok = NO;
+        if ([[NSFileManager defaultManager] isExecutableFileAtPath:@"/usr/bin/dscacheutil"]) {
+            NSTask *task = [[NSTask alloc] init];
+            task.launchPath = @"/usr/bin/dscacheutil";
+            task.arguments = @[@"-flushcache"];
+            task.standardOutput = [NSPipe pipe];
+            task.standardError = [NSPipe pipe];
+            @try {
+                [task launch];
+                [task waitUntilExit];
+                ok = (task.terminationStatus == 0);
+            } @catch (NSException *ex) {
+                ok = NO;
+            }
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf || !strongSelf.flushDNSButton) return;
+            NSString *feedback = ok ? (isZh ? @"✓ 已刷新" : @"✓ Flushed") : (isZh ? @"刷新失败" : @"Failed");
+            NSColor *fbColor = ok ? [NSColor colorWithHex:0x06C258] : [NSColor colorWithHex:0xE6704C];
+            NSDictionary *fbAttrs = @{
+                NSFontAttributeName: [NSFont systemFontOfSize:12.0],
+                NSForegroundColorAttributeName: fbColor
+            };
+            strongSelf.flushDNSButton.attributedTitle = [[NSAttributedString alloc] initWithString:feedback attributes:fbAttrs];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                if (!strongSelf || !strongSelf.flushDNSButton) return;
+                NSString *origTitle = isZh ? @"刷新DNS" : @"Flush DNS";
+                NSDictionary *origAttrs = @{
+                    NSFontAttributeName: [NSFont systemFontOfSize:12.0],
+                    NSForegroundColorAttributeName: [NSColor colorWithHex:0x1A83F7]
+                };
+                strongSelf.flushDNSButton.attributedTitle = [[NSAttributedString alloc] initWithString:origTitle attributes:origAttrs];
+                strongSelf.flushDNSButton.enabled = YES;
+            });
+        });
+    });
 }
 
 

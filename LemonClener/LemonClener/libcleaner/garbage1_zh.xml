@@ -1,4 +1,4 @@
-<garbage version="2024.03.21.1">
+<garbage version="2026.10.31.1">
     <filters>
         <!--临时目录下的缓存过滤-->
         <filter id="1" column="filename" relation="is" value="com.apple.dock" action="exclude"/>
@@ -267,6 +267,161 @@
                 <path type="abs" level="0" value="/.DocumentRevisions-V100/"/>
             </action>
         </item>
+        <!-- 全栈开发者工具链缓存 (Mole Integration) -->
+        <item id="2201" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[Node.js 缓存]]></title>
+            <tips><![CDATA[npm、pnpm、Yarn、Bun 全局包缓存]]></tips>
+            <action id="22011" type="file" recommend="YES">
+                <title><![CDATA[npm 缓存]]></title>
+                <path type="abs" level="1" value="~/.npm/_cacache/"/>
+                <path type="abs" level="1" value="~/.npm/_logs/"/>
+            </action>
+            <action id="22012" type="file" recommend="YES">
+                <title><![CDATA[pnpm 缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/pnpm/"/>
+                <path type="abs" level="1" value="~/Library/pnpm/store/"/>
+            </action>
+            <action id="22013" type="file" recommend="YES">
+                <title><![CDATA[Yarn 缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/Yarn/"/>
+                <path type="abs" level="1" value="~/.yarn/berry/cache/"/>
+            </action>
+            <action id="22014" type="file" recommend="YES">
+                <title><![CDATA[Bun / Turbo 缓存]]></title>
+                <path type="abs" level="1" value="~/.bun/install/cache/"/>
+                <path type="abs" level="1" value="~/.cache/corepack/"/>
+                <path type="abs" level="1" value="~/Library/Caches/turbo/"/>
+            </action>
+        </item>
+        <item id="2202" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[Python 缓存]]></title>
+            <tips><![CDATA[pip、uv、Poetry、Conda 离线包缓存]]></tips>
+            <action id="22021" type="file" recommend="YES">
+                <title><![CDATA[pip 缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/pip/"/>
+                <path type="abs" level="1" value="~/.cache/pip/"/>
+            </action>
+            <action id="22022" type="file" recommend="YES">
+                <title><![CDATA[uv 缓存]]></title>
+                <path type="abs" level="1" value="~/.cache/uv/"/>
+                <path type="abs" level="1" value="~/Library/Caches/uv/"/>
+            </action>
+            <action id="22023" type="file" recommend="YES">
+                <title><![CDATA[Poetry / Conda 缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/pypoetry/"/>
+                <path type="abs" level="1" value="~/.conda/pkgs/cache/"/>
+            </action>
+        </item>
+        <item id="2203" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[Rust / Go 缓存]]></title>
+            <tips><![CDATA[Cargo 下载包与 Go 编译缓存]]></tips>
+            <action id="22031" type="file" recommend="YES">
+                <title><![CDATA[Cargo 缓存]]></title>
+                <path type="abs" level="1" value="~/.cargo/registry/cache/"/>
+            </action>
+            <action id="22032" type="file" recommend="YES">
+                <title><![CDATA[Go 编译缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/go-build/"/>
+            </action>
+        </item>
+        <item id="2204" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[包管理器缓存]]></title>
+            <tips><![CDATA[Homebrew、CocoaPods、Gradle 缓存]]></tips>
+            <action id="22041" type="file" recommend="YES">
+                <title><![CDATA[Homebrew 缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/Homebrew/downloads/"/>
+                <path type="abs" level="1" value="~/Library/Logs/Homebrew/"/>
+            </action>
+            <action id="22042" type="file" recommend="YES">
+                <title><![CDATA[CocoaPods 缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/CocoaPods/"/>
+            </action>
+            <action id="22043" type="file" recommend="NO">
+                <title><![CDATA[Gradle 缓存]]></title>
+                <path type="abs" level="1" value="~/.gradle/caches/build-cache-1/"/>
+                <path type="abs" level="1" value="~/.gradle/daemon/"/>
+            </action>
+        </item>
+        <item id="2205" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="com.microsoft.VSCode">
+            <title><![CDATA[VS Code]]></title>
+            <tips><![CDATA[渲染缓存、扩展备份与日志]]></tips>
+            <action id="22051" type="file" recommend="YES">
+                <title><![CDATA[运行与扩展缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/CachedData/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/GPUCache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/CachedExtensionVSIXs/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.microsoft.VSCode/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.microsoft.VSCode.ShipIt/"/>
+            </action>
+            <action id="22052" type="file" recommend="YES">
+                <title><![CDATA[运行日志]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/logs/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Code/Crashpad/completed/"/>
+            </action>
+        </item>
+        <item id="2206" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="com.todesktop.230313mzl4w4u92">
+            <title><![CDATA[Cursor]]></title>
+            <tips><![CDATA[编辑器缓存与运行日志]]></tips>
+            <action id="22061" type="file" recommend="YES">
+                <title><![CDATA[运行与扩展缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/CachedData/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/GPUCache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/CachedExtensionVSIXs/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.todesktop.230313mzl4w4u92/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.todesktop.230313mzl4w4u92.ShipIt/"/>
+            </action>
+            <action id="22062" type="file" recommend="YES">
+                <title><![CDATA[运行日志]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/logs/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Cursor/Crashpad/completed/"/>
+            </action>
+        </item>
+        <item id="2207" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[JetBrains IDE]]></title>
+            <tips><![CDATA[IDEA / PyCharm / GoLand 缓存与日志]]></tips>
+            <action id="22071" type="file" recommend="YES">
+                <title><![CDATA[运行日志]]></title>
+                <path type="abs" level="1" value="~/Library/Logs/JetBrains/"/>
+            </action>
+            <action id="22072" type="file" recommend="NO">
+                <title><![CDATA[本地索引缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/JetBrains/"/>
+            </action>
+        </item>
+        <item id="2208" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+            <title><![CDATA[飞书]]></title>
+            <tips><![CDATA[客户端网页与渲染缓存]]></tips>
+            <action id="22081" type="file" recommend="YES">
+                <title><![CDATA[飞书渲染缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/com.electron.lark/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.bytedance.lark/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/LarkShell/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/LarkShell/GPUCache/"/>
+            </action>
+        </item>
+        <item id="2209" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="notion.id">
+            <title><![CDATA[Notion]]></title>
+            <tips><![CDATA[客户端网页与渲染缓存]]></tips>
+            <action id="22091" type="file" recommend="YES">
+                <title><![CDATA[Notion 渲染缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Application Support/Notion/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Notion/Code Cache/"/>
+                <path type="abs" level="1" value="~/Library/Application Support/Notion/GPUCache/"/>
+                <path type="abs" level="1" value="~/Library/Caches/notion.id/"/>
+                <path type="abs" level="1" value="~/Library/Caches/notion.id.ShipIt/"/>
+            </action>
+        </item>
+        <item id="2210" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="com.lemon.lvpro">
+            <title><![CDATA[剪映专业版]]></title>
+            <tips><![CDATA[渲染预览与临时媒体缓存]]></tips>
+            <action id="22101" type="file" recommend="YES">
+                <title><![CDATA[剪映缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/com.lemon.lvpro/"/>
+                <path type="abs" level="1" value="~/Library/Containers/com.lemon.lvpro/Data/Library/Caches/"/>
+            </action>
+        </item>
     </category>
     
     <category id="3">
@@ -345,6 +500,26 @@
             <!--Internet Cache-->
             <action id="3111" type="file" recommend="YES">
                 <path type="abs" level="0" value="~/Library/Caches/Microsoft Edge/Default/Cache/"/>
+            </action>
+        </item>
+        <item id="313" recommend="YES" showresult="YES" fastmode="NO" bundleid="company.thebrowser.Browser">
+            <title><![CDATA[Arc]]></title>
+            <tips><![CDATA[Arc 浏览器加载网页时缓存的静态资源与 GPU 缓存]]></tips>
+            <action id="3131" type="file" recommend="YES">
+                <path type="abs" level="1" value="~/Library/Caches/Arc/"/>
+                <path type="abs" level="1" value="~/Library/Caches/company.thebrowser.Browser/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/Default/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/Default/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/Default/GPUCache/"/>
+            </action>
+        </item>
+        <item id="314" recommend="YES" showresult="YES" fastmode="NO" bundleid="com.brave.Browser">
+            <title><![CDATA[Brave]]></title>
+            <tips><![CDATA[Brave 浏览器加载网页时产生的缓存文件]]></tips>
+            <action id="3141" type="file" recommend="YES">
+                <path type="abs" level="0" value="~/Library/Caches/BraveSoftware/Brave-Browser/Default/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/Default/GPUCache/"/>
             </action>
         </item>
         <item id="312" recommend="YES" fastmode="NO">

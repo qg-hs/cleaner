@@ -42,6 +42,7 @@
 //@property (nonatomic, strong) NSTextField *titleLabel;
 //@property (nonatomic, strong) NSTextField *descLabel;
 @property (weak) IBOutlet NSImageView *backImageView;
+@property (nonatomic, strong) NSScrollView *scrollView;
 @property (nonatomic, strong) LMCleanerTableView *tableView;
 @property (nonatomic, strong) NSMutableArray *dataSource;
 @property (nonatomic, assign) CGFloat wWidth;
@@ -190,11 +191,13 @@
 #ifndef APPSTORE_VERSION
     self.wWidth = self.view.bounds.size.width - 50;
     self.wHeight = 530;
-    _tableView = [[LMCleanerTableView alloc]initWithFrame:CGRectMake(0, 50, self.wWidth, self.wHeight)];
+    NSRect scrollFrame = CGRectMake(0, 50, self.wWidth + 24, self.wHeight);
+    _tableView = [[LMCleanerTableView alloc] initWithFrame:CGRectMake(0, 0, self.wWidth, self.wHeight)];
 #else
     self.wWidth = LMToolWidth - LMToolTopSpace * 2;
     self.wHeight = LMToolHeight - LMToolTopSpace * 4;
-    _tableView = [[LMCleanerTableView alloc]initWithFrame:CGRectMake(LMToolTopSpace, LMToolTopSpace*2, self.wWidth, self.wHeight)];
+    NSRect scrollFrame = CGRectMake(LMToolTopSpace, LMToolTopSpace*2, self.wWidth, self.wHeight);
+    _tableView = [[LMCleanerTableView alloc] initWithFrame:CGRectMake(0, 0, self.wWidth, self.wHeight)];
 #endif
     NSLog(@"view size = %@", NSStringFromSize(self.view.frame.size));
     [_tableView setBackgroundColor:[NSColor clearColor]];
@@ -220,7 +223,18 @@
     } else {
         // Fallback on earlier versions
     }
-    [self.view addSubview:_tableView];
+
+    // 外包透明 Layer-backed NSScrollView，支持 11+ 工具卡片平滑滚动
+    _scrollView = [[NSScrollView alloc] initWithFrame:scrollFrame];
+    _scrollView.drawsBackground = NO;
+    _scrollView.borderType = NSNoBorder;
+    _scrollView.hasVerticalScroller = YES;
+    _scrollView.hasHorizontalScroller = NO;
+    _scrollView.autohidesScrollers = YES;
+    _scrollView.scrollerStyle = NSScrollerStyleOverlay;
+    _scrollView.wantsLayer = YES;
+    _scrollView.documentView = _tableView;
+    [self.view addSubview:_scrollView];
     
 //    [_tableView reloadData];
     
@@ -339,7 +353,18 @@
 }
 
 -(BOOL)isNeedCheckFullDiskAccessWithClassName: (NSString *)className{
-    NSArray *classNames = @[@"McSpaceAnalyseWndController",@"McBigFileWndController",@"LMDuplicateWindowController",@"LMPhotoCleanerWndController",@"McUninstallWindowController",@"LMLoginItemManageWindowController"];
+    NSArray *classNames = @[
+        @"McSpaceAnalyseWndController",
+        @"McBigFileWndController",
+        @"LMDuplicateWindowController",
+        @"LMPhotoCleanerWndController",
+        @"McUninstallWindowController",
+        @"LMLoginItemManageWindowController",
+        @"LMProjectPurgeWindowController",
+        @"LMInstallerCleanWindowController",
+        @"LMSystemOptimizeWindowController",
+        @"LMAppSlimWindowController"
+    ];
     for (NSString* temp in classNames) {
         if([className isEqualToString:temp]){
             return YES;

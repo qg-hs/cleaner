@@ -283,6 +283,19 @@
 		F8190F02212454DC00454795 /* LMMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F8190F00212454DC00454795 /* LMMainViewController.m */; };
 		F8190F03212454DC00454795 /* LMMainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F8190F01212454DC00454795 /* LMMainViewController.xib */; };
 		F8190F07212454F000454795 /* LMToolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F8190F05212454F000454795 /* LMToolViewController.m */; };
+		A11001012FDB000100000101 /* LMModernToolBaseWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A11000022FDB000100000002 /* LMModernToolBaseWindowController.m */; };
+		A11001022FDB000100000102 /* LMProjectPurgeItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A11000042FDB000100000004 /* LMProjectPurgeItem.m */; };
+		A11001032FDB000100000103 /* LMProjectPurgeScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = A11000062FDB000100000006 /* LMProjectPurgeScanner.m */; };
+		A11001042FDB000100000104 /* LMProjectPurgeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A11000082FDB000100000008 /* LMProjectPurgeWindowController.m */; };
+		A11001052FDB000100000105 /* LMInstallerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A110000A2FDB00010000000A /* LMInstallerItem.m */; };
+		A11001062FDB000100000106 /* LMInstallerScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = A110000C2FDB00010000000C /* LMInstallerScanner.m */; };
+		A11001072FDB000100000107 /* LMInstallerCleanWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A110000E2FDB00010000000E /* LMInstallerCleanWindowController.m */; };
+		A11001082FDB000100000108 /* LMSystemOptimizeTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A11000102FDB000100000010 /* LMSystemOptimizeTask.m */; };
+		A11001092FDB000100000109 /* LMSystemOptimizeService.m in Sources */ = {isa = PBXBuildFile; fileRef = A11000122FDB000100000012 /* LMSystemOptimizeService.m */; };
+		A110010A2FDB00010000010A /* LMSystemOptimizeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A11000142FDB000100000014 /* LMSystemOptimizeWindowController.m */; };
+		A110010B2FDB00010000010B /* LMAppSlimItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A11000162FDB000100000016 /* LMAppSlimItem.m */; };
+		A110010C2FDB00010000010C /* LMAppSlimScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = A11000182FDB000100000018 /* LMAppSlimScanner.m */; };
+		A110010D2FDB00010000010D /* LMAppSlimWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A110001A2FDB00010000001A /* LMAppSlimWindowController.m */; };
 		F8190F08212454F000454795 /* LMToolViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F8190F06212454F000454795 /* LMToolViewController.xib */; };
 		F847086E22DF11FE0056CD1D /* com.tencent.Lemon.uninstall.plist in Copy Files */ = {isa = PBXBuildFile; fileRef = 2FA7A59E21C77C4B00B93EF5 /* com.tencent.Lemon.uninstall.plist */; };
 		F847086F22DF11FE0056CD1D /* com.tencent.LemonMonitor.plist in Copy Files */ = {isa = PBXBuildFile; fileRef = D4F025CF212D4BCE005E3D3B /* com.tencent.LemonMonitor.plist */; };
@@ -832,6 +845,32 @@
 		F8190F04212454F000454795 /* LMToolViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMToolViewController.h; sourceTree = "<group>"; };
 		F8190F05212454F000454795 /* LMToolViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LMToolViewController.m; sourceTree = "<group>"; };
 		F8190F06212454F000454795 /* LMToolViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LMToolViewController.xib; sourceTree = "<group>"; };
+		A11000012FDB000100000001 /* LMModernToolBaseWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/Shared/LMModernToolBaseWindowController.h"; sourceTree = "<group>"; };
+		A11000022FDB000100000002 /* LMModernToolBaseWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/Shared/LMModernToolBaseWindowController.m"; sourceTree = "<group>"; };
+		A11000032FDB000100000003 /* LMProjectPurgeItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/ProjectPurge/LMProjectPurgeItem.h"; sourceTree = "<group>"; };
+		A11000042FDB000100000004 /* LMProjectPurgeItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/ProjectPurge/LMProjectPurgeItem.m"; sourceTree = "<group>"; };
+		A11000052FDB000100000005 /* LMProjectPurgeScanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/ProjectPurge/LMProjectPurgeScanner.h"; sourceTree = "<group>"; };
+		A11000062FDB000100000006 /* LMProjectPurgeScanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/ProjectPurge/LMProjectPurgeScanner.m"; sourceTree = "<group>"; };
+		A11000072FDB000100000007 /* LMProjectPurgeWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/ProjectPurge/LMProjectPurgeWindowController.h"; sourceTree = "<group>"; };
+		A11000082FDB000100000008 /* LMProjectPurgeWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/ProjectPurge/LMProjectPurgeWindowController.m"; sourceTree = "<group>"; };
+		A11000092FDB000100000009 /* LMInstallerItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/InstallerClean/LMInstallerItem.h"; sourceTree = "<group>"; };
+		A110000A2FDB00010000000A /* LMInstallerItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/InstallerClean/LMInstallerItem.m"; sourceTree = "<group>"; };
+		A110000B2FDB00010000000B /* LMInstallerScanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/InstallerClean/LMInstallerScanner.h"; sourceTree = "<group>"; };
+		A110000C2FDB00010000000C /* LMInstallerScanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/InstallerClean/LMInstallerScanner.m"; sourceTree = "<group>"; };
+		A110000D2FDB00010000000D /* LMInstallerCleanWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/InstallerClean/LMInstallerCleanWindowController.h"; sourceTree = "<group>"; };
+		A110000E2FDB00010000000E /* LMInstallerCleanWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/InstallerClean/LMInstallerCleanWindowController.m"; sourceTree = "<group>"; };
+		A110000F2FDB00010000000F /* LMSystemOptimizeTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/SystemOptimize/LMSystemOptimizeTask.h"; sourceTree = "<group>"; };
+		A11000102FDB000100000010 /* LMSystemOptimizeTask.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/SystemOptimize/LMSystemOptimizeTask.m"; sourceTree = "<group>"; };
+		A11000112FDB000100000011 /* LMSystemOptimizeService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/SystemOptimize/LMSystemOptimizeService.h"; sourceTree = "<group>"; };
+		A11000122FDB000100000012 /* LMSystemOptimizeService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/SystemOptimize/LMSystemOptimizeService.m"; sourceTree = "<group>"; };
+		A11000132FDB000100000013 /* LMSystemOptimizeWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/SystemOptimize/LMSystemOptimizeWindowController.h"; sourceTree = "<group>"; };
+		A11000142FDB000100000014 /* LMSystemOptimizeWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/SystemOptimize/LMSystemOptimizeWindowController.m"; sourceTree = "<group>"; };
+		A11000152FDB000100000015 /* LMAppSlimItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/AppSlim/LMAppSlimItem.h"; sourceTree = "<group>"; };
+		A11000162FDB000100000016 /* LMAppSlimItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/AppSlim/LMAppSlimItem.m"; sourceTree = "<group>"; };
+		A11000172FDB000100000017 /* LMAppSlimScanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/AppSlim/LMAppSlimScanner.h"; sourceTree = "<group>"; };
+		A11000182FDB000100000018 /* LMAppSlimScanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/AppSlim/LMAppSlimScanner.m"; sourceTree = "<group>"; };
+		A11000192FDB000100000019 /* LMAppSlimWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tools/AppSlim/LMAppSlimWindowController.h"; sourceTree = "<group>"; };
+		A110001A2FDB00010000001A /* LMAppSlimWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Tools/AppSlim/LMAppSlimWindowController.m"; sourceTree = "<group>"; };
 		F82325F521089F5D005190A2 /* Pods_LemonBigOldFile.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_LemonBigOldFile.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F84A0B63227197BF007B7810 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		F854B1F320F7742F009102CF /* QMDataConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMDataConst.h; sourceTree = "<group>"; };
@@ -1517,6 +1556,32 @@
 				F8190F04212454F000454795 /* LMToolViewController.h */,
 				F8190F05212454F000454795 /* LMToolViewController.m */,
 				F8190F06212454F000454795 /* LMToolViewController.xib */,
+				A11000012FDB000100000001 /* LMModernToolBaseWindowController.h */,
+				A11000022FDB000100000002 /* LMModernToolBaseWindowController.m */,
+				A11000032FDB000100000003 /* LMProjectPurgeItem.h */,
+				A11000042FDB000100000004 /* LMProjectPurgeItem.m */,
+				A11000052FDB000100000005 /* LMProjectPurgeScanner.h */,
+				A11000062FDB000100000006 /* LMProjectPurgeScanner.m */,
+				A11000072FDB000100000007 /* LMProjectPurgeWindowController.h */,
+				A11000082FDB000100000008 /* LMProjectPurgeWindowController.m */,
+				A11000092FDB000100000009 /* LMInstallerItem.h */,
+				A110000A2FDB00010000000A /* LMInstallerItem.m */,
+				A110000B2FDB00010000000B /* LMInstallerScanner.h */,
+				A110000C2FDB00010000000C /* LMInstallerScanner.m */,
+				A110000D2FDB00010000000D /* LMInstallerCleanWindowController.h */,
+				A110000E2FDB00010000000E /* LMInstallerCleanWindowController.m */,
+				A110000F2FDB00010000000F /* LMSystemOptimizeTask.h */,
+				A11000102FDB000100000010 /* LMSystemOptimizeTask.m */,
+				A11000112FDB000100000011 /* LMSystemOptimizeService.h */,
+				A11000122FDB000100000012 /* LMSystemOptimizeService.m */,
+				A11000132FDB000100000013 /* LMSystemOptimizeWindowController.h */,
+				A11000142FDB000100000014 /* LMSystemOptimizeWindowController.m */,
+				A11000152FDB000100000015 /* LMAppSlimItem.h */,
+				A11000162FDB000100000016 /* LMAppSlimItem.m */,
+				A11000172FDB000100000017 /* LMAppSlimScanner.h */,
+				A11000182FDB000100000018 /* LMAppSlimScanner.m */,
+				A11000192FDB000100000019 /* LMAppSlimWindowController.h */,
+				A110001A2FDB00010000001A /* LMAppSlimWindowController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -2174,6 +2239,19 @@
 				BC7FBE222267295600D025CF /* LMSplashViewController.m in Sources */,
 				F85BC5B721256E6E00BD147D /* UIHelper.m in Sources */,
 				76B4C2822872953300F61386 /* LMVersionHelper.m in Sources */,
+				A11001012FDB000100000101 /* LMModernToolBaseWindowController.m in Sources */,
+				A11001022FDB000100000102 /* LMProjectPurgeItem.m in Sources */,
+				A11001032FDB000100000103 /* LMProjectPurgeScanner.m in Sources */,
+				A11001042FDB000100000104 /* LMProjectPurgeWindowController.m in Sources */,
+				A11001052FDB000100000105 /* LMInstallerItem.m in Sources */,
+				A11001062FDB000100000106 /* LMInstallerScanner.m in Sources */,
+				A11001072FDB000100000107 /* LMInstallerCleanWindowController.m in Sources */,
+				A11001082FDB000100000108 /* LMSystemOptimizeTask.m in Sources */,
+				A11001092FDB000100000109 /* LMSystemOptimizeService.m in Sources */,
+				A110010A2FDB00010000010A /* LMSystemOptimizeWindowController.m in Sources */,
+				A110010B2FDB00010000010B /* LMAppSlimItem.m in Sources */,
+				A110010C2FDB00010000010C /* LMAppSlimScanner.m in Sources */,
+				A110010D2FDB00010000010D /* LMAppSlimWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2389,7 +2467,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 101;
+				CURRENT_PROJECT_VERSION = 102;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2411,7 +2489,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp=none -o library --deep";
 				OTHER_LDFLAGS = (
@@ -2444,7 +2522,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 101;
+				CURRENT_PROJECT_VERSION = 102;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2467,7 +2545,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp -o library --deep";
 				OTHER_LDFLAGS = (
 					"$(inherited)",

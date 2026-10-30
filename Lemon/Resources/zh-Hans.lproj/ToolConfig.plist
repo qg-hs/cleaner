@@ -121,5 +121,73 @@
 		<key>reportId</key>
 		<integer>7208</integer>
 	</dict>
+	<key>LMProjectPurge</key>
+	<dict>
+		<key>toolId</key>
+		<integer>7</integer>
+		<key>toolPicName</key>
+		<string>tool_project_purge</string>
+		<key>className</key>
+		<string>LMProjectPurgeWindowController</string>
+		<key>toolName</key>
+		<string>项目构建清理</string>
+		<key>toolDesc</key>
+		<string>清理node_modules等构建产物</string>
+		<key>recommend</key>
+		<true/>
+		<key>reportId</key>
+		<integer>7209</integer>
+	</dict>
+	<key>LMInstallerClean</key>
+	<dict>
+		<key>toolId</key>
+		<integer>8</integer>
+		<key>toolPicName</key>
+		<string>tool_installer_clean</string>
+		<key>className</key>
+		<string>LMInstallerCleanWindowController</string>
+		<key>toolName</key>
+		<string>安装包清理</string>
+		<key>toolDesc</key>
+		<string>查找残留DMG与PKG安装包</string>
+		<key>recommend</key>
+		<true/>
+		<key>reportId</key>
+		<integer>7210</integer>
+	</dict>
+	<key>LMSystemOptimize</key>
+	<dict>
+		<key>toolId</key>
+		<integer>9</integer>
+		<key>toolPicName</key>
+		<string>tool_sys_optimize</string>
+		<key>className</key>
+		<string>LMSystemOptimizeWindowController</string>
+		<key>toolName</key>
+		<string>系统维护</string>
+		<key>toolDesc</key>
+		<string>Touch ID 免密与系统修复</string>
+		<key>recommend</key>
+		<false/>
+		<key>reportId</key>
+		<integer>7211</integer>
+	</dict>
+	<key>LMAppSlim</key>
+	<dict>
+		<key>toolId</key>
+		<integer>10</integer>
+		<key>toolPicName</key>
+		<string>tool_app_slim</string>
+		<key>className</key>
+		<string>LMAppSlimWindowController</string>
+		<key>toolName</key>
+		<string>应用架构瘦身</string>
+		<key>toolDesc</key>
+		<string>剥离冗余非本机架构二进制</string>
+		<key>recommend</key>
+		<false/>
+		<key>reportId</key>
+		<integer>7212</integer>
+	</dict>
 </dict>
 </plist>

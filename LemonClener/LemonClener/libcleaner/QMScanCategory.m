@@ -17,6 +17,69 @@
 #import "QMWechatScan.h"
 #import "QMScanFileSizeCacheManager.h"
 #import "CleanerCantant.h"
+#include <sys/sysctl.h>
+
+/// O(P) 单次内核快照获取当前活跃进程名集合，避免构建期清理包管理器缓存造成竞态
+static NSSet<NSString *> *QMActiveProcessNameSnapshot(void) {
+    int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
+    size_t bufSize = 0;
+    if (sysctl(mib, 4, NULL, &bufSize, NULL, 0) < 0 || bufSize == 0) {
+        return [NSSet set];
+    }
+    size_t allocSize = bufSize + (bufSize / 4);
+    struct kinfo_proc *procs = (struct kinfo_proc *)malloc(allocSize);
+    if (procs == NULL) {
+        return [NSSet set];
+    }
+    if (sysctl(mib, 4, procs, &allocSize, NULL, 0) < 0) {
+        free(procs);
+        return [NSSet set];
+    }
+    size_t count = allocSize / sizeof(struct kinfo_proc);
+    NSMutableSet<NSString *> *names = [NSMutableSet setWithCapacity:count];
+    size_t idx;
+    for (idx = 0; idx < count; idx++) {
+        const char *comm = procs[idx].kp_proc.p_comm;
+        if (comm[0] != '\0') {
+            NSString *name = [[NSString stringWithUTF8String:comm] lowercaseString];
+            if (name.length > 0) {
+                [names addObject:name];
+            }
+        }
+    }
+    free(procs);
+    return names;
+}
+
+static BOOL QMShouldSkipSubCategoryForActiveBuild(NSString *subCategoryID, NSSet<NSString *> *runningProcs) {
+    if (subCategoryID == nil || runningProcs.count == 0) {
+        return NO;
+    }
+    if ([subCategoryID isEqualToString:@"2201"]) {
+        return ([runningProcs containsObject:@"npm"] ||
+                [runningProcs containsObject:@"pnpm"] ||
+                [runningProcs containsObject:@"yarn"] ||
+                [runningProcs containsObject:@"bun"]);
+    }
+    if ([subCategoryID isEqualToString:@"2202"]) {
+        return ([runningProcs containsObject:@"pip"] ||
+                [runningProcs containsObject:@"pip3"] ||
+                [runningProcs containsObject:@"uv"] ||
+                [runningProcs containsObject:@"poetry"] ||
+                [runningProcs containsObject:@"conda"]);
+    }
+    if ([subCategoryID isEqualToString:@"2203"]) {
+        return ([runningProcs containsObject:@"cargo"] ||
+                [runningProcs containsObject:@"rustc"] ||
+                [runningProcs containsObject:@"go"]);
+    }
+    if ([subCategoryID isEqualToString:@"2204"]) {
+        return ([runningProcs containsObject:@"brew"] ||
+                [runningProcs containsObject:@"pod"] ||
+                [runningProcs containsObject:@"gradle"]);
+    }
+    return NO;
+}
 
 @interface QMScanCategory()<QMScanDelegate>
 
@@ -179,6 +242,7 @@
         m_scanFlags = 0;
     }
     m_curScanCategoryItem = categoryItem;
+    NSSet<NSString *> *runningProcs = QMActiveProcessNameSnapshot();
     
     for (QMCategorySubItem * subItem in m_categorySubItemArray_copy) {
         @autoreleasepool {
@@ -193,10 +257,15 @@
                 // 开始扫描
                 if (self->delegate)   [self->delegate startScanCategory:subItem.subCategoryID];
             });
-            if([subItem.title isEqualToString:@"IntelliJIdea"]){
-                NSLog(@"");
-            }
             NSUInteger subCount = [subItem.m_actionItemArray count];
+            if (QMShouldSkipSubCategoryForActiveBuild(subItem.subCategoryID, runningProcs)) {
+                m_scanCount += (int)subCount;
+                m_curScanSubCategoryItem.progressValue = 1;
+                dispatch_async(self.actionDelegateOperationQueue, ^{
+                    if (self->delegate) [self->delegate scanCategoryDidEnd:subItem.subCategoryID];
+                });
+                continue;
+            }
             
             NSMutableArray *operations = [NSMutableArray array];
             

@@ -105,8 +105,16 @@ const int LMToolCellTopSpace = 10;
         _animateTimer = nil;
         return;
     }
-    NSString* picName =[NSString stringWithFormat:@"%@%02ld", self.toolPicName, _animateCount];
+    NSString* picName =[NSString stringWithFormat:@"%@%02ld", self.toolPicName, (long)_animateCount];
     NSImage* image = [NSImage imageNamed:picName];
+    if (image == nil) {
+        // 静态图标无序列帧资源时立即终止定时器并保持原图，防止悬停置空闪烁
+        _animateCount = -1;
+        [self.imgView setImage:[NSImage imageNamed:self.toolPicName]];
+        [_animateTimer invalidate];
+        _animateTimer = nil;
+        return;
+    }
     [self.imgView setImage:image];
 }
 
