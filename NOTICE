@@ -1,0 +1,13 @@
+cleaner Mandatory Attribution Notice (强制署名声明)
+===================================================
+
+Copyright (C) 2026 qg-hs (https://github.com/qg-hs)
+Repository: https://github.com/qg-hs/cleaner
+
+任何使用、复制、修改、二次打包、分发本仓库代码或基于本仓库进行衍生开发的个人、组织或商业实体，必须根据 GPLv3 第 7(b) 条附加署名条款，在其项目文档底部（README）、软件“关于”界面以及分发产物中显著保留并展示以下来源与作者介绍：
+
+- 原项目名称：cleaner — 轻量、纯粹、零遥测的 macOS 系统深度清理与状态栏监控工具
+- 原项目仓库：https://github.com/qg-hs/cleaner
+- 原作者主页：qg-hs (https://github.com/qg-hs)
+
+严禁删除、隐藏、折叠或篡改上述仓库地址与作者署名信息；违反本署名要求将依据 GPLv3 第 8 条自动终止全部授权。

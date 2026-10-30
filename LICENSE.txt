@@ -1,8 +1,32 @@
-Tencent is pleased to support the open source community by making Lemon Cleaner available. 
+====================================================================
+cleaner - Mandatory Attribution & Legal Notice (GPLv3 Section 7(b))
+====================================================================
 
-Copyright (C) 2022 Tencent.  All rights reserved.
+Copyright (C) 2026 qg-hs (https://github.com/qg-hs)
+Project Repository: https://github.com/qg-hs/cleaner
 
-The files in modules Lemon Monitor and Lemon Cleaner is licensed under the GNU General Public License, version 3 except for the third-party components listed below.
+MANDATORY ATTRIBUTION REQUIREMENT (强制署名与来源标注条款):
+Pursuant to Section 7(b) of the GNU General Public License version 3 (GPLv3),
+any person or entity that uses, copies, modifies, redistributes, packages,
+or creates derivative works from this repository (in whole or in part, in
+source code or binary form) MUST prominently retain and display the following
+attribution notice in:
+  1. The bottom of the project README / documentation;
+  2. The application's "About" (关于) dialog or credits screen; and
+  3. All redistributed source or binary packages:
+
+  ------------------------------------------------------------------
+  Based on cleaner (https://github.com/qg-hs/cleaner)
+  Author & Maintainer: qg-hs (https://github.com/qg-hs)
+  ------------------------------------------------------------------
+
+Removal, obfuscation, or falsification of the above repository link or author
+attribution is a material breach of this License and immediately terminates
+all rights granted hereunder pursuant to GPLv3 Section 8.
+
+The files in modules LemonMonitor and cleaner are licensed under the GNU
+General Public License, version 3 except for the third-party components
+listed below.
 
 
 Terms of the GNU General Public License, version 3:

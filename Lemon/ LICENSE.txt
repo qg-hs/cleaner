@@ -1,5 +1,6 @@
-Lemon Cleaner uses 2 different licenses :
+cleaner uses 2 different licenses with a Mandatory Attribution Requirement (GPLv3 Section 7(b)):
 - the files in the LemonDaemon module use a GPL v2 license
-- all other files in the Lemon Monitor and Lemon Cleaner use a GPL v3 license, unless explicitly stated otherwise
+- all other files in LemonMonitor and cleaner use a GPL v3 license, unless explicitly stated otherwise
 
-The files in modules Lemon Monitor and Lemon Cleaner are licensed under the GNU General Public License, version 3 except for the third-party components as listed in the license text for Lemon Monitor and Lemon Cleaner.
+Mandatory Attribution:
+Any use, modification, redistribution, or derivative work of this repository MUST prominently retain and display the original repository link (https://github.com/qg-hs/cleaner) and author attribution (qg-hs, https://github.com/qg-hs) in the documentation and application interface.

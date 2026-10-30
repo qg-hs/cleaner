@@ -147,9 +147,21 @@ pod install
 
 ---
 
-## 开源协议 (License)
+## 开源协议与强制署名声明 (License & Mandatory Attribution)
 
-本项目遵循双许可证协议：
+本项目遵循 **GPLv2 / GPLv3** 开源协议，并附加 **GPLv3 第 7(b) 条强制署名与来源标注条款 ([`NOTICE`](NOTICE) / [`LICENSE.txt`](LICENSE.txt))**：
 
-- `Tools/LemonDaemon` 模块采用 **GNU General Public License v2.0 (GPLv2)** 协议（第三方组件除外）。
-- 主工程 `Lemon`、`LemonMonitor` 及其他功能模块采用 **GNU General Public License v3.0 (GPLv3)** 协议（第三方组件除外）。
+1. `Tools/LemonDaemon` 模块遵循 **GNU General Public License v2.0 (GPLv2)** 协议。
+2. 主工程 `Lemon`、`LemonMonitor` 及其他功能模块遵循 **GNU General Public License v3.0 (GPLv3)** 协议。
+3. **强制署名要求（Mandatory Attribution Requirement）**：
+   任何个人、团队或组织在使用、复制、修改、二次打包、分发本仓库代码，或基于本仓库开发衍生作品时，**必须在项目主页文档底部（README）、软件“关于”界面以及发行产物说明中显著保留并带上本仓库地址与作者介绍**，严禁移除、遮挡或篡改：
+
+```markdown
+---
+### 致谢与上游来源 (Attribution)
+本项目基于 **[cleaner](https://github.com/qg-hs/cleaner)** 二次开发/构建。
+- **原项目仓库**：[https://github.com/qg-hs/cleaner](https://github.com/qg-hs/cleaner)（轻量、纯粹、零遥测的 macOS 系统深度清理与状态栏监控工具）
+- **原作者**：[@qg-hs](https://github.com/qg-hs)
+```
+
+> 违反上述强制署名条款（如抹除仓库地址或作者信息进行二次分发）将依据 GPLv3 第 8 条自动终止全部开源授权，作者保留追究著作权侵权责任的权利。
