@@ -54,9 +54,9 @@
 "LMFloderAddViewController_alertDialog_content_needPermission" = "cleaner没有权限扫描系统相册，点击“获取权限”授权后继续完成扫描。";
 "LMFloderAddViewController_alertDialog_okButton_getPermission" = "获取权限";
 "LMFloderAddViewController_alertDialog_cancelButton" = "取消";
-"LMFloderAddViewController_accessPhoto_permissionGuide_title" = "10.14系统后，需获取权限才可扫描系统相册";
+"LMFloderAddViewController_accessPhoto_permissionGuide_title" = "需在“系统设置 -> 隐私与安全性 -> 照片”中授权才可扫描系统相册";
 "LMFloderAddViewController_accessPhoto_permissionGuide_descText" = "cleaner不会上传你的照片信息，请放心使用";
-"CheckDeleteSystemPhotoViewController_automation_permissionGuide_title" = "10.14系统后，需获取权限才可清理系统相册";
+"CheckDeleteSystemPhotoViewController_automation_permissionGuide_title" = "需在“系统设置 -> 隐私与安全性 -> 自动化”中授权才可清理系统相册";
 "CheckDeleteSystemPhotoViewController_automation_permissionGuide_descText" = "cleaner不会上传你的照片信息，请放心使用";
 "CheckDeleteSystemPhotoViewController_automation_needPermissionTips" = "cleaner没有权限清理系统相册，授权以继续完成清理";
 "CheckDeleteSystemPhotoViewController_operateButton_scanAgain" = "更新";

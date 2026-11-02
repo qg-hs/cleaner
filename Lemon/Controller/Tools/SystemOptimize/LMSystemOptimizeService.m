@@ -122,6 +122,15 @@ static BOOL LMContentHasActivePamTid(NSString *content) {
     t5.isSelected = YES;
     [list addObject:t5];
 
+    LMSystemOptimizeTask *t6 = [[LMSystemOptimizeTask alloc] init];
+    t6.taskType = LMSystemOptimizeTaskAPFSSnapshotThin;
+    t6.title = LMToolLocalized(@"APFS 快照瘦身", @"Thin APFS Snapshots");
+    t6.subtitle = LMToolLocalized(@"按需回收冗余时间机器本地快照空间",
+                                  @"Reclaim purgeable Time Machine local snapshots");
+    t6.requiresAdmin = NO;
+    t6.isSelected = YES;
+    [list addObject:t6];
+
     return list;
 }
 
@@ -424,6 +433,74 @@ static BOOL LMContentHasActivePamTid(NSString *content) {
             } else {
                 task.state = LMSystemOptimizeTaskStateSuccess;
                 task.resultText = LMToolLocalized(@"很干净", @"Healthy");
+            }
+            break;
+        }
+
+        case LMSystemOptimizeTaskAPFSSnapshotThin: {
+            NSString *snapOut = nil;
+            int listRc = LMRunCommandSync(@"/usr/bin/tmutil", @[@"listlocalsnapshots", @"/"], &snapOut);
+            if (listRc != 0) {
+                task.state = LMSystemOptimizeTaskStateSkipped;
+                task.resultText = LMToolLocalized(@"未启用", @"Inactive");
+                break;
+            }
+
+            NSUInteger tmSnapCountBefore = 0;
+            if (snapOut.length > 0) {
+                NSArray<NSString *> *lines = [snapOut componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+                NSUInteger i;
+                for (i = 0; i < lines.count; i++) {
+                    if ([lines[i] containsString:@"com.apple.TimeMachine."]) {
+                        tmSnapCountBefore++;
+                    }
+                }
+            }
+
+            if (tmSnapCountBefore == 0) {
+                task.state = LMSystemOptimizeTaskStateSuccess;
+                task.resultText = LMToolLocalized(@"无快照", @"No Snapshots");
+                break;
+            }
+
+            NSDictionary *fsBefore = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:nil];
+            uint64_t freeBefore = [fsBefore[NSFileSystemFreeSize] unsignedLongLongValue];
+
+            NSString *thinOut = nil;
+            // 请求 APFS 按紧迫度 4 回收至多 10 GiB 可清除时间机器本地快照，保留活跃备份链安全
+            int thinRc = LMRunCommandSync(@"/usr/bin/tmutil", @[@"thinlocalsnapshots", @"/", @"10737418240", @"4"], &thinOut);
+
+            NSDictionary *fsAfter = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:nil];
+            uint64_t freeAfter = [fsAfter[NSFileSystemFreeSize] unsignedLongLongValue];
+            uint64_t freed = (freeAfter > freeBefore) ? (freeAfter - freeBefore) : 0;
+
+            NSString *snapAfterOut = nil;
+            NSUInteger tmSnapCountAfter = tmSnapCountBefore;
+            if (LMRunCommandSync(@"/usr/bin/tmutil", @[@"listlocalsnapshots", @"/"], &snapAfterOut) == 0 && snapAfterOut != nil) {
+                tmSnapCountAfter = 0;
+                NSArray<NSString *> *afterLines = [snapAfterOut componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+                NSUInteger j;
+                for (j = 0; j < afterLines.count; j++) {
+                    if ([afterLines[j] containsString:@"com.apple.TimeMachine."]) {
+                        tmSnapCountAfter++;
+                    }
+                }
+            }
+
+            if (thinRc == 0) {
+                task.reclaimedBytes = freed;
+                task.state = LMSystemOptimizeTaskStateSuccess;
+                if (freed > 0) {
+                    task.resultText = [NSString stringWithFormat:LMToolLocalized(@"释放 %@", @"Freed %@"), LMFormatByteCount(freed)];
+                } else if (tmSnapCountBefore > tmSnapCountAfter) {
+                    task.resultText = [NSString stringWithFormat:LMToolLocalized(@"清理 %lu 个", @"Thinned %lu"),
+                                       (unsigned long)(tmSnapCountBefore - tmSnapCountAfter)];
+                } else {
+                    task.resultText = LMToolLocalized(@"已精简", @"Thinned");
+                }
+            } else {
+                task.state = LMSystemOptimizeTaskStateSkipped;
+                task.resultText = LMToolLocalized(@"无需瘦身", @"Optimal");
             }
             break;
         }

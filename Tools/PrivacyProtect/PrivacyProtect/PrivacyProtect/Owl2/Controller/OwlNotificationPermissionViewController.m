@@ -176,7 +176,7 @@
         _stepTF.drawsBackground = NO;
         _stepTF.font = [NSFontHelper getLightSystemFont:14];
         _stepTF.textColor = [NSColor colorWithHex:0x94979B];
-        _stepTF.stringValue = LMLocalizedSelfBundleString(@"步骤：\n【系统设置】——【通知】——【应用程序通知】——开启【LemonMonitor】", nil);
+        _stepTF.stringValue = LMLocalizedSelfBundleString(@"步骤：\n【系统设置】——【通知】——【应用程序通知】——开启【cleaner Monitor】", nil);
     }
     return _stepTF;
 }

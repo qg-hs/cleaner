@@ -14,6 +14,7 @@
 #include <sys/attr.h>
 #import <QMCoreFunction/QMShellExcuteHelper.h>
 #import <QMCoreFunction/NSString+Extension.h>
+#import <QMCoreFunction/McCoreFunction.h>
 #import <LemonFileManager/LMFileAttributesTool.h>
 
 @implementation LMBigFileItem
@@ -136,7 +137,8 @@ const float kMaxSearchProgress = 1.0f;
 //                                                                options:NSDirectoryEnumerationSkipsPackageDescendants
 //                                                           errorHandler:nil];
         
-            NSString *outputStr = [QMShellExcuteHelper excuteCmd:[NSString stringWithFormat:@"mdfind -onlyin %@ \"kMDItemFSSize > 52428800\"", path]];
+            NSString *escapedPath = [path stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+            NSString *outputStr = [QMShellExcuteHelper excuteCmd:[NSString stringWithFormat:@"mdfind -onlyin \"%@\" \"kMDItemFSSize > 52428800\"", escapedPath]];
             NSLog(@"big old file outputStr = %@", outputStr);
             NSArray *mdfindArr = [outputStr componentsSeparatedByString:@"\n"];
             [resultPathArray addObject:path];
@@ -145,11 +147,9 @@ const float kMaxSearchProgress = 1.0f;
             for (NSString * contentPath in mdfindArr)
             {
                 @autoreleasepool {
-                    NSLog(@"contentPath1==>%@",contentPath);
                     if ((contentPath == nil) || ([contentPath isEqualToString:@""])) {
                         continue;
                     }
-                    NSLog(@"big old file path = %@", contentPath);
                     if ([contentPath isEqualToString:[NSString getUserHomePath]]) {
                         continue;
                     }
@@ -175,27 +175,37 @@ const float kMaxSearchProgress = 1.0f;
                         }
                     }
 
+                    // 拦截 SF_DATALESS / .icloud 云盘虚拟存根文件（避免 Spotlight 逻辑体积误报及触发云端下载）
+                    struct stat preStat;
+                    const char *preFsPath = [contentPath fileSystemRepresentation];
+                    if (!preFsPath || lstat(preFsPath, &preStat) != 0) {
+                        continue;
+                    }
+                    if (LMPathIsCloudDataless(preFsPath, &preStat)) {
+                        continue;
+                    }
+
+                    NSURL *contentURL = [NSURL fileURLWithPath:contentPath];
                     // 过滤快捷方式
                     NSNumber * result = nil;
-                    [[NSURL URLWithString:contentPath] getResourceValue:&result forKey:NSURLIsAliasFileKey error:NULL];
+                    [contentURL getResourceValue:&result forKey:NSURLIsAliasFileKey error:NULL];
                     if (result && [result boolValue])
                         continue;
                     
                     NSNumber * dir = nil;
-                    [[NSURL URLWithString:contentPath] getResourceValue:&dir forKey:NSURLIsDirectoryKey error:NULL];
+                    [contentURL getResourceValue:&dir forKey:NSURLIsDirectoryKey error:NULL];
                     
                     NSNumber * pacakge = nil;
-                    [[NSURL URLWithString:contentPath] getResourceValue:&pacakge forKey:NSURLIsPackageKey error:NULL];
+                    [contentURL getResourceValue:&pacakge forKey:NSURLIsPackageKey error:NULL];
                     
                     
                     NSNumber * isHidden = nil;
-                    [[NSURL URLWithString:contentPath] getResourceValue:&isHidden forKey:NSURLIsHiddenKey error:NULL];
+                    [contentURL getResourceValue:&isHidden forKey:NSURLIsHiddenKey error:NULL];
                     // 隐藏文件 -- 使用系统API
                     if ([isHidden boolValue])
                     {
                         continue;
                     }
-                    NSLog(@"contentPath2==>%@",contentPath);
                     if (![dir boolValue] || [pacakge boolValue]){
                         [resultPathArray addObject:contentPath];
                     }
@@ -255,12 +265,18 @@ const float kMaxSearchProgress = 1.0f;
             @autoreleasepool {
                 struct stat fileStat;
                 NSUInteger totalSize = 0;
-                if (lstat([resultPath fileSystemRepresentation], &fileStat) != 0)
+                const char *fsPath = [resultPath fileSystemRepresentation];
+                if (!fsPath || lstat(fsPath, &fileStat) != 0)
+                    continue;
+                if (LMPathIsCloudDataless(fsPath, &fileStat))
                     continue;
                 
                 LMBigFileItem * fileItem = nil;
                 if (!(fileStat.st_mode & S_IFDIR))
                 {
+                    // 排除 0 物理磁盘块占用的稀疏占位文件，仅计入真实占用磁盘空间的大文件
+                    if (fileStat.st_blocks == 0 && fileStat.st_size > 0)
+                        continue;
                     totalSize += fileStat.st_size;
                     fileItem = [[LMBigFileItem alloc] init];
                     fileItem.filePath = resultPath;

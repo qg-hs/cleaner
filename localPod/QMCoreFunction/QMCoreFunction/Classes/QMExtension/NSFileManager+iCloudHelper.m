@@ -6,12 +6,19 @@
 //
 
 #import "NSFileManager+iCloudHelper.h"
+#import "McCoreFunction.h"
 
 @implementation NSFileManager (iCloudHelper)
 
 - (BOOL)qm_isICloudFileAtPath:(NSString *)path {
     if (!path || path.length == 0) {
         return NO;
+    }
+
+    // 优先检测 SF_DATALESS / .icloud 云端无数据存根（覆盖 iCloud Drive 与 macOS 12.3+ FileProvider 三方云盘）
+    const char *fsPath = [path fileSystemRepresentation];
+    if (fsPath && LMPathIsCloudDataless(fsPath, NULL)) {
+        return YES;
     }
     
     // 使用URL资源检查是否为iCloud文件
@@ -31,6 +38,15 @@
 }
 
 - (BOOL)qm_isICloudFileDownloadedAtPath:(NSString *)path {
+    if (!path || path.length == 0) {
+        return NO;
+    }
+    // SF_DATALESS 或 .icloud 占位文件未落盘，直接判定为未下载，杜绝后续读取触发 fileproviderd 拉取
+    const char *fsPath = [path fileSystemRepresentation];
+    if (fsPath && LMPathIsCloudDataless(fsPath, NULL)) {
+        return NO;
+    }
+
     if (![self qm_isICloudFileAtPath:path]) {
         return YES; // 本地文件认为是"已下载"的
     }

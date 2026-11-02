@@ -7,13 +7,118 @@
 #ifndef APPSTORE_VERSION
 
 #include <stdint.h>
+#include <dlfcn.h>
+#import <Foundation/Foundation.h>
 #include "CmcAppleSmc.h"
 #include "CmcAppleSmc2.h"
 #include "CmcTemperature.h"
 #import "McCpuInfoSMC.h"
 
-#define MAX_TEMP_V      110.0f
+#define MAX_TEMP_V      115.0f
 #define MIN_CPU_TEMP_V  20.0f // 过滤异常数据
+
+#ifdef __arm64__
+typedef struct __IOHIDEventSystemClient *LMIOHIDEventSystemClientRef;
+typedef struct __IOHIDServiceClient *LMIOHIDServiceClientRef;
+typedef struct __IOHIDEvent *LMIOHIDEventRef;
+
+typedef LMIOHIDEventSystemClientRef (*LMIOHIDCreate_t)(CFAllocatorRef);
+typedef int (*LMIOHIDSetMatching_t)(LMIOHIDEventSystemClientRef, CFDictionaryRef);
+typedef CFArrayRef (*LMIOHIDCopyServices_t)(LMIOHIDEventSystemClientRef);
+typedef CFTypeRef (*LMIOHIDCopyProperty_t)(LMIOHIDServiceClientRef, CFStringRef);
+typedef LMIOHIDEventRef (*LMIOHIDCopyEvent_t)(LMIOHIDServiceClientRef, int64_t, int32_t, int64_t);
+typedef double (*LMIOHIDGetFloat_t)(LMIOHIDEventRef, int32_t);
+
+// Apple Silicon 原生 IOHID 热敏通道直读（免型号硬编码，兼容 M1~M5+ 全系 SoC Die 传感器）
+static float CmcReadAppleSiliconIOHIDTemperature(void) {
+    static LMIOHIDCreate_t sCreate = NULL;
+    static LMIOHIDSetMatching_t sSetMatching = NULL;
+    static LMIOHIDCopyServices_t sCopyServices = NULL;
+    static LMIOHIDCopyProperty_t sCopyProp = NULL;
+    static LMIOHIDCopyEvent_t sCopyEvent = NULL;
+    static LMIOHIDGetFloat_t sGetFloat = NULL;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        void *handle = dlopen("/System/Library/Frameworks/IOKit.framework/IOKit", RTLD_LAZY);
+        if (handle) {
+            sCreate = (LMIOHIDCreate_t)dlsym(handle, "IOHIDEventSystemClientCreate");
+            sSetMatching = (LMIOHIDSetMatching_t)dlsym(handle, "IOHIDEventSystemClientSetMatching");
+            sCopyServices = (LMIOHIDCopyServices_t)dlsym(handle, "IOHIDEventSystemClientCopyServices");
+            sCopyProp = (LMIOHIDCopyProperty_t)dlsym(handle, "IOHIDServiceClientCopyProperty");
+            sCopyEvent = (LMIOHIDCopyEvent_t)dlsym(handle, "IOHIDServiceClientCopyEvent");
+            sGetFloat = (LMIOHIDGetFloat_t)dlsym(handle, "IOHIDEventGetFloatValue");
+        }
+    });
+
+    if (!sCreate || !sSetMatching || !sCopyServices || !sCopyProp || !sCopyEvent || !sGetFloat) {
+        return -1.0f;
+    }
+
+    LMIOHIDEventSystemClientRef client = sCreate(kCFAllocatorDefault);
+    if (!client) {
+        return -1.0f;
+    }
+
+    NSDictionary *matching = @{ @"PrimaryUsagePage": @(0xFF00), @"PrimaryUsage": @(5) };
+    sSetMatching(client, (__bridge CFDictionaryRef)matching);
+    CFArrayRef services = sCopyServices(client);
+
+    double primarySum = 0.0;
+    int primaryCount = 0;
+    double fallbackSum = 0.0;
+    int fallbackCount = 0;
+
+    if (services) {
+        CFIndex count = CFArrayGetCount(services);
+        CFIndex i;
+        for (i = 0; i < count; i++) {
+            LMIOHIDServiceClientRef svc = (LMIOHIDServiceClientRef)CFArrayGetValueAtIndex(services, i);
+            CFTypeRef prodRef = sCopyProp(svc, CFSTR("Product"));
+            NSString *name = nil;
+            if (prodRef) {
+                if (CFGetTypeID(prodRef) == CFStringGetTypeID()) {
+                    name = [(__bridge NSString *)prodRef copy];
+                }
+                CFRelease(prodRef);
+            }
+            if (name.length == 0) {
+                continue;
+            }
+            LMIOHIDEventRef ev = sCopyEvent(svc, 15, 0, 0); // kIOHIDEventTypeTemperature = 15
+            if (!ev) {
+                continue;
+            }
+            double celsius = sGetFloat(ev, (15 << 16));
+            CFRelease(ev);
+            if (celsius <= MIN_CPU_TEMP_V || celsius >= MAX_TEMP_V) {
+                continue;
+            }
+            // 一级核心通道：M1~M4+ SoC 硅片核心温度 (PMU tdie* / pACC / eACC / PMGR SOC Die)
+            if ([name hasPrefix:@"PMU tdie"] ||
+                [name containsString:@"pACC MTR Temp"] ||
+                [name containsString:@"eACC MTR Temp"] ||
+                [name containsString:@"PMGR SOC Die"] ||
+                [name containsString:@"SOC MTR Temp"]) {
+                primarySum += celsius;
+                primaryCount++;
+            } else if ([name hasPrefix:@"PMU TP"] && ![name containsString:@"tcal"]) {
+                fallbackSum += celsius;
+                fallbackCount++;
+            }
+        }
+        CFRelease(services);
+    }
+    CFRelease(client);
+
+    if (primaryCount > 0) {
+        return (float)(primarySum / (double)primaryCount);
+    }
+    if (fallbackCount > 0) {
+        return (float)(fallbackSum / (double)fallbackCount);
+    }
+    return -1.0f;
+}
+#endif
 
 // H - heatsink D - diode
 
@@ -49,6 +154,12 @@ int g_nbKeyIndex = 0;
 
 // get cpu temperature for apple silicon
 float GetCPUTemperature(void) {
+#ifdef __arm64__
+    float hidTemp = CmcReadAppleSiliconIOHIDTemperature();
+    if (hidTemp > MIN_CPU_TEMP_V && hidTemp < MAX_TEMP_V) {
+        return hidTemp;
+    }
+#endif
     
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
     
@@ -152,7 +263,7 @@ float GetCPUTemperature(void) {
     return -1;
 }
 
-// get cpu temperature for intel
+// get cpu temperature for intel & apple silicon
 int CmcGetCpuTemperature(double *value)
 {
     uint8_t buf[2];
@@ -160,6 +271,14 @@ int CmcGetCpuTemperature(double *value)
     
     if (value == NULL)
         return -1;
+
+#ifdef __arm64__
+    float armTemp = GetCPUTemperature();
+    if (armTemp > 0) {
+        *value = armTemp;
+        return 0;
+    }
+#endif
     
     if (CmcOpenSmc() == -1)
         return -1;

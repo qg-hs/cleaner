@@ -63,7 +63,8 @@
 
 "请开启通知提醒权限" = "Enable Notification Permissions";
 "若存在摄像头、麦克风或扬声器等隐私设备被调用情况，将发送通知告知隐私保护的情况" = "Notifications will alert you when a privacy device (e.g., camera, microphone, or speaker) is accessed";
-"步骤：\n【系统设置】——【通知】——【应用程序通知】——开启【LemonMonitor】" = "Path:\n [System Settings] → [Notifications] → [Application Notifications] → Enable [LemonMonitor]";
+"步骤：\n【系统设置】——【通知】——【应用程序通知】——开启【LemonMonitor】" = "Path:\n [System Settings] → [Notifications] → [Application Notifications] → Enable [cleaner Monitor]";
+"步骤：\n【系统设置】——【通知】——【应用程序通知】——开启【cleaner Monitor】" = "Path:\n [System Settings] → [Notifications] → [Application Notifications] → Enable [cleaner Monitor]";
 "取消" = "Cancel";
 "操作" = "Operation";
 "软件进程" = "Software Process";

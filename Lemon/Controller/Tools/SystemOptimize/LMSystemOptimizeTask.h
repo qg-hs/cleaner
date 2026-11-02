@@ -12,7 +12,8 @@ typedef NS_ENUM(NSInteger, LMSystemOptimizeTaskType) {
     LMSystemOptimizeTaskQuickLookRebuild = 1,
     LMSystemOptimizeTaskSQLiteVacuum = 2,
     LMSystemOptimizeTaskSavedStateAndQuarantine = 3,
-    LMSystemOptimizeTaskBrokenPlistAudit = 4
+    LMSystemOptimizeTaskBrokenPlistAudit = 4,
+    LMSystemOptimizeTaskAPFSSnapshotThin = 5
 };
 
 typedef NS_ENUM(NSInteger, LMSystemOptimizeTaskState) {

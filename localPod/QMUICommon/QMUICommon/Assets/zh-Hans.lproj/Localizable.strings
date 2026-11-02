@@ -10,15 +10,15 @@
 "GetFullDiskPopViewController_currentApplicationChnage_settingBtn_1" = "完成";
 "GetFullDiskPopViewController_currentApplicationChnage_settingBtn_2" = "前往设置";
 "GetFullDiskPopViewController_setupViews_titleLabel_1" = "cleaner不会上传你的文件信息，请放心使用";
-"GetFullDiskPopViewController_setupViews_descLabel_2" = "步骤：【解锁】——【添加】——【应用程序】——【cleaner】";
-"GetFullDiskPopViewController_setupViews_descLabel_2_lite" = "步骤：【解锁】——【添加】——【应用程序】——【cleaner】";
-"GetFullDiskPopViewController_setupViews_preScan_titleLabel_1" = "建议macOS 14.0及以上开启【完全磁盘访问权限】，提升用户体验";
-"GetFullDiskPopViewController_setupViews_preScan_descLabel_2" = "步骤：【隐私与安全性】——【完全磁盘访问权限】——【添加】——【cleaner】";
-"GetFullDiskPopViewController_setupViews_preScan_descLabel_2_lite" = "步骤：【隐私与安全性】——【完全磁盘访问权限】——【添加】——【cleaner】";
-"GetFullDiskPremission_Title_10_15" = "10.15系统上，cleaner无权限访问废纸篓、桌面等文件夹，需要开启“完全磁盘访问权限”才能扫描并清理垃圾。";
+"GetFullDiskPopViewController_setupViews_descLabel_2" = "步骤：【系统设置】→【隐私与安全性】→【完全磁盘访问权限】→ 开启【cleaner】";
+"GetFullDiskPopViewController_setupViews_descLabel_2_lite" = "步骤：【系统设置】→【隐私与安全性】→【完全磁盘访问权限】→ 开启【cleaner】";
+"GetFullDiskPopViewController_setupViews_preScan_titleLabel_1" = "建议开启【完全磁盘访问权限】，以完整扫描受保护缓存与废纸篓";
+"GetFullDiskPopViewController_setupViews_preScan_descLabel_2" = "步骤：【系统设置】→【隐私与安全性】→【完全磁盘访问权限】→ 开启【cleaner】";
+"GetFullDiskPopViewController_setupViews_preScan_descLabel_2_lite" = "步骤：【系统设置】→【隐私与安全性】→【完全磁盘访问权限】→ 开启【cleaner】";
+"GetFullDiskPremission_Title_10_15" = "cleaner 需要开启“完全磁盘访问权限”（系统设置 -> 隐私与安全性 -> 完全磁盘访问权限）才能扫描并清理废纸篓与桌面等受保护目录。";
 "GetFullDiskPremission_Button_OK_10_15" = "前往授权";
 "GetFullDiskPremission_Button_Cancel_10_15" = "取消";
-"GetFilesAndFolders_Title_10_15" = "10.15系统版本，cleaner无权限访问桌面、文稿、下载文件夹，需要开启“文件及文件夹”权限。";
+"GetFilesAndFolders_Title_10_15" = "请在“系统设置 -> 隐私与安全性 -> 文件和文件夹”中开启 cleaner 的目录访问权限。";
 
 "GetFullDiskPopViewController_setupViews_setupBtn _3" = "前往设置";
 "GetFullDiskPopViewController_setupViews_setupBtn_4" = "完成";
@@ -46,6 +46,6 @@
 "PathSelectViewController_add_system_photo" = "查找系统照片";
 
 
-"GetFullDiskPopViewController_setupViews_titleLabel_monitor" = "在 macOS 11.4 或以上版本，cleaner需要获取全盘读取权限才可清理软件卸载后的残余文件。";
+"GetFullDiskPopViewController_setupViews_titleLabel_monitor" = "cleaner 需要开启“完全磁盘访问权限”才可自动检测并清理软件卸载后的残留文件。";
 
-"GetFullDiskPopViewController_setupViews_descLabel_monitor" = "步骤：【解锁】——【添加】——【应用程序】——开启【cleaner】和【cleaner Monitor】";
+"GetFullDiskPopViewController_setupViews_descLabel_monitor" = "步骤：【系统设置】→【隐私与安全性】→【完全磁盘访问权限】→ 开启【cleaner】与【cleaner Monitor】";

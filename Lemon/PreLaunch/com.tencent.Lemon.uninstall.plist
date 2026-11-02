@@ -4,6 +4,10 @@
 <dict>
 	<key>Label</key>
 	<string>com.tencent.Lemon.uninstall</string>
+	<key>AssociatedBundleIdentifiers</key>
+	<array>
+		<string>com.tencent.Lemon</string>
+	</array>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/Library/Application Support/Lemon/LemonDaemon</string>

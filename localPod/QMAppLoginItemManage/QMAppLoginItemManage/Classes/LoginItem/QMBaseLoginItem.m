@@ -9,6 +9,7 @@
 #import "QMBaseLoginItem.h"
 #import <QMAppLoginItemManage/QMAppLoginItemManage.h>
 #import "QMLoginItemCacheHelper.h"
+#import <AppKit/AppKit.h>
 
 ///base login item
 @implementation QMBaseLoginItem
@@ -34,7 +35,25 @@
     return self;
 }
 
+- (void)openSystemLoginItemsSettings {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSURL *url = nil;
+        if (@available(macOS 13.0, *)) {
+            url = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.LoginItems-Settings.extension"];
+        } else {
+            url = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.preferences.users"];
+        }
+        if (url) {
+            [[NSWorkspace sharedWorkspace] openURL:url];
+        }
+    });
+}
+
 - (void)disableLoginItem {
+    if (self.isManagedBySMAppService) {
+        [self openSystemLoginItemsSettings];
+        return;
+    }
     switch (self.loginItemType) {
         case LoginItemTypeSystemItem:
             [[QMLoginItemManager shareInstance] removeSystemLoginItemWithAppPath:self.appPath];
@@ -51,6 +70,10 @@
 }
 
 - (void)enableLoginItem {
+    if (self.isManagedBySMAppService) {
+        [self openSystemLoginItemsSettings];
+        return;
+    }
     switch (self.loginItemType) {
         case LoginItemTypeSystemItem:
             [[QMLoginItemManager shareInstance] addSystemLoginItemWithAppPath:self.appPath];

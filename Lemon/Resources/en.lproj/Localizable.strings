@@ -15,7 +15,8 @@
 "关闭主面板" = "When click close icon";
 "最小化到程序坞（Dock栏），不退出程序" = "Get back to Dock and keep cleaner running";
 "直接退出程序" = "Quit cleaner";
-"10.14系统后dock栏会默认保留近期使用的3款应用程序，" = "On macOS 10.14 or above, the system shows recent 3 applications in dock \nby default.";
+"10.14系统后dock栏会默认保留近期使用的3款应用程序，" = "macOS shows recent applications in Dock by default.";
+"macOS 程序坞默认会保留近期使用的应用程序，" = "macOS shows recent applications in Dock by default.";
 "更改设置" = "Change settings";
 "偏好设置" = "Preferences";
 "状态栏展示信息设置" = "What to show on menu bar";
@@ -48,7 +49,7 @@
 "系统功能" = " System";
 "查看网速，快捷清理" = "Monitor your system state from Menu bar";
 "方便查看实时状态指标，轻轻一点，快速清理垃圾释放内存" = "Provide a quick look at network speed, RAM usage and easy access to free up";
-"多维扫描，深度清理" = "Full scan and clean your Mac by launching Lemon";
+"多维扫描，深度清理" = "Full scan and clean your Mac by launching cleaner";
 "全方位深度分析系统，揪出占用磁盘元凶，彻底卸载软件" = "Analyze and clean your disk deeply. Uninstall unused apps completely";
 "语言设置" = "Language";
 "简体中文" = "简体中文";
@@ -58,7 +59,7 @@
 "取消" = "No";
 "立即体验" = "Let' go!";
 "需要在状态栏显示图标吗？" = "Do you want to enable the menu bar icon?";
-"显示后可以在状态栏查看实时网速。" = "It shows real-time network speed and works as a shortcut to launch Lemon.";
+"显示后可以在状态栏查看实时网速。" = "It shows real-time network speed and works as a shortcut to launch cleaner.";
 "仅本次" = "Show it this time";
 "开机默认显示" = "Show it upon startup of my Mac";
 "确定" = "Confirm";
@@ -70,8 +71,10 @@
 "关闭开机启动状态栏后，当前状态栏（包括网速显示）也将直接退出" = "If yes, the icon along with the network speed will quit immediately.";
 "取消" = "Cancel";
 "确定" = "Yes";
-"Lemon将会自动重启，重启后语言切换生效。" = "Lemon will restart to make the language change come into effect.";
-"无需重启系统，仅重启Lemon应用。" = "You don’t have to reboot the system. It restarts Lemon application.";
+"Lemon将会自动重启，重启后语言切换生效。" = "cleaner will restart to make the language change take effect.";
+"cleaner将会自动重启，重启后语言切换生效。" = "cleaner will restart to make the language change take effect.";
+"无需重启系统，仅重启Lemon应用。" = "You don’t have to reboot the system. Only cleaner will restart.";
+"无需重启系统，仅重启cleaner应用。" = "You don’t have to reboot the system. Only cleaner will restart.";
 "取消" = "Cancel";
 "好的" = "OK";
 "显示状态栏" = "Show menu bar icon";
@@ -81,7 +84,8 @@
 " 通用 " = "General";
 "状态栏" = "Menu bar";
 "主题设置" = "Appearance";
-"仅支持macOS 10.14系统及以上" = "Support macOS 10.14 or above";
+"仅支持macOS 10.14系统及以上" = "Supports Light, Dark, and System appearance";
+"支持浅色、深色与跟随系统外观" = "Supports Light, Dark, and System appearance";
 
 "前往社区分享你的宝贵意见" = "Join our community and to be heard";
 "cleaner" = "cleaner";
@@ -92,9 +96,11 @@
 "add_folder_drag_folder_tips" = "Drag and drop file folder here";
 
 
-"macOS 10.15系统，需授权Lemon废纸篓访问权限才可开启。点击“前往授权”。" = "From macOS 10.15, you have to grant permission \"Full Disk Access\" to clean trash. Please click \"Grant permission\".";
+"macOS 10.15系统，需授权Lemon废纸篓访问权限才可开启。点击“前往授权”。" = "Please grant \"Full Disk Access\" to cleaner in System Settings -> Privacy & Security to monitor Trash. Click \"Grant permission\".";
+"请在“系统设置 -> 隐私与安全性 -> 完全磁盘访问权限”中授权 cleaner 以开启废纸篓监控。点击“前往授权”。" = "Please grant \"Full Disk Access\" to cleaner in System Settings -> Privacy & Security to monitor Trash. Click \"Grant permission\".";
 
-"macOS 10.15系统，需要打开状态栏并且授权Lemon废纸篓访问权限才可开启。要开启并授权吗？" = "From macOS 10.15, you have to add menu bar icon and grant permission \"Full Disk Access\" to clean trash. Do you want to open it？";
+"macOS 10.15系统，需要打开状态栏并且授权Lemon废纸篓访问权限才可开启。要开启并授权吗？" = "This feature requires the menu bar monitor and \"Full Disk Access\" in System Settings -> Privacy & Security. Enable and grant permission?";
+"开启此功能需要显示状态栏并在“系统设置 -> 隐私与安全性 -> 完全磁盘访问权限”中授权 cleaner。是否开启并授权？" = "This feature requires the menu bar monitor and \"Full Disk Access\" in System Settings -> Privacy & Security. Enable and grant permission?";
 
 "需要打开状态栏才可开启。要打开吗？" = "To keep the service running, you have to add menu bar icon to detect leftover files in the background. Do you want to add it?";
 
@@ -103,15 +109,18 @@
 
 "跟随系统" = "Follow system";
 
-"Lemon不会上传你的文件信息，请放心使用" = "Please rest assured that cleaner never or ever upload your files.";
+"Lemon不会上传你的文件信息，请放心使用" = "Please rest assured that cleaner never uploads your files.";
+"cleaner不会上传你的文件信息，请放心使用" = "Please rest assured that cleaner never uploads your files.";
 
-"步骤：【解锁】——【添加】——【应用程序】——【Lemon】" = "Click the lock —— Click add icon —— Find \"cleaner\" in Application";
+"步骤：【解锁】——【添加】——【应用程序】——【Lemon】" = "System Settings → Privacy & Security → Full Disk Access → Enable \"cleaner\"";
+"步骤：【系统设置】→【隐私与安全性】→【完全磁盘访问权限】→ 开启【cleaner】" = "System Settings → Privacy & Security → Full Disk Access → Enable \"cleaner\"";
 
 "打开状态栏" = "YES";
 
 
 
-"10.15系统上，Lemon无权限访问废纸篓、桌面等文件夹，需要开启“完全磁盘访问权限”才能扫描并清理垃圾。" = "From mac OS 10.15, you have to grant permission \"Full Disk Access\" to clean trash or  desktop folders.";
+"10.15系统上，Lemon无权限访问废纸篓、桌面等文件夹，需要开启“完全磁盘访问权限”才能扫描并清理垃圾。" = "Please grant \"Full Disk Access\" to cleaner in System Settings -> Privacy & Security to scan protected folders and Trash.";
+"cleaner 需要开启“完全磁盘访问权限”（系统设置 -> 隐私与安全性 -> 完全磁盘访问权限）才能扫描并清理废纸篓与桌面等受保护目录。" = "Please grant \"Full Disk Access\" to cleaner in System Settings -> Privacy & Security to scan protected folders and Trash.";
 
 "删除文件到废纸篓时提醒" = "when move files to the trash";
 "废纸篓清理提醒" = "Notifications to empty the trash prompt";

@@ -173,7 +173,7 @@
     //如果没有授权，状态栏在，“前往授权”
     if(![self checkFullDiskAuthorizationStatus] && button.on && [self isAppRunningBundleId:MONITOR_APP_BUNDLEID])
     {
-        [FullDiskAccessPermissionViewController showFullDiskAccessRequestWithParentController:self title:NSLocalizedString(@"macOS 10.15系统，需授权Lemon废纸篓访问权限才可开启。点击“前往授权”。", nil) windowCloseBlock:^{
+        [FullDiskAccessPermissionViewController showFullDiskAccessRequestWithParentController:self title:NSLocalizedString(@"请在“系统设置 -> 隐私与安全性 -> 完全磁盘访问权限”中授权 cleaner 以开启废纸篓监控。点击“前往授权”。", nil) windowCloseBlock:^{
             button.on = NO;
         } okButtonBlock:^{
             if(button == self.autoUninstallSwitch){
@@ -192,7 +192,7 @@
     //如果没有授权，状态栏不在, "开启并授权"
     if(![self checkFullDiskAuthorizationStatus] && button.on && ![self isAppRunningBundleId:MONITOR_APP_BUNDLEID])
     {
-        [FullDiskAccessPermissionViewController showFullDiskAccessRequestWithParentController:self title:NSLocalizedString(@"macOS 10.15系统，需要打开状态栏并且授权Lemon废纸篓访问权限才可开启。要开启并授权吗？", nil) description:@"" okBtnTitle:NSLocalizedString(@"开启并授权", nil) windowHeight: 140 windowCloseBlock:^{
+        [FullDiskAccessPermissionViewController showFullDiskAccessRequestWithParentController:self title:NSLocalizedString(@"开启此功能需要显示状态栏并在“系统设置 -> 隐私与安全性 -> 完全磁盘访问权限”中授权 cleaner。是否开启并授权？", nil) description:@"" okBtnTitle:NSLocalizedString(@"开启并授权", nil) windowHeight: 140 windowCloseBlock:^{
             button.on = NO;
         } okButtonBlock:^{
             if(button == self.autoUninstallSwitch){
@@ -337,7 +337,7 @@
     
     NSTextField* dockRadioBtnExitDes = [self createLabel:NSLocalizedString(@"直接退出程序", nil) font:[NSFontHelper getLightSystemFont:12] color:[LMAppThemeHelper getTitleColor]];
     
-    NSTextField* javaOsTipLabel = [self createLabel:NSLocalizedString(@"10.14系统后dock栏会默认保留近期使用的3款应用程序，", nil) font:[NSFontHelper getLightSystemFont:12] color:[NSColor colorWithHex:0x999999]];
+    NSTextField* javaOsTipLabel = [self createLabel:NSLocalizedString(@"macOS 程序坞默认会保留近期使用的应用程序，", nil) font:[NSFontHelper getLightSystemFont:12] color:[NSColor colorWithHex:0x999999]];
     if (@available(macOS 10.11, *)) {
         javaOsTipLabel.maximumNumberOfLines = 2;
     }
@@ -420,7 +420,7 @@
     NSTextField* languageTitle = [self createLabel:NSLocalizedString(@"语言设置", nil) font:[NSFont systemFontOfSize:14] color:[LMAppThemeHelper getTitleColor]];
     ///主题设置
     NSTextField *themeTitle = [self createLabel:NSLocalizedString(@"主题设置", nil) font:[NSFont systemFontOfSize:14] color:[LMAppThemeHelper getTitleColor]];
-    NSTextField* themeDesc =[self createLabel:NSLocalizedString(@"仅支持macOS 10.14系统及以上", nil) font:[NSFontHelper getLightSystemFont:12] color:[NSColor colorWithHex:0x94979B]];
+    NSTextField* themeDesc =[self createLabel:NSLocalizedString(@"支持浅色、深色与跟随系统外观", nil) font:[NSFontHelper getLightSystemFont:12] color:[NSColor colorWithHex:0x94979B]];
     
     NSButton *lightThemeRadioBtn = [[NSButton alloc]init];
     lightThemeRadioBtn.frame = NSMakeRect(0, 0, 14, 14);
@@ -751,12 +751,21 @@
 
 -(void)openMonitor{
     NSLog(@"%s, open monitor", __FUNCTION__);
-    NSError *error = NULL;
-    NSRunningApplication *app = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:MONITOR_APP_PATH]
-                                                                              options:NSWorkspaceLaunchWithoutAddingToRecents | NSWorkspaceLaunchWithoutActivation
-                                                                        configuration:@{NSWorkspaceLaunchConfigurationArguments: @[[NSString stringWithFormat:@"%lu", LemonMonitorRunningMenu]]}
-                                                                                error:&error];
-    NSLog(@"%s, open lemon monitor: %@, %@",__FUNCTION__, app, error);
+    NSURL *monitorURL = [NSURL fileURLWithPath:MONITOR_APP_PATH];
+    if (@available(macOS 10.15, *)) {
+        // 使用 macOS 12+ 标准 NSWorkspaceOpenConfiguration 替代废弃 launchApplicationAtURL:
+        NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
+        config.addsToRecentItems = NO;
+        config.activates = NO;
+        config.arguments = @[[NSString stringWithFormat:@"%lu", (unsigned long)LemonMonitorRunningMenu]];
+        [[NSWorkspace sharedWorkspace] openApplicationAtURL:monitorURL
+                                              configuration:config
+                                          completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"%s, open monitor error: %@", __FUNCTION__, error);
+            }
+        }];
+    }
 }
 
 
@@ -781,8 +790,8 @@
         if([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish){
             imageName = @"setstep_en";
         }
-        NSString *title = NSLocalizedString(@"Lemon不会上传你的文件信息，请放心使用", nil);
-        NSString *descText = NSLocalizedString(@"步骤：【解锁】——【添加】——【应用程序】——【Lemon】", nil);
+        NSString *title = NSLocalizedString(@"cleaner不会上传你的文件信息，请放心使用", nil);
+        NSString *descText = NSLocalizedString(@"步骤：【系统设置】→【隐私与安全性】→【完全磁盘访问权限】→ 开启【cleaner】", nil);
         self.permissionGuideWndController = [[LMPermissionGuideWndController alloc] initWithParaentCenterPos:centerPoint title:title descText:descText image:[NSImage imageNamed:imageName withClass:self.class] guideImageViewHeight:680];
         self.permissionGuideWndController.needCheckMonitorFullDiskAuthorizationStatus = YES;
         self.permissionGuideWndController.settingButtonEvent = ^{
@@ -893,7 +902,18 @@
 }
 
 -(void)gotoSystemSettingPage{
-    [[NSWorkspace sharedWorkspace] openFile:@"/System/Library/PreferencePanes/Dock.prefPane"];
+    // 适配 macOS 13+ 系统设置“桌面与程序坞”扩展 URL，回退兼容 macOS 12
+    if (@available(macOS 13.0, *)) {
+        NSURL *modernURL = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.Desktop-Settings.extension"];
+        if (modernURL) {
+            [[NSWorkspace sharedWorkspace] openURL:modernURL];
+            return;
+        }
+    }
+    NSURL *legacyURL = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.dock"];
+    if (legacyURL) {
+        [[NSWorkspace sharedWorkspace] openURL:legacyURL];
+    }
 }
 
 -(void)dockMinValueChange:(id)sender
@@ -945,8 +965,8 @@
     
     [alert.accessoryView setFrameOrigin:NSMakePoint(0, 0)];
     alert.alertStyle = NSAlertStyleInformational;
-    alert.messageText = NSLocalizedString(@"Lemon将会自动重启，重启后语言切换生效。", nil);
-    alert.informativeText = NSLocalizedString(@"无需重启系统，仅重启Lemon应用。", nil);
+    alert.messageText = NSLocalizedString(@"cleaner将会自动重启，重启后语言切换生效。", nil);
+    alert.informativeText = NSLocalizedString(@"无需重启系统，仅重启cleaner应用。", nil);
     [alert addButtonWithTitle:NSLocalizedString(@"好的", nil)];
     [alert addButtonWithTitle:NSLocalizedString(@"取消", nil)];
     

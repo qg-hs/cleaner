@@ -7,12 +7,15 @@
 //
 
 #import "LemonMonitroHelpParams.h"
+#import <AppKit/AppKit.h>
 #import <QMCoreFunction/QMShellExcuteHelper.h>
 #import <sys/sysctl.h>
 #import <libproc.h>
 
 @interface LemonMonitroHelpParams ()
 @property (nonatomic, strong) NSTimer *memTopTimer;
+@property (nonatomic, assign) BOOL isStatActive;
+@property (nonatomic, assign) BOOL isScreenSleepingOrLocked;
 @end
 
 @implementation LemonMonitroHelpParams
@@ -25,19 +28,71 @@
     });
     return instance;
 }
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        NSNotificationCenter *wsCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+        [wsCenter addObserver:self selector:@selector(handleScreenSleep:) name:NSWorkspaceScreensDidSleepNotification object:nil];
+        [wsCenter addObserver:self selector:@selector(handleScreenSleep:) name:NSWorkspaceWillSleepNotification object:nil];
+        [wsCenter addObserver:self selector:@selector(handleScreenWake:) name:NSWorkspaceScreensDidWakeNotification object:nil];
+        [wsCenter addObserver:self selector:@selector(handleScreenWake:) name:NSWorkspaceDidWakeNotification object:nil];
+        [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleScreenSleep:) name:@"com.apple.screenIsLocked" object:nil];
+        [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleScreenWake:) name:@"com.apple.screenIsUnlocked" object:nil];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [self.memTopTimer invalidate];
+    self.memTopTimer = nil;
+    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)handleScreenSleep:(NSNotification *)note
+{
+    self.isScreenSleepingOrLocked = YES;
+    [self.memTopTimer invalidate];
+    self.memTopTimer = nil;
+}
+
+- (void)handleScreenWake:(NSNotification *)note
+{
+    self.isScreenSleepingOrLocked = NO;
+    if (self.isStatActive && !self.memTopTimer) {
+        self.memTopTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(memoryTopRepeater) userInfo:nil repeats:YES];
+        self.memTopTimer.tolerance = 1.0;
+        [self.memTopTimer fire];
+    }
+}
+
 - (void)startStatMemory
 {
-    self.memTopTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(memoryTopRepeater) userInfo:nil repeats:YES];
+    self.isStatActive = YES;
+    [self.memTopTimer invalidate];
+    self.memTopTimer = nil;
+    if (self.isScreenSleepingOrLocked) {
+        return;
+    }
+    self.memTopTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(memoryTopRepeater) userInfo:nil repeats:YES];
+    self.memTopTimer.tolerance = 1.0; // 20% Timer Coalescing 容差
     [self.memTopTimer fire];
 }
 - (void)stopStatMemory
 {
+    self.isStatActive = NO;
     [self.memTopTimer invalidate];
     self.memTopTimer = nil;
 }
 
 // 对应活动监视器里面的 实际内存 （反映了进程真正占用的物理内存空间，不包括那些已被换出到磁盘交换空间的部分，正好有用户提了建议）
 - (void)memoryTopRepeater {
+    if (self.isScreenSleepingOrLocked) {
+        return;
+    }
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {

@@ -35,6 +35,9 @@ typedef enum{
 ///login item is enabled
 @property BOOL isEnable;
 
+/// macOS 13+ 由 SMAppService / BTM 托管（需跳转系统设置->登录项进行授权变更）
+@property (nonatomic, assign) BOOL isManagedBySMAppService;
+
 - (instancetype)initWithAppPath: (NSString *)appPath;
 
 - (instancetype)initWithAppPath: (NSString *)appPath loginItemType: (LoginItemType)type;
@@ -42,6 +45,8 @@ typedef enum{
 - (void)disableLoginItem;
 
 - (void)enableLoginItem;
+
+- (void)openSystemLoginItemsSettings;
 
 /// 被用户禁用
 @property (nonatomic) BOOL isDisabledByUser;

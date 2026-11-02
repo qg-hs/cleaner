@@ -8,6 +8,7 @@
 
 #import "McStatMonitor.h"
 #import "McStatInfoHelp.h"
+#import <AppKit/AppKit.h>
 #include <pthread.h>
 #include <sys/sysctl.h>
 #import <libproc.h>
@@ -15,6 +16,7 @@
 #import "McStatInfoConst.h"
 #import "QMSampleStorage.h"
 #import "LMReferenceDefines.h"
+#import "McCoreFunction.h"
 
 #define STATUS_TYPE_LOGO (1 << 0)
 #define STATUS_TYPE_MEM  (1 << 1)
@@ -41,28 +43,34 @@
 @property int processSamplerLifeCounter;
 // 串行队列
 @property (nonatomic, strong) dispatch_queue_t loopQueue;
+@property (nonatomic, strong) dispatch_source_t pollTimer;
+@property (atomic, assign) BOOL isScreenSleepingOrLocked;
 
 @end
 
 @implementation McStatMonitor
+@synthesize isTrayPageOpen = _isTrayPageOpen;
 
 - (id)init
 {
     if (self = [super init])
     {
         refreshInterval = 2;
+        escThread = NO;
+        _isScreenSleepingOrLocked = NO;
         storage = [[QMSampleStorage alloc] init];
         // 创建对象，用于线程调用
         m_monitorFunction = [[McMonitorFuction alloc] init];
         isExistBattery = [McStatInfoHelp checkBatteryExist];
         
         self.loopQueue = dispatch_queue_create("com.tecent.lemonmonitor.loopgetdataqueue", DISPATCH_QUEUE_SERIAL);
+        [self _registerPowerAndLockNotifications];
 
-        // 首次立即执行, 后续定时执行
+        // 首次立即执行, 后续由可挂起的 Coalesced Dispatch Timer 驱动（熄屏/锁屏零唤醒）
         dispatch_async(self.loopQueue, ^{
             [self _collectAndSendSystemInfo];
         });
-        [self _loopStatData];
+        [self _startPollTimerIfNeeded];
     }
     
     return self;
@@ -83,31 +91,116 @@
 -(void)dealloc
 {
     escThread = YES;
+    [self _stopPollTimer];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)_loopStatData
+- (void)_registerPowerAndLockNotifications
 {
-    @weakify(self);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self->refreshInterval * NSEC_PER_SEC)), self.loopQueue, ^{
-        @strongify(self);
-        @autoreleasepool {
+    NSNotificationCenter *wsCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+    [wsCenter addObserver:self selector:@selector(_handleScreenOrSystemSleep:) name:NSWorkspaceScreensDidSleepNotification object:nil];
+    [wsCenter addObserver:self selector:@selector(_handleScreenOrSystemSleep:) name:NSWorkspaceWillSleepNotification object:nil];
+    [wsCenter addObserver:self selector:@selector(_handleScreenOrSystemWake:) name:NSWorkspaceScreensDidWakeNotification object:nil];
+    [wsCenter addObserver:self selector:@selector(_handleScreenOrSystemWake:) name:NSWorkspaceDidWakeNotification object:nil];
+
+    NSDistributedNotificationCenter *distCenter = [NSDistributedNotificationCenter defaultCenter];
+    [distCenter addObserver:self selector:@selector(_handleScreenOrSystemSleep:) name:@"com.apple.screenIsLocked" object:nil];
+    [distCenter addObserver:self selector:@selector(_handleScreenOrSystemWake:) name:@"com.apple.screenIsUnlocked" object:nil];
+}
+
+- (void)_handleScreenOrSystemSleep:(NSNotification *)note
+{
+    self.isScreenSleepingOrLocked = YES;
+    [self _stopPollTimer];
+}
+
+- (void)_handleScreenOrSystemWake:(NSNotification *)note
+{
+    self.isScreenSleepingOrLocked = NO;
+    if (!self->escThread) {
+        [self _startPollTimerIfNeeded];
+        dispatch_async(self.loopQueue, ^{
             [self _collectAndSendSystemInfo];
+        });
+    }
+}
+
+- (void)_startPollTimerIfNeeded
+{
+    dispatch_async(self.loopQueue, ^{
+        if (self->escThread || self.isScreenSleepingOrLocked) {
+            return;
         }
-        [self _loopStatData];
+        if (self.pollTimer != nil) {
+            return;
+        }
+        int intervalSec = self->refreshInterval > 0 ? self->refreshInterval : 2;
+        uint64_t intervalNs = (uint64_t)intervalSec * NSEC_PER_SEC;
+        // 20% Leeway 允许 XNU 内核合并时钟中断（Timer Coalescing），显著降低能效核唤醒功耗
+        uint64_t leewayNs = intervalNs / 5;
+
+        dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.loopQueue);
+        dispatch_source_set_timer(timer,
+                                  dispatch_time(DISPATCH_TIME_NOW, (int64_t)intervalNs),
+                                  intervalNs,
+                                  leewayNs);
+        @weakify(self);
+        dispatch_source_set_event_handler(timer, ^{
+            @strongify(self);
+            if (!self || self->escThread || self.isScreenSleepingOrLocked) {
+                return;
+            }
+            @autoreleasepool {
+                [self _collectAndSendSystemInfo];
+            }
+        });
+        self.pollTimer = timer;
+        dispatch_resume(timer);
     });
+}
+
+- (void)_stopPollTimer
+{
+    dispatch_async(self.loopQueue, ^{
+        if (self.pollTimer != nil) {
+            dispatch_source_cancel(self.pollTimer);
+            self.pollTimer = nil;
+        }
+    });
+}
+
+- (void)setIsTrayPageOpen:(BOOL)isTrayPageOpen
+{
+    BOOL changedToOpen = (!_isTrayPageOpen && isTrayPageOpen);
+    _isTrayPageOpen = isTrayPageOpen;
+    if (changedToOpen && !self->escThread && !self.isScreenSleepingOrLocked) {
+        dispatch_async(self.loopQueue, ^{
+            @autoreleasepool {
+                [self _collectAndSendSystemInfo];
+            }
+        });
+    }
+}
+
+- (BOOL)isTrayPageOpen
+{
+    return _isTrayPageOpen;
 }
 
 - (void)_collectAndSendSystemInfo
 {
-    if (!self->escThread)
+    if (!self->escThread && !self.isScreenSleepingOrLocked)
     {
-        [self networkInfo];
+        if ((self.trayType & STATUS_TYPE_NET) || (self.isTrayPageOpen)) {
+            [self networkInfo];
+        }
         if ((self.trayType & STATUS_TYPE_MEM) || (self.isTrayPageOpen)) {
             [self memoryInfo];
         }
 #ifndef APPSTORE_VERSION
-        if ((self.trayType & STATUS_TYPE_FAN) || (self.isTrayPageOpen)) {
+        if (LMDeviceHasPhysicalFan() && ((self.trayType & STATUS_TYPE_FAN) || (self.isTrayPageOpen))) {
             [self fanInfo];
         }
 #endif
@@ -125,7 +218,6 @@
         if ((self.trayType & STATUS_TYPE_GPU) || (self.isTrayPageOpen)) {
             [self gpuInfo];
         }
-        //                                   [self batteryStateInfo];
         if (self.processSamplerOn) {
             self.processSamplerLifeCounter -= 1;
             [self->storage sample];
@@ -137,32 +229,31 @@
 - (void)startRunMonitor
 {
     escThread = NO;
-    
+    [self _startPollTimerIfNeeded];
 }
 - (void)stopRunMonitor
 {
     escThread = YES;
+    [self _stopPollTimer];
 }
 
 - (void)refreshTime:(NSNotification *)notification
 {
-    refreshInterval = [[notification object] intValue];
+    int newInterval = [[notification object] intValue];
+    if (newInterval > 0 && newInterval != refreshInterval) {
+        refreshInterval = newInterval;
+        [self _stopPollTimer];
+        [self _startPollTimerIfNeeded];
+    }
 }
 
 - (void)sendStatInfoNotification
 {
-    //    NSMutableDictionary * statDict = [NSMutableDictionary dictionary];
-    // cpu信息
-    //    if (m_cpuDict)
-    //    {
-    //        // monitor暂时不用CPU信息
-    //        [[NSNotificationCenter defaultCenter] postNotificationName:kStatCPUInfoNotification object:m_cpuDict];
-    //        [statDict setObject:m_cpuDict forKey:kStatCPUInfoNotification];
-    //    }
-    //网络信息
+    // 网络信息（仅在勾选网速或浮窗展开时投递）
     if (m_networkDict) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kNetworkInfoNotification object:m_networkDict];
-        //            [statDict setObject:m_networkDict forKey:kNetworkInfoNotification];
+        if ((self.trayType & STATUS_TYPE_NET) || (self.isTrayPageOpen)) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:kNetworkInfoNotification object:m_networkDict];
+        }
     }
     
     // 内存信息

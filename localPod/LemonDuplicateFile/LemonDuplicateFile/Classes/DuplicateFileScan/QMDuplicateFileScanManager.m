@@ -15,6 +15,7 @@
 #include <sys/attr.h>
 #import <QMUICommon/LMiCloudPathHelper.h>
 #import <QMCoreFunction/NSString+PathExtension.h>
+#import <QMCoreFunction/McCoreFunction.h>
 
 const float kDuplicateIndexFileProgress = 0.2f; // 索引所有文件部分占用的进度
 const float kDuplicateCalculateProgress = 0.6f; // 计算索引文件大小占用的进度
@@ -234,7 +235,11 @@ const float kDuplicateMaxSearchProgress = kDuplicateIndexFileProgress + kDuplica
             @autoreleasepool {
                 struct stat fileStat;
                 NSUInteger totalSize = 0;
-                if (lstat([resultPath fileSystemRepresentation], &fileStat) != 0)  //获取文件信息
+                const char *fsPath = [resultPath fileSystemRepresentation];
+                if (!fsPath || lstat(fsPath, &fileStat) != 0)  //获取文件信息
+                    continue;
+                // 跳过 SF_DATALESS / .icloud 云端无数据存根，严禁后续打开文件流触发自动下载
+                if (LMPathIsCloudDataless(fsPath, &fileStat))
                     continue;
 
                 QMFileItem *fileItem = nil;
@@ -318,7 +323,11 @@ const float kDuplicateMaxSearchProgress = kDuplicateIndexFileProgress + kDuplica
     BOOL diskMode = NO;
 
     struct stat fileStat;
-    if (lstat([path fileSystemRepresentation], &fileStat) == noErr) {
+    const char *fsPath = [path fileSystemRepresentation];
+    if (fsPath && lstat(fsPath, &fileStat) == noErr) {
+        if (LMPathIsCloudDataless(fsPath, &fileStat)) {
+            return 0;
+        }
         if (fileStat.st_mode & S_IFDIR)
 //            fileSize = [self fastFolderSizeAtFSRef:path diskMode:diskMode delegate:showDelegate];
             fileSize = [self sizeAtPath:path diskMode:diskMode delegate:showDelegate];
@@ -350,8 +359,12 @@ const float kDuplicateMaxSearchProgress = kDuplicateIndexFileProgress + kDuplica
             [searchPaths removeObjectAtIndex:0];
             
             struct stat fileStat;
-            if (lstat([fullPath fileSystemRepresentation], &fileStat) == 0)
+            const char *fullFsPath = [fullPath fileSystemRepresentation];
+            if (fullFsPath && lstat(fullFsPath, &fileStat) == 0)
             {
+                if (LMPathIsCloudDataless(fullFsPath, &fileStat)) {
+                    continue;
+                }
                 if (fileStat.st_mode & S_IFDIR)
                 {
                     NSArray *childSubPaths = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPath error:nil];

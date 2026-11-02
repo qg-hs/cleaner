@@ -31,27 +31,137 @@
 
 -(BOOL)getHardWareInfo{
     [self.diskZoneArr removeAllObjects];
-    [self writeInfoToToFile];
-    [self readFromFile];
+    // 优先通过内核 FileSystem Resource Keys 原生直读，避免每 30 秒 fork system_profiler 子进程与磁盘写入
+    if (![self populateFromNativeMountedVolumes]) {
+        [self writeInfoToToFile];
+        [self readFromFile];
+    }
     self.isInit = YES;
     
     return YES;
 }
 
--(float)getAllUsableBytes{
-    if (@available(macOS 10.13, *)) {
-        NSError *error = nil;
-        NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:NSHomeDirectory()];
-        NSDictionary *results = [fileURL resourceValuesForKeys:@[NSURLVolumeAvailableCapacityForImportantUsageKey] error:&error];
-        if (!results) {
-            NSLog(@"Error retrieving resource keys");
-            return 0;
-        }
-        //    NSLog(@"float Available capacity for important usage: %lf",[[results objectForKey:NSURLVolumeAvailableCapacityForImportantUsageKey] floatValue]);
-        return [[results objectForKey:NSURLVolumeAvailableCapacityForImportantUsageKey] floatValue];
-    }else{
+-(long long)getAllUsableBytesForURL:(NSURL *)targetURL {
+    NSURL *fileURL = targetURL ?: [NSURL fileURLWithPath:NSHomeDirectory()];
+    [fileURL removeAllCachedResourceValues];
+    NSError *error = nil;
+    NSArray<NSURLResourceKey> *keys = @[
+        NSURLVolumeAvailableCapacityForImportantUsageKey,
+        NSURLVolumeAvailableCapacityKey
+    ];
+    NSDictionary *results = [fileURL resourceValuesForKeys:keys error:&error];
+    if (!results) {
         return 0;
     }
+    long long importantBytes = [[results objectForKey:NSURLVolumeAvailableCapacityForImportantUsageKey] longLongValue];
+    if (importantBytes > 0) {
+        return importantBytes;
+    }
+    return [[results objectForKey:NSURLVolumeAvailableCapacityKey] longLongValue];
+}
+
+-(long long)getAllUsableBytes{
+    return [self getAllUsableBytesForURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+}
+
+-(BOOL)populateFromNativeMountedVolumes {
+    NSArray<NSURLResourceKey> *keys = @[
+        NSURLVolumeLocalizedNameKey,
+        NSURLVolumeNameKey,
+        NSURLVolumeTotalCapacityKey,
+        NSURLVolumeAvailableCapacityForImportantUsageKey,
+        NSURLVolumeAvailableCapacityKey,
+        NSURLVolumeIsReadOnlyKey,
+        NSURLVolumeIsLocalKey,
+        NSURLVolumeIsInternalKey
+    ];
+    NSArray<NSURL *> *urls = [[NSFileManager defaultManager] mountedVolumeURLsIncludingResourceValuesForKeys:keys
+                                                                                                     options:NSVolumeEnumerationSkipHiddenVolumes];
+    if (urls.count == 0) {
+        return NO;
+    }
+
+    BOOL addedMainDisk = NO;
+    long long mainContainerSize = 0;
+
+    for (NSURL *volURL in urls) {
+        [volURL removeAllCachedResourceValues];
+        NSDictionary<NSURLResourceKey, id> *vals = [volURL resourceValuesForKeys:keys error:nil];
+        if (!vals) {
+            continue;
+        }
+        if (vals[NSURLVolumeIsLocalKey] && ![vals[NSURLVolumeIsLocalKey] boolValue]) {
+            continue;
+        }
+        NSString *mountPath = [volURL path] ?: @"";
+        BOOL isRootMount = [mountPath isEqualToString:@"/"];
+        BOOL isDataMount = [mountPath isEqualToString:@"/System/Volumes/Data"];
+        BOOL isReadOnly = [vals[NSURLVolumeIsReadOnlyKey] boolValue];
+
+        // macOS 11+ SSV 根卷 "/" 为只读快照，但代表用户主磁盘名称（如 Macintosh HD），需保留并聚合 Data 卷真实可用容量
+        if (isReadOnly && !isRootMount) {
+            continue;
+        }
+        if ([mountPath hasPrefix:@"/System/Volumes/"] && !isDataMount) {
+            continue;
+        }
+
+        NSString *volName = vals[NSURLVolumeLocalizedNameKey] ?: vals[NSURLVolumeNameKey] ?: [mountPath lastPathComponent];
+        if ([volName isEqualToString:@"Recovery"] || [volName isEqualToString:@"Preboot"] || [volName isEqualToString:@"VM"] || [volName isEqualToString:@"Update"]) {
+            continue;
+        }
+
+        long long totalBytes = [vals[NSURLVolumeTotalCapacityKey] longLongValue];
+        if (totalBytes <= 0) {
+            continue;
+        }
+
+        if (isRootMount || isDataMount) {
+            if (addedMainDisk) {
+                continue;
+            }
+            DiskZoneModel *mainZone = [[DiskZoneModel alloc] init];
+            if (isDataMount) {
+                NSURL *rootURL = [NSURL fileURLWithPath:@"/"];
+                NSDictionary *rootVals = [rootURL resourceValuesForKeys:@[NSURLVolumeLocalizedNameKey, NSURLVolumeNameKey] error:nil];
+                volName = rootVals[NSURLVolumeLocalizedNameKey] ?: rootVals[NSURLVolumeNameKey] ?: volName;
+            }
+            mainZone.diskName = volName ?: @"Macintosh HD";
+            mainZone.maxSize = totalBytes;
+            long long usable = [self getAllUsableBytes];
+            if (usable <= 0) {
+                usable = [self getAllUsableBytesForURL:volURL];
+            }
+            mainZone.leftSize = (usable > totalBytes) ? totalBytes : usable;
+            mainZone.isMainDisk = YES;
+            [self.diskZoneArr insertObject:mainZone atIndex:0];
+            addedMainDisk = YES;
+            mainContainerSize = totalBytes;
+            continue;
+        }
+
+        // 过滤挂载在 /Volumes 下的磁盘映像（DMG）只读或虚拟卷以及同 APFS 主容器重复影射卷
+        BOOL isInternal = vals[NSURLVolumeIsInternalKey] ? [vals[NSURLVolumeIsInternalKey] boolValue] : NO;
+        if (isInternal && mainContainerSize > 0 && totalBytes == mainContainerSize && [mountPath hasPrefix:@"/Volumes/"]) {
+            NSString *symDest = [[NSFileManager defaultManager] destinationOfSymbolicLinkAtPath:mountPath error:nil];
+            if ([symDest isEqualToString:@"/"]) {
+                continue;
+            }
+        }
+
+        long long leftBytes = [self getAllUsableBytesForURL:volURL];
+        if (leftBytes > totalBytes) {
+            leftBytes = totalBytes;
+        }
+        DiskZoneModel *zoneModel = [[DiskZoneModel alloc] init];
+        zoneModel.diskName = volName ?: @"Disk";
+        zoneModel.maxSize = totalBytes;
+        zoneModel.leftSize = leftBytes;
+        zoneModel.isMainDisk = NO;
+        [self.diskZoneArr addObject:zoneModel];
+    }
+
+    return self.diskZoneArr.count > 0;
 }
 
 -(void)writeInfoToToFile{
@@ -124,12 +234,11 @@
         zoneModel.leftSize = [[itemDic objectForKey:@"free_space_in_bytes"] longLongValue];
         zoneModel.isMainDisk = NO;
         if ([mountPoint isEqualToString:@"/"] || [mountPoint isEqualToString:@"/System/Volumes/Data"]) {
-            float newLeftSize = [self getAllUsableBytes];
+            long long newLeftSize = [self getAllUsableBytes];
             if (newLeftSize > 0) {
                 zoneModel.leftSize = newLeftSize;
             }
             zoneModel.isMainDisk = YES;
-//            NSLog(@"%s, maindisk zoneModel: %@", __FUNCTION__, zoneModel);
         }
         
         [self.diskZoneArr addObject:zoneModel];

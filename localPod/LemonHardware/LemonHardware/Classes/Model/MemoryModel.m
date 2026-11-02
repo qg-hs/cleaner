@@ -7,6 +7,7 @@
 //
 
 #import "MemoryModel.h"
+#include <sys/sysctl.h>
 
 #define MEM_PLIST @"mem.plist"
 
@@ -30,12 +31,23 @@
 }
 
 -(BOOL)getHardWareInfo{
-    //    __weak MemoryModel *weakSelf = self;
-    //    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    [self.memBankArr removeAllObjects];
+#ifdef __arm64__
+    // Apple Silicon 采用 SoC 统一内存架构，无独立 DIMM 插槽，直接通过 sysctl hw.memsize 原生读取
+    uint64_t memBytes = 0;
+    size_t memLen = sizeof(memBytes);
+    if (sysctlbyname("hw.memsize", &memBytes, &memLen, NULL, 0) == 0 && memBytes > 0) {
+        double gb = (double)memBytes / (1024.0 * 1024.0 * 1024.0);
+        MemBankModel *bankModel = [[MemBankModel alloc] init];
+        bankModel.memSize = [NSString stringWithFormat:@"%.0f GB", round(gb)];
+        [self.memBankArr addObject:bankModel];
+        self.isInit = YES;
+        return YES;
+    }
+#endif
     [self writeToFile];
     [self readFromFile];
     self.isInit = YES;
-    //    });
     
     return YES;
 }

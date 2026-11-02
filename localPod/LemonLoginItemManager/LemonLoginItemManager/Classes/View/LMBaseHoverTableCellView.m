@@ -105,6 +105,16 @@
 }
 
 - (void)updateLoginItem:(QMBaseLoginItem *)loginItem switchLabel:(NSTextField *)label withSwtichBtn:(COSwitch *)button {
+    if (loginItem.isManagedBySMAppService) {
+        // macOS 13+ BTM 托管项：保持真实启用态并引导跳转“系统设置 -> 通用 -> 登录项”
+        void (^savedHandler)(COSwitch *) = button.onValueChanged;
+        button.onValueChanged = nil;
+        button.on = loginItem.isEnable;
+        button.onValueChanged = savedHandler;
+        [self updateSwitchLabel:label withDisableByUser:loginItem.isDisabledByUser];
+        [loginItem openSystemLoginItemsSettings];
+        return;
+    }
     loginItem.isEnable = button.on;
     [self updateSwitchLabel:label withDisableByUser:loginItem.isDisabledByUser];
     dispatch_async(dispatch_get_global_queue(0, 0), ^{

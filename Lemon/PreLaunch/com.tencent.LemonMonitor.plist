@@ -4,6 +4,10 @@
 <dict>
 	<key>Label</key>
 	<string>com.tencent.LemonMonitor</string>
+	<key>AssociatedBundleIdentifiers</key>
+	<array>
+		<string>com.tencent.Lemon</string>
+	</array>
 	<key>LimitLoadToSessionType</key>
 	<string>Aqua</string>
 	<key>WorkingDirectory</key>

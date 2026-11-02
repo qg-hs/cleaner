@@ -15,9 +15,17 @@
 #import <CoreFoundation/CFBase.h>
 #import <QMCoreFunction/NSTextField+Extension.h>
 #import <QMCoreFunction/NSColor+Extension.h>
+#import <QMCoreFunction/McCoreFunction.h>
+#import <LemonHardware/MachineModel.h>
 #import <QMUICommon/LMCommonHelper.h>
 
 #import "QMDragEffectView.h"
+
+// 状态栏全量采用等宽数字字体（tnum），彻底消除数字跳变引起的状态栏左右抖动
+static NSFont *LMStatusMonoDigitFont(CGFloat size, NSFontWeight weight)
+{
+    return [NSFont monospacedDigitSystemFontOfSize:size weight:weight];
+}
 
 @interface QMStatusMonitorView ()
 {
@@ -88,7 +96,7 @@
     
     
     NSTextField* memTextField = [NSTextField labelWithStringCompat:@"100%"];
-    memTextField.font = [NSFont systemFontOfSize:11];
+    memTextField.font = LMStatusMonoDigitFont(11, NSFontWeightRegular);
 
 
     [containerMem addSubview:memTextField];
@@ -128,7 +136,7 @@
 
 
     NSTextField* DiskTextField = [NSTextField labelWithStringCompat:@"0%"];
-    DiskTextField.font = [NSFont systemFontOfSize:11];
+    DiskTextField.font = LMStatusMonoDigitFont(11, NSFontWeightRegular);
     [containerDisk addSubview:DiskTextField];
     [DiskTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(containerDisk.mas_centerX);
@@ -166,7 +174,7 @@
     
     
     NSTextField* mTextField = [NSTextField labelWithStringCompat:@"90C"];
-    mTextField.font = [NSFont systemFontOfSize:11];
+    mTextField.font = LMStatusMonoDigitFont(11, NSFontWeightRegular);
     [container addSubview:mTextField];
     [mTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(container.mas_centerX);
@@ -203,7 +211,7 @@
     NSView* container = [[NSView alloc] init];
     
     NSTextField* mTextField = [NSTextField labelWithStringCompat:@"9999"];
-    mTextField.font = [NSFont systemFontOfSize:11];
+    mTextField.font = LMStatusMonoDigitFont(11, NSFontWeightRegular);
     [container addSubview:mTextField];
     [mTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(container.mas_centerX);
@@ -251,7 +259,7 @@
     
     NSTextField* upLoadSpeedText = [NSTextField labelWithStringCompat:@"0"];
     upLoadSpeedText.attributedStringValue = [self getAttrStringFromNetSpeed:0];
-    upLoadSpeedText.font = [NSFont systemFontOfSize:9];
+    upLoadSpeedText.font = LMStatusMonoDigitFont(9, NSFontWeightRegular);
     [colNetContainerView addSubview:upLoadSpeedText];
     [upLoadSpeedText mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(upLoadSpeedIcon.mas_right);
@@ -270,7 +278,7 @@
     
     NSTextField* downLoadSpeedText = [NSTextField labelWithStringCompat:@"0"];
     downLoadSpeedText.attributedStringValue = [self getAttrStringFromNetSpeed:0];
-    downLoadSpeedText.font = [NSFont systemFontOfSize:9];
+    downLoadSpeedText.font = LMStatusMonoDigitFont(9, NSFontWeightRegular);
     [colNetContainerView addSubview:downLoadSpeedText];
     [downLoadSpeedText mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(downLoadSpeedIcon.mas_right);
@@ -301,7 +309,7 @@
 - (NSView *)getCpuUsageContainerView:(NSSize *)size {
     NSView *containerView = [[NSView alloc] init];
     NSTextField *cpuValueText = [NSTextField labelWithStringCompat:@"%"];
-    cpuValueText.font = [NSFont systemFontOfSize:11];
+    cpuValueText.font = LMStatusMonoDigitFont(11, NSFontWeightRegular);
     [containerView addSubview:cpuValueText];
     [cpuValueText mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(containerView);
@@ -328,7 +336,7 @@
 - (NSView *)getGpuUsageContainerView:(NSSize *)size {
     NSView *containerView = [[NSView alloc] init];
     NSTextField *gpuValueText = [NSTextField labelWithStringCompat:@"%"];
-    gpuValueText.font = [NSFont systemFontOfSize:11];
+    gpuValueText.font = LMStatusMonoDigitFont(11, NSFontWeightRegular);
     [containerView addSubview:gpuValueText];
     [gpuValueText mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(containerView);
@@ -346,10 +354,123 @@
     (*size).height = 22;
     (*size).width = 30;
     mGpuUsageField = gpuValueText;
-    [self setGpuUsed:self.cpuUsed];
+    [self setGpuUsed:self.gpuUsed];
     [mArrayForDarkModeAdaptiveViews addObject:gpuValueText];
     [mArrayForDarkModeAdaptiveViews addObject:gpuLabel];
     return containerView;
+}
+
+- (void)_bindCompactField:(NSTextField *)valueField forItemFlag:(long)flag {
+    switch (flag) {
+        case STATUS_TYPE_CPU:
+            mCpuUsageField = valueField;
+            [self setCpuUsed:self.cpuUsed];
+            break;
+        case STATUS_TYPE_GPU:
+            mGpuUsageField = valueField;
+            [self setGpuUsed:self.gpuUsed];
+            break;
+        case STATUS_TYPE_MEM:
+            mMemUsageField = valueField;
+            [self setRamUsed:self.ramUsed];
+            break;
+        case STATUS_TYPE_DISK:
+            mDiskUsageField = valueField;
+            [self setDiskUsed:self.diskUsed];
+            break;
+        case STATUS_TYPE_TEP:
+            mCpuTempField = valueField;
+            [self setTemperatureValue:self.temperatureValue];
+            break;
+        case STATUS_TYPE_FAN:
+            mCpuFanSpeedField = valueField;
+            [self setFanSpeedValue:self.fanSpeedValue];
+            break;
+        default:
+            break;
+    }
+}
+
+- (NSString *)_shortTitleForItemFlag:(long)flag {
+    switch (flag) {
+        case STATUS_TYPE_CPU:  return @"CPU";
+        case STATUS_TYPE_GPU:  return @"GPU";
+        case STATUS_TYPE_MEM:  return @"MEM";
+        case STATUS_TYPE_DISK: return @"SSD";
+        case STATUS_TYPE_TEP:  return @"SEN";
+        case STATUS_TYPE_FAN:  return @"RPM";
+        default:               return @"";
+    }
+}
+
+- (NSView *)_singleMetricViewForFlag:(long)flag size:(NSSize *)size {
+    switch (flag) {
+        case STATUS_TYPE_CPU:  return [self getCpuUsageContainerView:size];
+        case STATUS_TYPE_GPU:  return [self getGpuUsageContainerView:size];
+        case STATUS_TYPE_MEM:  return [self getMemContainerView:size];
+        case STATUS_TYPE_DISK: return [self getDiskContainerView:size];
+        case STATUS_TYPE_TEP:  return [self getTmpContainerView:size];
+        case STATUS_TYPE_FAN:  return [self getRpmContainerView:size];
+        default:               return [self getLogoContainerView:size];
+    }
+}
+
+// 刘海屏紧凑双行堆叠列：上下两行各渲染一项 "标签 + 等宽数值"，列宽压缩约 45%
+- (NSView *)getCompactPairContainerTopFlag:(long)topFlag bottomFlag:(long)bottomFlag size:(NSSize *)size {
+    NSView *container = [[NSView alloc] init];
+    NSColor *txtColor = [self getTextColor];
+
+    NSTextField *topTitle = [NSTextField labelWithStringCompat:[self _shortTitleForItemFlag:topFlag]];
+    topTitle.font = [NSFont systemFontOfSize:7.5 weight:NSFontWeightMedium];
+    topTitle.textColor = txtColor;
+    [container addSubview:topTitle];
+
+    NSTextField *topVal = [NSTextField labelWithStringCompat:@"0%"];
+    topVal.font = LMStatusMonoDigitFont(8.5, NSFontWeightRegular);
+    topVal.alignment = NSTextAlignmentRight;
+    topVal.textColor = txtColor;
+    [container addSubview:topVal];
+
+    NSTextField *botTitle = [NSTextField labelWithStringCompat:[self _shortTitleForItemFlag:bottomFlag]];
+    botTitle.font = [NSFont systemFontOfSize:7.5 weight:NSFontWeightMedium];
+    botTitle.textColor = txtColor;
+    [container addSubview:botTitle];
+
+    NSTextField *botVal = [NSTextField labelWithStringCompat:@"0%"];
+    botVal.font = LMStatusMonoDigitFont(8.5, NSFontWeightRegular);
+    botVal.alignment = NSTextAlignmentRight;
+    botVal.textColor = txtColor;
+    [container addSubview:botVal];
+
+    [topVal mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.equalTo(container);
+        make.top.equalTo(container).offset(1);
+    }];
+    [topTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(container);
+        make.centerY.equalTo(topVal);
+    }];
+    [botVal mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.equalTo(container);
+        make.bottom.equalTo(container).offset(-1);
+    }];
+    [botTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(container);
+        make.centerY.equalTo(botVal);
+    }];
+
+    [mArrayForDarkModeAdaptiveViews addObject:topTitle];
+    [mArrayForDarkModeAdaptiveViews addObject:topVal];
+    [mArrayForDarkModeAdaptiveViews addObject:botTitle];
+    [mArrayForDarkModeAdaptiveViews addObject:botVal];
+
+    [self _bindCompactField:topVal forItemFlag:topFlag];
+    [self _bindCompactField:botVal forItemFlag:bottomFlag];
+
+    BOOL hasRpm = (topFlag == STATUS_TYPE_FAN || bottomFlag == STATUS_TYPE_FAN);
+    (*size).height = 22;
+    (*size).width = hasRpm ? 48 : 44;
+    return container;
 }
 
 - (NSColor *)getTextColor {
@@ -415,13 +536,14 @@
 }
 
 - (void)setCpuUsed:(double)cpuUsed {
-//    [super setCpuUsed:cpuUsed];
+    [super setCpuUsed:cpuUsed];
     dispatch_async(dispatch_get_main_queue(), ^{
         self->mCpuUsageField.stringValue = [NSString stringWithFormat:@"%d%%",(int)round(cpuUsed*100)];
     });
 }
 
 - (void)setGpuUsed:(double)gpuUsed {
+    [super setGpuUsed:gpuUsed];
     dispatch_async(dispatch_get_main_queue(), ^{
         self->mGpuUsageField.stringValue = [NSString stringWithFormat:@"%d%%",(int)round(gpuUsed*100)];
     });
@@ -442,60 +564,47 @@
         _value = value;
         formatStr = @" K/s";
     }
-    if (_value > 100)
-    {
-        NSString* str =  [NSString stringWithFormat:@"%d%@", (int)_value, formatStr];
-//        NSString* str = [NSString stringWithFormat:@"%d M/s", (int)valueForShow];
-        NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:str];
-        [attributeString addAttribute:NSFontAttributeName value:[NSFont systemFontOfSize:8] range:NSMakeRange(str.length-3, 3)];
-        NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc]init];
-        paragraph.alignment = NSTextAlignmentCenter;
-        [attributeString addAttribute:NSParagraphStyleAttributeName value:paragraph range:NSMakeRange(0, str.length)];
-        return attributeString;
-    }
-    else
-    {
-        NSString* str = [NSString stringWithFormat:@"%.1f%@", _value, formatStr];
-//        NSString* str = [NSString stringWithFormat:@"%.1f K/s", valueForShow];
-        NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:str];
-        [attributeString addAttribute:NSFontAttributeName value:[NSFont systemFontOfSize:8] range:NSMakeRange(str.length-3, 3)];
-        NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc]init];
-        paragraph.alignment = NSTextAlignmentCenter;
-        [attributeString addAttribute:NSParagraphStyleAttributeName value:paragraph range:NSMakeRange(0, str.length)];
-        return attributeString;
-    }
+    NSFont *numFont = LMStatusMonoDigitFont(9, NSFontWeightRegular);
+    NSFont *unitFont = LMStatusMonoDigitFont(8, NSFontWeightRegular);
+    NSString *str = (_value > 100)
+        ? [NSString stringWithFormat:@"%d%@", (int)_value, formatStr]
+        : [NSString stringWithFormat:@"%.1f%@", _value, formatStr];
+    NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:str];
+    [attributeString addAttribute:NSFontAttributeName value:numFont range:NSMakeRange(0, str.length)];
+    [attributeString addAttribute:NSFontAttributeName value:unitFont range:NSMakeRange(str.length - 3, 3)];
+    NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
+    paragraph.alignment = NSTextAlignmentCenter;
+    [attributeString addAttribute:NSParagraphStyleAttributeName value:paragraph range:NSMakeRange(0, str.length)];
+    return attributeString;
 }
 
 - (void)setUpSpeed:(float)value
 {
     [super setUpSpeed:value];
     mUpSpeedField.attributedStringValue = [self getAttrStringFromNetSpeed:value/1000.f];
-    
-
 }
 
 - (void)setDownSpeed:(float)value
 {
     [super setDownSpeed:value];
     mDownSpeedField.attributedStringValue = [self getAttrStringFromNetSpeed:value/1000.f];
-    
 }
 
 -(void)setTemperatureValue:(double)value
 {
     [super setTemperatureValue:value];
-    mCpuTempField.stringValue = [NSString stringWithFormat:@"%d°C", (int)(value)];
+    if (value < 10.0) {
+        mCpuTempField.stringValue = @"--°C";
+    } else {
+        mCpuTempField.stringValue = [NSString stringWithFormat:@"%d°C", (int)round(value)];
+    }
 }
 
 -(void)setFanSpeedValue:(float)value
 {
     [super setFanSpeedValue:value];
-    mCpuFanSpeedField.stringValue = [NSString stringWithFormat:@"%d", (int)(value)];
+    mCpuFanSpeedField.stringValue = [NSString stringWithFormat:@"%d", (int)round(value)];
 }
-
-
-
-
 
 - (void)setStatusType:(long)type
 {
@@ -508,87 +617,95 @@
     }
     
     [mArrayForDarkModeAdaptiveViews removeAllObjects];
-        
-//    self.wantsLayer = true;
-//    self.layer.backgroundColor = [NSColor colorWithHex:0xff0000 alpha:1.0f].CGColor;
-//    type = STATUS_TYPE_LOGO|STATUS_TYPE_NET| STATUS_TYPE_MEM | STATUS_TYPE_DISK| STATUS_TYPE_FAN| STATUS_TYPE_TEP|STATUS_TYPE_NET;
-//   STATUS_TYPE_LOGO | STATUS_TYPE_MEM | STATUS_TYPE_DISK| STATUS_TYPE_FAN| STATUS_TYPE_TEP|STATUS_TYPE_NET;
     
-    NSMutableArray* containerArray= [[NSMutableArray alloc] init];
+    BOOL hasPhysicalFan = LMDeviceHasPhysicalFan();
+    long scalarOrder[6] = {
+        STATUS_TYPE_CPU,
+        STATUS_TYPE_GPU,
+        STATUS_TYPE_MEM,
+        STATUS_TYPE_DISK,
+        STATUS_TYPE_TEP,
+        STATUS_TYPE_FAN
+    };
+    long enabledScalars[6] = {0};
+    int scalarCount = 0;
+    int idx;
+    for (idx = 0; idx < 6; idx++) {
+        long flag = scalarOrder[idx];
+        if (flag == STATUS_TYPE_FAN && !hasPhysicalFan) {
+            continue; // 无风扇机型自动跳过顶栏 0 RPM 占位
+        }
+        if (type & flag) {
+            enabledScalars[scalarCount++] = flag;
+        }
+    }
+
+    int totalVisibleItems = scalarCount + ((type & STATUS_TYPE_LOGO) ? 1 : 0) + ((type & STATUS_TYPE_NET) ? 1 : 0);
+    BOOL isCompact = NO;
+    if (type & STATUS_TYPE_COMPACT_SET) {
+        isCompact = ((type & STATUS_TYPE_COMPACT) != 0);
+    } else {
+        // 刘海屏且勾选指标 >= 4 项时默认自动启用紧凑双行布局，避免被系统刘海区域裁剪
+        isCompact = ([MachineModel isLiquidScreen] && totalVisibleItems >= 4);
+    }
+
+    NSMutableArray* containerArray = [[NSMutableArray alloc] init];
     NSMutableArray* containerSize = [[NSMutableArray alloc] init];
     self.statusNum = 0;
     NSSize size;
     BOOL showOne = NO;
-    if (type & STATUS_TYPE_LOGO)
-    {
+
+    if (type & STATUS_TYPE_LOGO) {
         NSView* containerLogo = [self getLogoContainerView:&size];
         [containerArray addObject:containerLogo];
         [containerSize addObject:[NSValue valueWithSize:size]];
         showOne = YES;
     }
-    
-    if (type & STATUS_TYPE_CPU)
-    {
-        NSView* containerCpu = [self getCpuUsageContainerView:&size];
-        [containerArray addObject:containerCpu];
-        [containerSize addObject:[NSValue valueWithSize:size]];
-        showOne = YES;
-    }
-    
-    if (type & STATUS_TYPE_GPU) {
-        NSView* containerGpu = [self getGpuUsageContainerView:&size];
-        [containerArray addObject:containerGpu];
-        [containerSize addObject:[NSValue valueWithSize:size]];
-        showOne = YES;
-    }
-    
-    if (type & STATUS_TYPE_MEM)
-    {
-        NSView* containerMem = [self getMemContainerView:&size];
-        [containerArray addObject:containerMem];
-        [containerSize addObject:[NSValue valueWithSize:size]];
-        showOne = YES;
+
+    if (isCompact && scalarCount >= 2) {
+        int sIdx = 0;
+        while (sIdx + 1 < scalarCount) {
+            NSView *pairView = [self getCompactPairContainerTopFlag:enabledScalars[sIdx]
+                                                         bottomFlag:enabledScalars[sIdx + 1]
+                                                               size:&size];
+            [containerArray addObject:pairView];
+            [containerSize addObject:[NSValue valueWithSize:size]];
+            showOne = YES;
+            sIdx += 2;
+        }
+        if (sIdx < scalarCount) {
+            NSView *oddView = [self _singleMetricViewForFlag:enabledScalars[sIdx] size:&size];
+            [containerArray addObject:oddView];
+            [containerSize addObject:[NSValue valueWithSize:size]];
+            showOne = YES;
+        }
+    } else {
+        int sIdx;
+        for (sIdx = 0; sIdx < scalarCount; sIdx++) {
+            NSView *metricView = [self _singleMetricViewForFlag:enabledScalars[sIdx] size:&size];
+            [containerArray addObject:metricView];
+            [containerSize addObject:[NSValue valueWithSize:size]];
+            showOne = YES;
+        }
     }
 
-    if (type & STATUS_TYPE_DISK)
-    {
-        NSView* containerDisk = [self getDiskContainerView:&size];
-        [containerArray addObject:containerDisk];
-        [containerSize addObject:[NSValue valueWithSize:size]];
-        showOne = YES;
-    }
-    
-    if (type & STATUS_TYPE_TEP)
-    {
-        NSView* containerTmp = [self getTmpContainerView:&size];
-        [containerArray addObject:containerTmp];
-        [containerSize addObject:[NSValue valueWithSize:size]];
-        showOne = YES;
-    }
-
-    if (type & STATUS_TYPE_FAN)
-    {
-        NSView* containerRpm = [self getRpmContainerView:&size];
-        [containerArray addObject:containerRpm];
-        [containerSize addObject:[NSValue valueWithSize:size]];
-        showOne = YES;
-    }
-    
-    if (type & STATUS_TYPE_NET)
-    {
+    if (type & STATUS_TYPE_NET) {
         NSView* containerNet = [self getNetContainerView:&size];
         [containerArray addObject:containerNet];
         [containerSize addObject:[NSValue valueWithSize:size]];
         showOne = YES;
     }
-    self.statusNum = (int)containerArray.count ;
+
+    self.statusNum = totalVisibleItems;
     if (!showOne) {
         NSView* containerLogo = [self getLogoContainerView:&size];
         [containerArray addObject:containerLogo];
         [containerSize addObject:[NSValue valueWithSize:size]];
     }
-    
-    for (int i=0; i<containerArray.count ; i++)
+
+    CGFloat dividerPad = isCompact ? 2.5 : 3.0;
+    int i;
+    for (i = 0; i < (int)containerArray.count; i++)
     {
         NSView* container  = [containerArray objectAtIndex:i];
         NSNumber* width = [NSNumber numberWithFloat:[[containerSize objectAtIndex:i] sizeValue].width];
@@ -612,14 +729,13 @@
                 make.width.equalTo(width);
             }];
         }
-        else if (i == containerArray.count - 1)
+        else if (i == (int)containerArray.count - 1)
         {
-            //
             NSView* containerPre = [containerArray objectAtIndex:i-1];
             NSImageView *dividerIcon = [self getDividerImageView];
             [self addSubview:dividerIcon];
             [dividerIcon mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(containerPre.mas_right).offset(3);
+                make.left.equalTo(containerPre.mas_right).offset(dividerPad);
                 make.centerY.equalTo(self.mas_centerY);
                 make.width.equalTo(@1);
                 make.height.equalTo(@16);
@@ -628,7 +744,7 @@
             [self addSubview:container];
             [container mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.centerY.equalTo(self.mas_centerY);
-                make.left.equalTo(dividerIcon.mas_right).offset(3);
+                make.left.equalTo(dividerIcon.mas_right).offset(dividerPad);
                 make.right.equalTo(self.mas_right);
                 make.height.equalTo(height);
                 make.width.mas_equalTo(width.intValue + 2);
@@ -641,17 +757,16 @@
             [self addSubview:dividerIcon];
 
             [dividerIcon mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(containerPre.mas_right).offset(3);
+                make.left.equalTo(containerPre.mas_right).offset(dividerPad);
                 make.centerY.equalTo(self.mas_centerY);
                 make.width.equalTo(@1);
                 make.height.equalTo(@16);
             }];
             
-            //
             [self addSubview:container];
             [container mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.centerY.equalTo(self.mas_centerY);
-                make.left.equalTo(dividerIcon.mas_right).offset(3);
+                make.left.equalTo(dividerIcon.mas_right).offset(dividerPad);
                 make.height.equalTo(height);
                 make.width.equalTo(width);
             }];

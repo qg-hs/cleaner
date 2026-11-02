@@ -19,34 +19,84 @@
 
 #define kIOBlockStorageDriver   "IOBlockStorageDriver"
 
+// APFS 真实可用空间读取：优先读取包含 Purgeable 可清除缓存与可回收快照的 AvailableCapacityForImportantUsage，与访达和系统设置保持一致
+static BOOL CmcGetVolumeCapacityByPath(NSString *nsPath, uint64_t *freeBytes, uint64_t *totalBytes)
+{
+    if (nsPath.length == 0 || freeBytes == NULL || totalBytes == NULL) {
+        return NO;
+    }
+    NSURL *volURL = [NSURL fileURLWithPath:nsPath];
+    if (!volURL) {
+        return NO;
+    }
+    [volURL removeAllCachedResourceValues];
+    NSError *resErr = nil;
+    NSArray<NSURLResourceKey> *keys = @[
+        NSURLVolumeTotalCapacityKey,
+        NSURLVolumeAvailableCapacityForImportantUsageKey,
+        NSURLVolumeAvailableCapacityKey
+    ];
+    NSDictionary<NSURLResourceKey, id> *vals = [volURL resourceValuesForKeys:keys error:&resErr];
+    if (!vals || resErr != nil) {
+        return NO;
+    }
+    NSNumber *totalNum = vals[NSURLVolumeTotalCapacityKey];
+    NSNumber *importantAvailNum = vals[NSURLVolumeAvailableCapacityForImportantUsageKey];
+    NSNumber *stdAvailNum = vals[NSURLVolumeAvailableCapacityKey];
+    uint64_t totalVal = totalNum ? [totalNum unsignedLongLongValue] : 0;
+    uint64_t availVal = (importantAvailNum && [importantAvailNum longLongValue] > 0)
+        ? [importantAvailNum unsignedLongLongValue]
+        : (stdAvailNum ? [stdAvailNum unsignedLongLongValue] : 0);
+    if (totalVal == 0) {
+        return NO;
+    }
+    if (availVal > totalVal) {
+        availVal = totalVal;
+    }
+    *totalBytes = totalVal;
+    *freeBytes = availVal;
+    return YES;
+}
+
 // get file system stat where 'path' is mounted
 // return in bytes
 int CmcGetFsStat(const char *path, uint64_t *freeBytes, uint64_t *totalBytes)
 {
     struct statfs stat = {0};
     
-    if (freeBytes == NULL || totalBytes == NULL)
+    if (path == NULL || freeBytes == NULL || totalBytes == NULL)
         return -1;
     
-    // get file system info
+    NSString *nsPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:path length:strlen(path)];
+    if (CmcGetVolumeCapacityByPath(nsPath, freeBytes, totalBytes)) {
+        return 0;
+    }
+    
+    // get file system info fallback
     if (statfs(path, &stat) == -1)
     {
         McLog(MCLOG_ERR, @"[%s] get fs stat fail: %d", __FUNCTION__, errno);
         return -1;
     }
     
-    *freeBytes = stat.f_bfree * stat.f_bsize;
-    *totalBytes = stat.f_blocks * stat.f_bsize;
+    *freeBytes = (uint64_t)stat.f_bavail * (uint64_t)stat.f_bsize;
+    *totalBytes = (uint64_t)stat.f_blocks * (uint64_t)stat.f_bsize;
     return 0;
 }
 
 int CmcGetFsStatByFM(NSString *path, uint64_t *freeBytes, uint64_t *totalBytes)
 {
+    if (path == nil || freeBytes == NULL || totalBytes == NULL) {
+        return -1;
+    }
+    if (CmcGetVolumeCapacityByPath(path, freeBytes, totalBytes)) {
+        return 0;
+    }
     
     NSError *error = nil;
     NSDictionary* fileAttributes =[[NSFileManager defaultManager] attributesOfFileSystemForPath:path error:&error];
-    unsigned long long freeSize = [[fileAttributes objectForKey:NSFileSystemFreeSize] longLongValue];
-    unsigned long long totalSize = [[fileAttributes objectForKey:NSFileSystemSize] longLongValue];
+    unsigned long long freeSize = [[fileAttributes objectForKey:NSFileSystemFreeSize] unsignedLongLongValue];
+    unsigned long long totalSize = [[fileAttributes objectForKey:NSFileSystemSize] unsignedLongLongValue];
     
     *freeBytes = freeSize;
     *totalBytes = totalSize;

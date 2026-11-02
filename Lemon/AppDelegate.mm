@@ -283,11 +283,19 @@ extern "C" int CmcGetCurrentAppVersion(char *version, int version_size, char *bu
             @try {
                 NSString *path = [[NSBundle mainBundle] bundlePath];
                 NSURL *appUrl = [NSURL fileURLWithPath:path];
-                [[NSWorkspace sharedWorkspace] launchApplicationAtURL:appUrl options:NSWorkspaceLaunchNewInstance configuration:@{} error:NULL];
+                if (@available(macOS 10.15, *)) {
+                    NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
+                    config.createsNewApplicationInstance = YES;
+                    [[NSWorkspace sharedWorkspace] openApplicationAtURL:appUrl configuration:config completionHandler:nil];
+                }
             }
             @catch (NSException *exption) {
                 NSURL *appUrl = [NSURL fileURLWithPath:@"/Applications/cleaner.app"];
-                [[NSWorkspace sharedWorkspace] launchApplicationAtURL:appUrl options:NSWorkspaceLaunchNewInstance configuration:@{} error:NULL];
+                if (@available(macOS 10.15, *)) {
+                    NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
+                    config.createsNewApplicationInstance = YES;
+                    [[NSWorkspace sharedWorkspace] openApplicationAtURL:appUrl configuration:config completionHandler:nil];
+                }
             }
             
         }
@@ -898,7 +906,11 @@ extern "C" int CmcGetCurrentAppVersion(char *version, int version_size, char *bu
     
     -(void)openMainApp{
         //NSLog(@"openMainApp: %@", [[NSBundle mainBundle] bundlePath]);
-        [[NSWorkspace sharedWorkspace] launchApplication:[[NSBundle mainBundle] bundlePath]];
+        if (@available(macOS 10.15, *)) {
+            [[NSWorkspace sharedWorkspace] openApplicationAtURL:[[NSBundle mainBundle] bundleURL]
+                                                  configuration:[NSWorkspaceOpenConfiguration configuration]
+                                              completionHandler:nil];
+        }
     }
     
 #pragma mark NSUserNotificationCenterDelegate

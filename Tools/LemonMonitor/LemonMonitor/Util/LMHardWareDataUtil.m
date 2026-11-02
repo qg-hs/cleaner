@@ -40,18 +40,18 @@
             continue;
         }
         if ([volumeInfo.volName isEqualToString:mainDiskName] && volumeInfo.internalDevice) {
-            //重新进行计算可用空间
-            NSInteger freeBytes = [self getAllUsableBytes];
-//            NSLog(@"%s, newLeftSize: %ld", __FUNCTION__, (long)freeBytes);
-            if (freeBytes > 0) {
-                volumeInfo.freeBytes = freeBytes;
+            // 使用 64 位精确字节数校准 APFS 主磁盘可用空间（消除原 float 24bit 尾数精度截断）
+            uint64_t usableBytes = [self getAllUsableBytes];
+            if (usableBytes > 0) {
+                volumeInfo.freeBytes = usableBytes;
             }
         }
-//           NSLog(@"DiskInfo--%s--[volumnInfo.volName:%@,volumnInfo.devName:%@,volumnInfo.freeBytes:%llu,volumnInfo.totalBytes:%llul,]",__FUNCTION__,volumeInfo.volName, volumeInfo.devName,volumeInfo.freeBytes,volumeInfo.totalBytes);
         //如果不是Disk Image，并且磁盘可写，不是Recovery; Recovery:用于恢复系统、修复磁盘用的一个可启动应用
         if (![volumeInfo.volName isEqualToString:@"Disk Image"] && ![volumeInfo.volName isEqualToString:@"Recovery"] && volumeInfo.writeble) {
-            //如果有两个完全一样的磁盘，则认为是同一个磁盘
-            if (![volumeInfo.volName isEqualToString:mainDiskName] && (volumeInfo.totalBytes == mainDiskTotalBytes) && (volumeInfo.freeBytes == mainDiskFreeBytes)) {
+            // APFS 同容器多卷共享同一 totalBytes，避免重复累加主容器容量
+            if (![volumeInfo.volName isEqualToString:mainDiskName] &&
+                ((volumeInfo.totalBytes == mainDiskTotalBytes && volumeInfo.internalDevice) ||
+                 (volumeInfo.totalBytes == mainDiskTotalBytes && volumeInfo.freeBytes == mainDiskFreeBytes))) {
                 continue;
             }
             *freeBytes += volumeInfo.freeBytes;
@@ -61,20 +61,20 @@
     
 }
 
-+(float)getAllUsableBytes{
-    if (@available(macOS 10.13, *)) {
-        NSError *error = nil;
-        NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:NSHomeDirectory()];
-        //TODO: 拿到有效的剩余空间
-        NSDictionary *results = [fileURL resourceValuesForKeys:@[NSURLVolumeAvailableCapacityForImportantUsageKey] error:&error];
-        if (!results) {
-            NSLog(@"Error retrieving resource keys");
-            return 0;
-        }
-        //    NSLog(@"float Available capacity for important usage: %lf",[[results objectForKey:NSURLVolumeAvailableCapacityForImportantUsageKey] floatValue]);
-        return [[results objectForKey:NSURLVolumeAvailableCapacityForImportantUsageKey] floatValue];
-    }else{
++(uint64_t)getAllUsableBytes{
+    NSError *error = nil;
+    NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:NSHomeDirectory()];
+    [fileURL removeAllCachedResourceValues];
+    NSDictionary *results = [fileURL resourceValuesForKeys:@[NSURLVolumeAvailableCapacityForImportantUsageKey, NSURLVolumeAvailableCapacityKey] error:&error];
+    if (!results) {
+        NSLog(@"Error retrieving resource keys: %@", error);
         return 0;
     }
+    long long importantVal = [[results objectForKey:NSURLVolumeAvailableCapacityForImportantUsageKey] longLongValue];
+    if (importantVal > 0) {
+        return (uint64_t)importantVal;
+    }
+    long long availVal = [[results objectForKey:NSURLVolumeAvailableCapacityKey] longLongValue];
+    return availVal > 0 ? (uint64_t)availVal : 0;
 }
 @end

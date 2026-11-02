@@ -54,10 +54,10 @@
 "LMFloderAddViewController_alertDialog_content_needPermission" = "Please grant cleaner permission to scan the photos in Photo Library.";
 "LMFloderAddViewController_alertDialog_okButton_getPermission" = "Grant access";
 "LMFloderAddViewController_alertDialog_cancelButton" = "cancel";
-"LMFloderAddViewController_accessPhoto_permissionGuide_title" = "On macOS 10.14 or above, cleaner needs permission to scan the items.";
-"LMFloderAddViewController_accessPhoto_permissionGuide_descText" = "cleaner will NEVER or EVER collect your personal information. Please rest assure.";
-"CheckDeleteSystemPhotoViewController_automation_permissionGuide_title" = "On macOS 10.14 or above, cleaner needs permission to remove the items.";
-"CheckDeleteSystemPhotoViewController_automation_permissionGuide_descText" = "cleaner will NEVER or EVER collect your personal information. Please rest assure.";
+"LMFloderAddViewController_accessPhoto_permissionGuide_title" = "cleaner needs Photos permission in System Settings -> Privacy & Security to scan items.";
+"LMFloderAddViewController_accessPhoto_permissionGuide_descText" = "cleaner will NEVER collect your personal information. Please rest assured.";
+"CheckDeleteSystemPhotoViewController_automation_permissionGuide_title" = "cleaner needs Automation permission in System Settings -> Privacy & Security to remove items.";
+"CheckDeleteSystemPhotoViewController_automation_permissionGuide_descText" = "cleaner will NEVER collect your personal information. Please rest assured.";
 "CheckDeleteSystemPhotoViewController_automation_needPermissionTips" = "Please grant cleaner permission to clean up";
 "CheckDeleteSystemPhotoViewController_automation_needPermission_extraTips" = "the photos in Photo Library.";
 "CheckDeleteSystemPhotoViewController_operateButton_scanAgain" = "Reflash";

@@ -11,9 +11,25 @@
 #import <QMUICommon/LMAppThemeHelper.h>
 #import <QMUICommon/COSwitch.h>
 #import <QMCoreFunction/LanguageHelper.h>
+#import <QMCoreFunction/McCoreFunction.h>
 #import <QMCoreFunction/NSColor+Extension.h>
 #import <QMCoreFunction/NSTextField+Extension.h>
 #import <QMUICommon/LMCheckboxButton.h>
+
+static BOOL LMIsLiquidRetinaScreen(void) {
+    if (@available(macOS 12.0, *)) {
+        for (NSScreen *screen in [NSScreen screens]) {
+            if (screen.safeAreaInsets.top > 0) {
+                return YES;
+            }
+        }
+    }
+    Class cls = NSClassFromString(@"MachineModel");
+    if (cls && [cls respondsToSelector:@selector(isLiquidScreen)]) {
+        return ((BOOL (*)(id, SEL))[cls methodForSelector:@selector(isLiquidScreen)])(cls, @selector(isLiquidScreen));
+    }
+    return NO;
+}
 
 #define kLemonShowMonitorCfg            @"kLemonShowMonitorCfg"
 // 状态栏显示方式
@@ -25,7 +41,10 @@
 #define STATUS_TYPE_NET  (1 << 5)
 #define STATUS_TYPE_CPU  (1 << 6)
 #define STATUS_TYPE_GPU  (1 << 7)
-#define STATUS_TYPE_GLOBAL (0x80000000)     // 对应设置“打开Lemon时显示”
+#define STATUS_TYPE_ITEMS_MASK  (0xFF)
+#define STATUS_TYPE_COMPACT     (1 << 8)
+#define STATUS_TYPE_COMPACT_SET (1 << 9)
+#define STATUS_TYPE_GLOBAL (0x80000000)     // 对应设置“打开主界面时显示”
 #define STATUS_TYPE_BOOTSHOW (0x40000000)   // 对应设置“开机时显示”
 #define STATUS_TYPE_USE (0x20000000)        // 对应设置“启用状态栏”
 #define kStatusChangedNotification @"StatusChangedNotification"
@@ -80,6 +99,7 @@
 @property(strong) COSwitch *useStatusBarSwitch;
 @property(strong) COSwitch *statusBarVisibilitySwitch;
 @property(strong) COSwitch *bootMonitorSwitch;
+@property(strong) COSwitch *compactStatusBarSwitch;
 
 // 当“启用状态栏” 开关 是否遮盖在控件上，隐藏 / 显示的效果
 @property (strong) LMPreferenceMaskView * maskView;
@@ -113,6 +133,14 @@
 
 -(void)initView {
     _myStatusType = [[[NSUserDefaults standardUserDefaults] objectForKey:kLemonShowMonitorCfg] integerValue];
+    BOOL hasPhysicalFan = LMDeviceHasPhysicalFan();
+    if (!hasPhysicalFan && (_myStatusType & STATUS_TYPE_FAN)) {
+        _myStatusType &= ~STATUS_TYPE_FAN;
+        if ((_myStatusType & STATUS_TYPE_ITEMS_MASK) == 0) {
+            _myStatusType |= STATUS_TYPE_LOGO;
+        }
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:_myStatusType] forKey:kLemonShowMonitorCfg];
+    }
     __weak typeof(self) weakSelf = self;
 
     // 打开lemon时显示
@@ -244,10 +272,30 @@
         });
     }];
     
+    BOOL isZhLang = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeChinese);
+    NSString *compactTitleStr = isZhLang ? @"紧凑双行显示（适配刘海屏）" : @"Compact 2-row layout (Notch-friendly)";
+    NSTextField *compactStatusBarText = [self buildLabel:compactTitleStr font:[NSFont systemFontOfSize:14] color:[LMAppThemeHelper getTitleColor]];
+
+    COSwitch *compactStatusBarSwitch = [[COSwitch alloc] init];
+    self.compactStatusBarSwitch = compactStatusBarSwitch;
+    [compactStatusBarSwitch updateSwitchState:[self __isEffectiveCompactMode]];
+    [compactStatusBarSwitch setOnValueChanged:^(COSwitch *button) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.myStatusType |= STATUS_TYPE_COMPACT_SET;
+            if (button.on) {
+                weakSelf.myStatusType |= STATUS_TYPE_COMPACT;
+            } else {
+                weakSelf.myStatusType &= ~STATUS_TYPE_COMPACT;
+            }
+            [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:weakSelf.myStatusType] forKey:kLemonShowMonitorCfg];
+            [weakSelf __sendCurrentStatusTypeToMonitor];
+        });
+    }];
+
     // 状态栏图标显示
     NSTextField *tfMonitorTitle = [self buildLabel:NSLocalizedString(@"状态栏展示信息设置", nil) font:[NSFont systemFontOfSize:14] color:[LMAppThemeHelper getTitleColor]];
     NSImageView *monitorImageView = [[NSImageView alloc] init];
-    if ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeChinese) {
+    if (isZhLang) {
         monitorImageView.image = [[NSBundle mainBundle] imageForResource:@"navigation_bar_pattern_ch"];
     }else{
         monitorImageView.image = [[NSBundle mainBundle] imageForResource:@"navigation_bar_pattern_en"];
@@ -258,7 +306,7 @@
     [tfMonitorWarningTips setHidden:YES];
     
     NSString *appLogoTitle = nil;
-    if ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeChinese) {
+    if (isZhLang) {
         appLogoTitle = @"Logo";
     }else{
         appLogoTitle = @"App\n logo";
@@ -268,6 +316,14 @@
     NSView* optDisk = [self getOptionView:@"stat_disk":NSLocalizedString(@"磁盘占用", nil):STATUS_TYPE_DISK];
     NSView* optCpuTem = [self getOptionView:@"stat_cpu_temperature":NSLocalizedString(@"CPU温度", nil):STATUS_TYPE_TEP];
     NSView* optCpuFan = [self getOptionView:@"stat_cpu_fan":NSLocalizedString(@"风扇转速", nil):STATUS_TYPE_FAN];
+    if (!hasPhysicalFan) {
+        NSString *fanlessTip = isZhLang ? @"当前机型采用无风扇被动散热设计" : @"This Mac uses a fanless passive cooling design";
+        optCpuFan.toolTip = fanlessTip;
+        optCpuFan.alphaValue = 0.55;
+        NSButton *fanCheck = (NSButton *)_myStatusControls[[NSNumber numberWithInteger:STATUS_TYPE_FAN]];
+        fanCheck.enabled = NO;
+        fanCheck.toolTip = fanlessTip;
+    }
     NSView* optNet = [self getOptionView:@"stat_net":NSLocalizedString(@"网速", nil):STATUS_TYPE_NET];
     
     NSView* optCpuUsed = [self getOptionView:@"stat_cpu_usage":NSLocalizedString(@"CPU占用", nil):STATUS_TYPE_CPU];
@@ -281,6 +337,8 @@
     [self.view addSubview:statusBarVisibilitySwitch];
     [self.view addSubview:showStatusBarIconOnBootText];
     [self.view addSubview:bootMonitorSwitch];
+    [self.view addSubview:compactStatusBarText];
+    [self.view addSubview:compactStatusBarSwitch];
     [self.view addSubview:useStatusBarText];
     [self.view addSubview:useStatusBarSwitch];
         
@@ -301,7 +359,7 @@
     NSView *cView = self.view;
     // 启用状态栏
     [useStatusBarText mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(cView).offset(20);
+        make.top.equalTo(cView).offset(16);
         make.leading.equalTo(cView).offset(29);
     }];
     [useStatusBarSwitch mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -312,7 +370,7 @@
     }];
     
     [showStatusBarIconText mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(useStatusBarText.mas_bottom).offset(20);
+        make.top.equalTo(useStatusBarText.mas_bottom).offset(16);
         make.leading.equalTo(cView).offset(40);
     }];
 
@@ -323,9 +381,9 @@
         make.height.equalTo(@(19));
     }];
     
-       // 状态栏自启设置
+    // 状态栏自启设置
     [showStatusBarIconOnBootText mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(showStatusBarIconText.mas_bottom).offset(20);
+        make.top.equalTo(showStatusBarIconText.mas_bottom).offset(16);
         make.leading.equalTo(cView).offset(40);
     }];
 
@@ -336,9 +394,22 @@
         make.height.equalTo(@(19));
     }];
 
+    // 刘海屏紧凑双行开关
+    [compactStatusBarText mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(showStatusBarIconOnBootText.mas_bottom).offset(16);
+        make.leading.equalTo(cView).offset(40);
+    }];
+
+    [compactStatusBarSwitch mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(compactStatusBarText.mas_centerY);
+        make.right.equalTo(cView).offset(-30);
+        make.width.equalTo(@(40));
+        make.height.equalTo(@(19));
+    }];
+
     // 状态栏图标显示
     [tfMonitorTitle mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(showStatusBarIconOnBootText.mas_bottom).offset(20);
+        make.top.equalTo(compactStatusBarText.mas_bottom).offset(16);
         make.leading.equalTo(cView).offset(40);
     }];
 
@@ -540,11 +611,34 @@
 
 
 
+- (BOOL)__isEffectiveCompactMode {
+    if (_myStatusType & STATUS_TYPE_COMPACT_SET) {
+        return (_myStatusType & STATUS_TYPE_COMPACT) != 0;
+    }
+    int count = 0;
+    int bit;
+    BOOL hasFan = LMDeviceHasPhysicalFan();
+    for (bit = 0; bit < 8; bit++) {
+        NSInteger flag = (1 << bit);
+        if (flag == STATUS_TYPE_FAN && !hasFan) {
+            continue;
+        }
+        if (_myStatusType & flag) {
+            count++;
+        }
+    }
+    return (LMIsLiquidRetinaScreen() && count >= 4);
+}
+
 - (void)doCheckChanged:(id)sender
 {
     NSLog(@"preference:doCheckChanged");
     NSButton* optChecked = (NSButton*)sender;
     NSInteger tag = optChecked.tag;
+    if (tag == STATUS_TYPE_FAN && !LMDeviceHasPhysicalFan()) {
+        optChecked.state = NSControlStateValueOff;
+        return;
+    }
     if (optChecked.state == NSControlStateValueOn )
     {
         _myStatusType |= tag;
@@ -558,8 +652,8 @@
         
         _myStatusType &= ~tag;
         
-        // 容错处理，至少拷贝选择一项
-        if ((_myStatusType & ~STATUS_TYPE_BOOTSHOW & ~STATUS_TYPE_USE & ~STATUS_TYPE_GLOBAL) == 0)
+        // 容错处理，至少保留一项可见指标
+        if ((_myStatusType & STATUS_TYPE_ITEMS_MASK) == 0)
         {
             [self.tfMonitorWarningTips setHidden:NO];
             _myStatusType |= tag;
@@ -570,6 +664,9 @@
     
     // 需要保存一下， __updateCheckboxStatusWithNotificationFlag 不再处理保存逻辑
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:_myStatusType] forKey:kLemonShowMonitorCfg];
+    if ((_myStatusType & STATUS_TYPE_COMPACT_SET) == 0 && self.compactStatusBarSwitch != nil) {
+        [self.compactStatusBarSwitch updateSwitchState:[self __isEffectiveCompactMode]];
+    }
     
     [self __updateCheckboxStatusWithNotificationFlag:YES];
 }

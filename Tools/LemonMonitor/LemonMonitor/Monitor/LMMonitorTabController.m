@@ -533,8 +533,11 @@ static const CGFloat kTopPadding = 10;
     // UI
     NSMenu* rightClickMenu = [[NSMenu alloc] init];
     NSMenuItem *itemUpdate = nil;
+    BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
     if (bNeedUpdate && [LMGitHubUpdater sharedUpdater].latestVersion.length > 0) {
-        NSString *updateTitle = [NSString stringWithFormat:@"发现新版本 v%@（点击热更）", [LMGitHubUpdater sharedUpdater].latestVersion];
+        NSString *updateTitle = isEnglish
+            ? [NSString stringWithFormat:@"New Version v%@ (Click to Update)", [LMGitHubUpdater sharedUpdater].latestVersion]
+            : [NSString stringWithFormat:@"发现新版本 v%@（点击热更）", [LMGitHubUpdater sharedUpdater].latestVersion];
         itemUpdate = [[NSMenuItem alloc] initWithTitle:updateTitle
                                                 action:@selector(onRightUpdateAction:)
                                          keyEquivalent:@""];
@@ -547,12 +550,15 @@ static const CGFloat kTopPadding = 10;
     [itemCheckUpdate setTarget:self];
 
     // 状态栏右键菜单统一品牌名称为 cleaner
-    NSMenuItem *item1 = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(NSLocalizedString(@"关于 cleaner", nil),
-                                                                            @"") action:@selector(rightAboutAction:) keyEquivalent:@""];
-    NSMenuItem *item6 = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(NSLocalizedString(@"偏好设置", nil),
-                                                                            @"") action:@selector(rightOpenPreference:) keyEquivalent:@""];
-    NSMenuItem *item7 = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(NSLocalizedString(@"退出状态栏", nil),
-                                                                            @"") action:@selector(rightQuitAction:) keyEquivalent:@""];
+    NSMenuItem *item1 = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"关于 cleaner", @"")
+                                                   action:@selector(rightAboutAction:)
+                                            keyEquivalent:@""];
+    NSMenuItem *item6 = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"偏好设置", @"")
+                                                   action:@selector(rightOpenPreference:)
+                                            keyEquivalent:@""];
+    NSMenuItem *item7 = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"退出状态栏", @"")
+                                                   action:@selector(rightQuitAction:)
+                                            keyEquivalent:@""];
     if (bNeedUpdate) {
         if (itemUpdate) {
             itemUpdate.image = [myBundle imageForResource:@"redpoint"];
@@ -584,9 +590,9 @@ static const CGFloat kTopPadding = 10;
     NSRect frame = [(NSButton *)sender frame];
     NSPoint menuOrigin = [[(NSButton *)sender superview] convertPoint:NSMakePoint(frame.origin.x, frame.origin.y) toView:nil];
     
-    NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
+    NSEvent *event =  [NSEvent mouseEventWithType:NSEventTypeLeftMouseDown
                                          location:menuOrigin
-                                    modifierFlags:NSLeftMouseDownMask
+                                    modifierFlags:0
                                         timestamp:0
                                      windowNumber:[[(NSButton *)sender window] windowNumber]
                                           context:[[(NSButton *)sender window] graphicsContext]
@@ -606,8 +612,12 @@ static const CGFloat kTopPadding = 10;
     
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:MONITOR_OPNE_LEMON_505];
         
-    [[NSWorkspace sharedWorkspace] launchApplication:DEFAULT_APP_PATH];
-//    [[NSWorkspace sharedWorkspace] launchApplication:@"Calculator.app"];
+    if (@available(macOS 10.15, *)) {
+        NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
+        [[NSWorkspace sharedWorkspace] openApplicationAtURL:[NSURL fileURLWithPath:DEFAULT_APP_PATH]
+                                              configuration:config
+                                          completionHandler:nil];
+    }
     
     [self notifyDimissPopover];
 }
@@ -645,11 +655,14 @@ static const CGFloat kTopPadding = 10;
 {
     if ([NSRunningApplication runningApplicationsWithBundleIdentifier:MAIN_APP_BUNDLEID].count == 0)
     {
-        NSArray *arguments = @[[NSString stringWithFormat:@"2"]];
-        [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:DEFAULT_APP_PATH]
-                                                      options:NSWorkspaceLaunchWithoutAddingToRecents
-                                                configuration:@{NSWorkspaceLaunchConfigurationArguments: arguments}
-                                                        error:NULL];
+        if (@available(macOS 10.15, *)) {
+            NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
+            config.addsToRecentItems = NO;
+            config.arguments = @[@"2"];
+            [[NSWorkspace sharedWorkspace] openApplicationAtURL:[NSURL fileURLWithPath:DEFAULT_APP_PATH]
+                                                  configuration:config
+                                              completionHandler:nil];
+        }
     }
     else
     {
@@ -858,7 +871,7 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
     if (ver.length == 0) {
         ver = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     }
-    return ver ?: @"1.0.3";
+    return ver ?: @"1.1.0";
 }
 
 - (NSString *)normalizeVersionString:(NSString *)rawVersion {
@@ -957,13 +970,14 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
     if (self.progressWindow) {
         return;
     }
+    BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
     NSRect rect = NSMakeRect(0, 0, 380, 140);
     NSUInteger style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable;
     NSWindow *win = [[NSWindow alloc] initWithContentRect:rect
                                                 styleMask:style
                                                   backing:NSBackingStoreBuffered
                                                     defer:NO];
-    win.title = @"cleaner 版本更新";
+    win.title = isEnglish ? @"cleaner Update" : @"cleaner 版本更新";
     win.level = NSStatusWindowLevel + 1;
     win.releasedWhenClosed = NO;
 
@@ -998,7 +1012,7 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
 
     NSButton *primaryBtn = [[NSButton alloc] initWithFrame:NSMakeRect(248, 14, 110, 28)];
     primaryBtn.bezelStyle = NSBezelStyleRounded;
-    primaryBtn.title = @"立即热更";
+    primaryBtn.title = isEnglish ? @"Update Now" : @"立即热更";
     primaryBtn.keyEquivalent = @"\r";
     primaryBtn.target = self;
     primaryBtn.action = @selector(onConfirmHotUpdateClicked:);
@@ -1007,7 +1021,7 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
 
     NSButton *closeBtn = [[NSButton alloc] initWithFrame:NSMakeRect(156, 14, 84, 28)];
     closeBtn.bezelStyle = NSBezelStyleRounded;
-    closeBtn.title = @"确定";
+    closeBtn.title = isEnglish ? @"OK" : @"确定";
     closeBtn.target = self;
     closeBtn.action = @selector(onDismissWindowClicked:);
     [win.contentView addSubview:closeBtn];
@@ -1019,8 +1033,11 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
 
 - (void)showCheckingWindow {
     [self ensureUpdaterWindow];
-    self.progressLabel.stringValue = @"正在检查更新...";
-    self.detailLabel.stringValue = [NSString stringWithFormat:@"当前版本 v%@，正在连接 GitHub Releases...", [self currentInstalledVersion]];
+    BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
+    self.progressLabel.stringValue = isEnglish ? @"Checking for updates..." : @"正在检查更新...";
+    self.detailLabel.stringValue = isEnglish
+        ? [NSString stringWithFormat:@"Current version v%@, connecting to GitHub Releases...", [self currentInstalledVersion]]
+        : [NSString stringWithFormat:@"当前版本 v%@，正在连接 GitHub Releases...", [self currentInstalledVersion]];
     self.actionButton.hidden = YES;
     self.cancelButton.hidden = YES;
     self.progressBar.hidden = NO;
@@ -1037,6 +1054,7 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
                            detail:(NSString *)detail
                  showUpdateButton:(BOOL)showUpdateButton {
     [self ensureUpdaterWindow];
+    BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
     [self.progressBar stopAnimation:nil];
     self.progressBar.hidden = YES;
     self.progressLabel.stringValue = title ?: @"";
@@ -1044,14 +1062,15 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
 
     if (showUpdateButton) {
         self.actionButton.hidden = NO;
+        self.actionButton.title = isEnglish ? @"Update Now" : @"立即热更";
         self.actionButton.frame = NSMakeRect(248, 14, 110, 28);
         self.cancelButton.hidden = NO;
-        self.cancelButton.title = @"稍后";
+        self.cancelButton.title = isEnglish ? @"Later" : @"稍后";
         self.cancelButton.frame = NSMakeRect(156, 14, 84, 28);
     } else {
         self.actionButton.hidden = YES;
         self.cancelButton.hidden = NO;
-        self.cancelButton.title = @"确定";
+        self.cancelButton.title = isEnglish ? @"OK" : @"确定";
         self.cancelButton.frame = NSMakeRect(274, 14, 84, 28);
     }
     if (!self.progressWindow.isVisible) {
@@ -1108,17 +1127,22 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
         }
         strongSelf.isChecking = NO;
 
+        BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
         NSHTTPURLResponse *httpResp = [response isKindOfClass:[NSHTTPURLResponse class]] ? (NSHTTPURLResponse *)response : nil;
         if (error || !data || (httpResp && httpResp.statusCode != 200)) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (isManual) {
                     if (httpResp && httpResp.statusCode == 404) {
-                        [strongSelf showResultWindowWithTitle:@"当前已是最新版本"
-                                                       detail:[NSString stringWithFormat:@"当前版本 v%@ 已是最新版本（GitHub 仓库暂无更高版本 Release）。", [strongSelf currentInstalledVersion]]
+                        [strongSelf showResultWindowWithTitle:isEnglish ? @"Already Up to Date" : @"当前已是最新版本"
+                                                       detail:isEnglish
+                                                            ? [NSString stringWithFormat:@"Current version v%@ is already the latest release.", [strongSelf currentInstalledVersion]]
+                                                            : [NSString stringWithFormat:@"当前版本 v%@ 已是最新版本（GitHub 仓库暂无更高版本 Release）。", [strongSelf currentInstalledVersion]]
                                              showUpdateButton:NO];
                     } else {
-                        [strongSelf showResultWindowWithTitle:@"检查更新失败"
-                                                       detail:[NSString stringWithFormat:@"无法连接 GitHub Releases 接口（%@）。", error.localizedDescription ?: @"HTTP 状态异常"]
+                        [strongSelf showResultWindowWithTitle:isEnglish ? @"Update Check Failed" : @"检查更新失败"
+                                                       detail:isEnglish
+                                                            ? [NSString stringWithFormat:@"Failed to connect to GitHub Releases (%@).", error.localizedDescription ?: @"HTTP error"]
+                                                            : [NSString stringWithFormat:@"无法连接 GitHub Releases 接口（%@）。", error.localizedDescription ?: @"HTTP 状态异常"]
                                              showUpdateButton:NO];
                     }
                 }
@@ -1130,8 +1154,8 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
         if (![json isKindOfClass:[NSDictionary class]]) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (isManual) {
-                    [strongSelf showResultWindowWithTitle:@"检查更新失败"
-                                                   detail:@"返回数据格式异常，请稍后重试。"
+                    [strongSelf showResultWindowWithTitle:isEnglish ? @"Update Check Failed" : @"检查更新失败"
+                                                   detail:isEnglish ? @"Invalid response data format, please try again later." : @"返回数据格式异常，请稍后重试。"
                                          showUpdateButton:NO];
                 }
             });
@@ -1167,8 +1191,10 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
                 if (isManual) {
                     NSString *detailText = releaseBody.length > 0
                         ? releaseBody
-                        : [NSString stringWithFormat:@"当前版本 v%@，是否立即下载 v%@ 并自动替换重启？", localVer, cleanRemoteVer];
-                    [strongSelf showResultWindowWithTitle:[NSString stringWithFormat:@"发现新版本 v%@", cleanRemoteVer]
+                        : (isEnglish
+                            ? [NSString stringWithFormat:@"Current version is v%@. Would you like to download v%@ and automatically restart?", localVer, cleanRemoteVer]
+                            : [NSString stringWithFormat:@"当前版本 v%@，是否立即下载 v%@ 并自动替换重启？", localVer, cleanRemoteVer]);
+                    [strongSelf showResultWindowWithTitle:isEnglish ? [NSString stringWithFormat:@"New Version v%@ Available", cleanRemoteVer] : [NSString stringWithFormat:@"发现新版本 v%@", cleanRemoteVer]
                                                    detail:detailText
                                          showUpdateButton:YES];
                 }
@@ -1183,8 +1209,10 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"LemonHasNewVersion" object:nil];
 
                 if (isManual) {
-                    [strongSelf showResultWindowWithTitle:@"当前已是最新版本"
-                                                   detail:[NSString stringWithFormat:@"当前版本 v%@ 已是最新发行版。", localVer]
+                    [strongSelf showResultWindowWithTitle:isEnglish ? @"Already Up to Date" : @"当前已是最新版本"
+                                                   detail:isEnglish
+                                                        ? [NSString stringWithFormat:@"Current version v%@ is already the latest release.", localVer]
+                                                        : [NSString stringWithFormat:@"当前版本 v%@ 已是最新发行版。", localVer]
                                          showUpdateButton:NO];
                 }
             }
@@ -1195,10 +1223,15 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
 
 - (void)showProgressWindowWithVersion:(NSString *)version {
     [self ensureUpdaterWindow];
+    BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
     self.actionButton.hidden = YES;
     self.cancelButton.hidden = YES;
-    self.progressLabel.stringValue = [NSString stringWithFormat:@"正在下载新版本 v%@ (0%%)...", version ?: @""];
-    self.detailLabel.stringValue = @"下载完成后将自动替换 cleaner.app 并重启应用";
+    self.progressLabel.stringValue = isEnglish
+        ? [NSString stringWithFormat:@"Downloading v%@ (0%%)...", version ?: @""]
+        : [NSString stringWithFormat:@"正在下载新版本 v%@ (0%%)...", version ?: @""];
+    self.detailLabel.stringValue = isEnglish
+        ? @"cleaner.app will be replaced and restarted automatically upon completion."
+        : @"下载完成后将自动替换 cleaner.app 并重启应用";
     self.progressBar.hidden = NO;
     self.progressBar.indeterminate = NO;
     self.progressBar.doubleValue = 0.0;
@@ -1243,20 +1276,26 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
       didWriteData:(int64_t)bytesWritten
  totalBytesWritten:(int64_t)totalBytesWritten
 totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
+    BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
     if (totalBytesExpectedToWrite > 0) {
         double pct = (double)totalBytesWritten * 100.0 / (double)totalBytesExpectedToWrite;
         self.progressBar.doubleValue = pct;
-        self.progressLabel.stringValue = [NSString stringWithFormat:@"正在下载新版本 v%@ (%.0f%%)...", self.latestVersion ?: @"", pct];
+        self.progressLabel.stringValue = isEnglish
+            ? [NSString stringWithFormat:@"Downloading v%@ (%.0f%%)...", self.latestVersion ?: @"", pct]
+            : [NSString stringWithFormat:@"正在下载新版本 v%@ (%.0f%%)...", self.latestVersion ?: @"", pct];
     } else {
         self.progressBar.indeterminate = YES;
         [self.progressBar startAnimation:nil];
-        self.progressLabel.stringValue = [NSString stringWithFormat:@"正在下载新版本 v%@...", self.latestVersion ?: @""];
+        self.progressLabel.stringValue = isEnglish
+            ? [NSString stringWithFormat:@"Downloading v%@...", self.latestVersion ?: @""]
+            : [NSString stringWithFormat:@"正在下载新版本 v%@...", self.latestVersion ?: @""];
     }
 }
 
 - (void)URLSession:(NSURLSession *)session
       downloadTask:(NSURLSessionDownloadTask *)downloadTask
 didFinishDownloadingToURL:(NSURL *)location {
+    BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
     NSString *tempRoot = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"cleaner_hotupdate_%d", getpid()]];
     NSFileManager *fm = [NSFileManager defaultManager];
     [fm removeItemAtPath:tempRoot error:nil];
@@ -1270,7 +1309,7 @@ didFinishDownloadingToURL:(NSURL *)location {
         return;
     }
 
-    self.progressLabel.stringValue = @"正在解压并校验安装包...";
+    self.progressLabel.stringValue = isEnglish ? @"Extracting and verifying package..." : @"正在解压并校验安装包...";
     self.progressBar.indeterminate = YES;
     [self.progressBar startAnimation:nil];
 
@@ -1289,15 +1328,17 @@ didFinishDownloadingToURL:(NSURL *)location {
         if (unzipTask.terminationStatus != 0 || ![fm isExecutableFileAtPath:extractedExecPath]) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.isDownloading = NO;
-                [self showResultWindowWithTitle:@"热更新包校验失败"
-                                         detail:@"下载的压缩包内未找到有效的 cleaner.app，请稍后重试。"
+                [self showResultWindowWithTitle:isEnglish ? @"Verification Failed" : @"热更新包校验失败"
+                                         detail:isEnglish
+                                            ? @"A valid cleaner.app was not found in the downloaded archive. Please try again later."
+                                            : @"下载的压缩包内未找到有效的 cleaner.app，请稍后重试。"
                                showUpdateButton:NO];
             });
             return;
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.progressLabel.stringValue = @"正在替换应用并自动重启...";
+            self.progressLabel.stringValue = isEnglish ? @"Replacing application and restarting..." : @"正在替换应用并自动重启...";
         });
 
         // 清理已更新版本的缓存标记
@@ -1351,9 +1392,10 @@ didFinishDownloadingToURL:(NSURL *)location {
               task:(NSURLSessionTask *)task
 didCompleteWithError:(NSError *)error {
     if (error) {
+        BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
         self.isDownloading = NO;
-        [self showResultWindowWithTitle:@"下载新版本失败"
-                                 detail:error.localizedDescription ?: @"网络连接中断，请稍后重试。"
+        [self showResultWindowWithTitle:isEnglish ? @"Download Failed" : @"下载新版本失败"
+                                 detail:error.localizedDescription ?: (isEnglish ? @"Network disconnected, please try again later." : @"网络连接中断，请稍后重试。")
                        showUpdateButton:NO];
     }
 }

@@ -85,6 +85,7 @@ typedef enum {
 
 
 @property (weak) IBOutlet NSTextField *windowTitle;
+@property (nonatomic, assign) BOOL pendingBTMRefreshOnActive;
 
 @end
 
@@ -96,15 +97,30 @@ typedef enum {
     return self;
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)awakeFromNib {
     [super awakeFromNib];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(handleAppDidBecomeActive:)
+                                                 name:NSApplicationDidBecomeActiveNotification
+                                               object:nil];
     [self initLocalizeString];
     [self initView];
     [self initData];
+}
+
+- (void)handleAppDidBecomeActive:(NSNotification *)notification {
+    if (self.pendingBTMRefreshOnActive) {
+        self.pendingBTMRefreshOnActive = NO;
+        [self initData];
+    }
 }
 
 - (void)initView {
@@ -179,17 +195,51 @@ typedef enum {
 }
 
 - (void)initData {
-    long startTime = [[NSDate date] timeIntervalSince1970];
     [self showView:self.loadingContentView];
     self.dataArray = [[NSMutableArray alloc] init];
+    self.otherLoginItemInfo = nil;
     self.sortType = LMLoginItemSortTypeStatus;
     self.sortOrderType = Ascending;
     QMLoginItemManager *manager = [QMLoginItemManager shareInstance];
     manager.delegate = self;
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        self.launchItemArray = [manager getLaunchServiceItems];
-        self.systemLoginItemArray = [manager getSystemLoginItems];
-        self.appLoginItemArray = [manager getAppLoginItems];
+        __block NSArray *launchItems = nil;
+        __block NSArray *systemItems = nil;
+        __block NSArray *appItems = nil;
+        dispatch_group_t group = dispatch_group_create();
+        dispatch_group_async(group, dispatch_get_global_queue(0, 0), ^{
+            launchItems = [manager getLaunchServiceItems];
+        });
+        dispatch_group_async(group, dispatch_get_global_queue(0, 0), ^{
+            systemItems = [manager getSystemLoginItems];
+        });
+        dispatch_group_async(group, dispatch_get_global_queue(0, 0), ^{
+            appItems = [manager getAppLoginItems];
+        });
+        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+        // 对 LSSharedFileList 系统登录项与 SMAppService.mainApp 登录项按 appPath 去重
+        NSMutableSet<NSString *> *systemAppPaths = [NSMutableSet set];
+        for (QMBaseLoginItem *sysItem in systemItems) {
+            if (sysItem.appPath.length > 0) {
+                [systemAppPaths addObject:sysItem.appPath];
+            }
+        }
+        NSMutableArray *filteredAppItems = [NSMutableArray arrayWithCapacity:appItems.count];
+        for (QMBaseLoginItem *item in appItems) {
+            if ([item isKindOfClass:QMAppLoginItem.class]) {
+                QMAppLoginItem *appLogin = (QMAppLoginItem *)item;
+                if ([appLogin.loginItemPath isEqualToString:appLogin.appPath] &&
+                    [systemAppPaths containsObject:appLogin.appPath]) {
+                    continue;
+                }
+            }
+            [filteredAppItems addObject:item];
+        }
+
+        self.launchItemArray = launchItems ?: @[];
+        self.systemLoginItemArray = systemItems ?: @[];
+        self.appLoginItemArray = filteredAppItems;
         [self handleData];
         [self sortData];
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -449,26 +499,55 @@ typedef enum {
 - (void)clickSwitchButton:(COSwitch *)switchBtn onCellView:(LMBaseHoverTableCellView *)cellView {
     if ([cellView isKindOfClass:LMLoginItemAppInfoCellView.class]) {
         LMLoginItemAppInfoCellView *appInfoCellView = (LMLoginItemAppInfoCellView *)cellView;
+        BOOL hasSMAppServiceManagedItem = NO;
+        QMBaseLoginItem *firstSMAppServiceItem = nil;
+
         NSArray *launchItemData = [appInfoCellView.loginItemInfo getLaunchItemData];
         for (QMBaseLoginItem *loginItem in launchItemData) {
+            if (loginItem.isManagedBySMAppService) {
+                hasSMAppServiceManagedItem = YES;
+                if (!firstSMAppServiceItem) {
+                    firstSMAppServiceItem = loginItem;
+                }
+                continue;
+            }
             loginItem.isEnable = switchBtn.on;
             loginItem.isDisabledByUser = !switchBtn.on;
             [self udpateLoginItem:loginItem WithSwitchBtn:switchBtn];
         }
         NSArray *loginItemData = [appInfoCellView.loginItemInfo getLoginItemData];
         for (QMBaseLoginItem *loginItem in loginItemData) {
+            if (loginItem.isManagedBySMAppService) {
+                hasSMAppServiceManagedItem = YES;
+                if (!firstSMAppServiceItem) {
+                    firstSMAppServiceItem = loginItem;
+                }
+                continue;
+            }
             loginItem.isEnable = switchBtn.on;
             loginItem.isDisabledByUser = !switchBtn.on;
             [self udpateLoginItem:loginItem WithSwitchBtn:switchBtn];
         }
+        if (hasSMAppServiceManagedItem && firstSMAppServiceItem) {
+            self.pendingBTMRefreshOnActive = YES;
+            [firstSMAppServiceItem openSystemLoginItemsSettings];
+        }
+        [appInfoCellView.loginItemInfo updateEnableStatus];
         [self.outlineView reloadItem:appInfoCellView.loginItemInfo reloadChildren:YES];
         return;
     }
     if ([cellView isKindOfClass:LMLoginItemFileCellView.class]) {
         LMLoginItemFileCellView *fileCellView = (LMLoginItemFileCellView *)cellView;
+        if (fileCellView.loginItem.isManagedBySMAppService) {
+            self.pendingBTMRefreshOnActive = YES;
+        }
         id typeItem = [self.outlineView parentForItem:fileCellView.loginItem];
         LMAppLoginItemInfo *loginItemInfo = [self.outlineView parentForItem:typeItem];
         [loginItemInfo updateEnableStatus];
+        return;
+    }
+    if ([cellView isKindOfClass:LMLoginItemSearchTableCellView.class]) {
+        self.pendingBTMRefreshOnActive = YES;
     }
 }
 
@@ -551,6 +630,7 @@ typedef enum {
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     LMLoginItemSearchTableCellView *cellView = [self.searchResultTableView makeViewWithIdentifier:@"LMLoginItemSearchTableCellView" owner:self];
+    cellView.delegate = self;
     [cellView setLoginItem:self.searchResultArray[row]];
     return cellView;
 }

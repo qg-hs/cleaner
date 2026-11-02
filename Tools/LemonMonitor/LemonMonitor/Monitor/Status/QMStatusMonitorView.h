@@ -38,6 +38,9 @@
 #define STATUS_TYPE_NET  (1 << 5)
 #define STATUS_TYPE_CPU  (1 << 6)
 #define STATUS_TYPE_GPU  (1 << 7)
+#define STATUS_TYPE_ITEMS_MASK  (0xFF)
+#define STATUS_TYPE_COMPACT     (1 << 8)
+#define STATUS_TYPE_COMPACT_SET (1 << 9)
 
 -(void)setStatusType:(long)type;
 -(void)onDarkModeChange;

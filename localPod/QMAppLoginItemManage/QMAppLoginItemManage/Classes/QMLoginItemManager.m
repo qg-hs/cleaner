@@ -15,6 +15,7 @@
 #import <ServiceManagement/ServiceManagement.h>
 #import "QMLocalAppHelper.h"
 #import <AppKit/NSWorkspace.h>
+#include <unistd.h>
 
 // FinalShell.app 的bundle id
 static NSString * const kFinalShellAppBundleId = @"st";
@@ -63,24 +64,223 @@ typedef char (*SMLoginItemSetEnabledWithURL_ptr) ( void* ptr, char enabled);
 }
 
 
+#pragma mark -- Launchctl & BTM Snapshot Helpers
+
+- (NSSet<NSString *> *)queryUserLaunchctlLoadedLabels {
+    NSMutableSet<NSString *> *labels = [NSMutableSet set];
+    NSTask *task = [[NSTask alloc] init];
+    task.executableURL = [NSURL fileURLWithPath:@"/bin/launchctl"];
+    task.arguments = @[@"list"];
+    NSPipe *outPipe = [NSPipe pipe];
+    task.standardOutput = outPipe;
+    task.standardError = [NSPipe pipe];
+
+    NSError *launchErr = nil;
+    if (![task launchAndReturnError:&launchErr]) {
+        return labels;
+    }
+    NSData *data = [[outPipe fileHandleForReading] readDataToEndOfFile];
+    [task waitUntilExit];
+    if (data.length == 0) {
+        return labels;
+    }
+    NSString *output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSArray<NSString *> *lines = [output componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    for (NSString *line in lines) {
+        if (line.length == 0 || [line hasPrefix:@"PID"]) {
+            continue;
+        }
+        NSArray<NSString *> *cols = [line componentsSeparatedByString:@"\t"];
+        NSString *label = cols.lastObject;
+        if (cols.count >= 3 && label.length > 0) {
+            [labels addObject:[label stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]];
+        }
+    }
+    return labels;
+}
+
+- (void)parseBTMSnapshotRecord:(NSDictionary<NSString *, NSString *> *)rec
+                      stateMap:(NSMutableDictionary<NSString *, NSNumber *> *)stateMap
+                      mainApps:(NSMutableArray<NSDictionary<NSString *, NSString *> *> *)mainApps {
+    if (rec.count == 0) {
+        return;
+    }
+    NSString *typeStr = rec[@"Type"] ?: @"";
+    NSString *dispStr = rec[@"Disposition"] ?: @"";
+    NSString *rawId = rec[@"Identifier"] ?: @"";
+    NSString *bundleId = rec[@"Bundle Identifier"] ?: @"";
+    NSString *urlStr = rec[@"URL"] ?: @"";
+
+    BOOL isEnabled = ([dispStr containsString:@"enabled"] &&
+                      ![dispStr containsString:@"disabled"] &&
+                      ![dispStr containsString:@"disallowed"]);
+
+    // 剥离 BTM Identifier 前缀数字与点号，如 "4.net.tunnelblick.launcher" -> "net.tunnelblick.launcher"
+    NSString *cleanId = rawId;
+    NSRange dotRange = [rawId rangeOfString:@"."];
+    if (dotRange.location != NSNotFound && dotRange.location <= 6) {
+        NSString *prefix = [rawId substringToIndex:dotRange.location];
+        NSCharacterSet *nonDigits = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+        if ([prefix rangeOfCharacterFromSet:nonDigits].location == NSNotFound) {
+            cleanId = [rawId substringFromIndex:dotRange.location + 1];
+        }
+    }
+
+    if (cleanId.length > 0) {
+        BOOL prev = [stateMap[cleanId] boolValue];
+        stateMap[cleanId] = @(prev || isEnabled);
+    }
+    if (bundleId.length > 0) {
+        BOOL prev = [stateMap[bundleId] boolValue];
+        stateMap[bundleId] = @(prev || isEnabled);
+    }
+
+    // SMAppService.mainApp 注册的主应用登录项：Type 为 "app (0x2)" 且处于 enabled & allowed 状态
+    if ([typeStr hasPrefix:@"app "] && isEnabled && urlStr.length > 0 && ![urlStr isEqualToString:@"(null)"]) {
+        NSString *appPath = urlStr;
+        if ([urlStr hasPrefix:@"file://"]) {
+            NSURL *fileURL = [NSURL URLWithString:urlStr];
+            if (fileURL.path.length > 0) {
+                appPath = fileURL.path;
+            }
+        }
+        if ([appPath hasPrefix:@"/"] &&
+            [appPath hasSuffix:@".app"] &&
+            ![appPath hasPrefix:@"/System/"] &&
+            [[NSFileManager defaultManager] fileExistsAtPath:appPath]) {
+            NSString *resolvedBundleId = bundleId.length > 0 ? bundleId : cleanId;
+            if (resolvedBundleId.length == 0) {
+                resolvedBundleId = [[NSBundle bundleWithPath:appPath] bundleIdentifier] ?: @"";
+            }
+            if (resolvedBundleId.length > 0) {
+                [mainApps addObject:@{
+                    @"appPath": appPath,
+                    @"bundleId": resolvedBundleId
+                }];
+            }
+        }
+    }
+}
+
+- (void)queryBTMSnapshotWithStateMap:(NSMutableDictionary<NSString *, NSNumber *> *)stateMap
+                            mainApps:(NSMutableArray<NSDictionary<NSString *, NSString *> *> *)mainApps {
+    if (![[NSFileManager defaultManager] isExecutableFileAtPath:@"/usr/bin/sfltool"]) {
+        return;
+    }
+    NSTask *task = [[NSTask alloc] init];
+    task.executableURL = [NSURL fileURLWithPath:@"/usr/bin/sfltool"];
+    task.arguments = @[@"dumpbtm"];
+    NSPipe *outPipe = [NSPipe pipe];
+    task.standardOutput = outPipe;
+    task.standardError = [NSPipe pipe];
+
+    __block NSData *outputData = nil;
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError *launchErr = nil;
+        if ([task launchAndReturnError:&launchErr]) {
+            outputData = [[outPipe fileHandleForReading] readDataToEndOfFile];
+            [task waitUntilExit];
+        }
+        dispatch_semaphore_signal(sema);
+    });
+
+    // 超时保护（上限 6 秒），避免后台服务异常阻塞
+    if (dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6.0 * NSEC_PER_SEC))) != 0) {
+        if (task.isRunning) {
+            [task terminate];
+        }
+        return;
+    }
+    if (outputData.length == 0) {
+        return;
+    }
+
+    NSString *output = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
+    if (output.length == 0) {
+        return;
+    }
+
+    long currentUid = (long)getuid();
+    BOOL inValidUidSection = YES;
+    NSMutableDictionary<NSString *, NSString *> *currentRec = nil;
+    NSArray<NSString *> *lines = [output componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+
+    for (NSString *rawLine in lines) {
+        NSString *trimmed = [rawLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (trimmed.length == 0) {
+            continue;
+        }
+        if ([trimmed hasPrefix:@"Records for UID "]) {
+            if (currentRec) {
+                [self parseBTMSnapshotRecord:currentRec stateMap:stateMap mainApps:mainApps];
+                currentRec = nil;
+            }
+            NSString *rest = [trimmed substringFromIndex:@"Records for UID ".length];
+            long secUid = (long)[rest integerValue];
+            inValidUidSection = (secUid == -2 || secUid == currentUid);
+            continue;
+        }
+        if (!inValidUidSection) {
+            continue;
+        }
+        // 新记录起始形如 "#1:"、"#28:"（注意排除 Embedded Item Identifiers 下的 "#1: 16.xxx"）
+        if ([trimmed hasPrefix:@"#"] && [trimmed hasSuffix:@":"]) {
+            if (currentRec) {
+                [self parseBTMSnapshotRecord:currentRec stateMap:stateMap mainApps:mainApps];
+            }
+            currentRec = [NSMutableDictionary dictionary];
+            continue;
+        }
+        if (!currentRec) {
+            continue;
+        }
+        NSRange colonRange = [trimmed rangeOfString:@":"];
+        if (colonRange.location != NSNotFound && colonRange.location > 0) {
+            NSString *key = [trimmed substringToIndex:colonRange.location];
+            if ([key hasPrefix:@"#"]) {
+                continue;
+            }
+            NSString *val = [[trimmed substringFromIndex:colonRange.location + 1]
+                             stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            currentRec[key] = val;
+        }
+    }
+    if (currentRec && inValidUidSection) {
+        [self parseBTMSnapshotRecord:currentRec stateMap:stateMap mainApps:mainApps];
+    }
+}
+
 #pragma mark -- App LoginItem
 /**
 获取LoginItem数据
 获取应用中LoginItem数据
-方法：遍历应用列表，筛选出包含LoginItem目录的应用
+方法：结合应用包内 Contents/Library/LoginItems、Contents/Library/LaunchAgents|LaunchDaemons 与 macOS 13+ BTM 快照
 */
 -(NSMutableArray *)getAppLoginItems{
     NSMutableArray *loginItemArray = [[NSMutableArray alloc]init];
-    
-    // macOS 13之后LoginItem不能被非应用本身来注册，仅支持应用自身使用SMAppService注册。
+    BOOL isMacOS13OrLater = NO;
     if (@available(macOS 13.0, *)) {
-        return loginItemArray;
+        isMacOS13OrLater = YES;
     }
-    
+
+    NSSet<NSString *> *loadedUserLabels = [self queryUserLaunchctlLoadedLabels];
+    NSMutableDictionary<NSString *, NSNumber *> *btmStateMap = [NSMutableDictionary dictionary];
+    NSMutableArray<NSDictionary<NSString *, NSString *> *> *btmMainApps = [NSMutableArray array];
+    if (isMacOS13OrLater) {
+        [self queryBTMSnapshotWithStateMap:btmStateMap mainApps:btmMainApps];
+    }
+
+    NSMutableSet<NSString *> *recordedIdentifiers = [NSMutableSet set];
+    NSMutableSet<NSString *> *appsWithEmbeddedItems = [NSMutableSet set];
+
     NSArray<QMLocalApp *> *appArray = [[QMLocalAppHelper shareInstance] getLocalAppData];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
     for (QMLocalApp *localApp in appArray) {
+        if (!localApp.bundlePath || [localApp.bundlePath hasPrefix:@"/System/"]) {
+            continue;
+        }
         if ([self needFilterLoginItem:localApp.bundleId]) {
             continue;
         }
@@ -91,27 +291,112 @@ typedef char (*SMLoginItemSetEnabledWithURL_ptr) ( void* ptr, char enabled);
         }
         NSString *loginItemDirPath = [localApp.bundlePath stringByAppendingString:@"/Contents/Library/LoginItems"];
         BOOL isExist = [fileManager fileExistsAtPath:loginItemDirPath];
-        if(isExist){
+        if (isExist) {
             NSError *error = nil;
             NSArray *contentsArray = [fileManager contentsOfDirectoryAtPath:loginItemDirPath error:&error];
             for (NSString *path in contentsArray) {
-                if ([path containsString:@".app"]) {
-                   NSString *loginItemAppPath = [[loginItemDirPath stringByAppendingString:@"/"] stringByAppendingString:path];
-//                    NSLog(@"%s, loginItemPath: %@", __FUNCTION__, loginItemAppPath);
+                if ([path hasSuffix:@".app"]) {
+                    NSString *loginItemAppPath = [loginItemDirPath stringByAppendingPathComponent:path];
                     QMAppLoginItem *loginItem = [[QMAppLoginItem alloc] initWithAppPath:localApp.bundlePath loginItemPath:loginItemAppPath loginItemType:LoginItemTypeAppItem];
-                    if (!loginItem.loginItemBundleId) {
+                    if (!loginItem.loginItemBundleId || [recordedIdentifiers containsObject:loginItem.loginItemBundleId]) {
                         continue;
                     }
-                    loginItem.isEnable = [self appLoginItemIsEnabledWithBundleId:loginItem.loginItemBundleId];
+                    NSNumber *btmEnabled = btmStateMap[loginItem.loginItemBundleId];
+                    if (isMacOS13OrLater && btmEnabled != nil) {
+                        loginItem.isEnable = [btmEnabled boolValue];
+                    } else {
+                        loginItem.isEnable = ([loadedUserLabels containsObject:loginItem.loginItemBundleId] ||
+                                              [self appLoginItemIsEnabledWithBundleId:loginItem.loginItemBundleId]);
+                    }
+                    loginItem.isManagedBySMAppService = isMacOS13OrLater;
                     if (loginItem.isEnable) {
-                        loginItem.isDisabledByUser = NO; // 上次关闭失败，或者该服务会做对抗，例如ioa
+                        loginItem.isDisabledByUser = NO;
                     }
                     [loginItemArray addObject:loginItem];
+                    [recordedIdentifiers addObject:loginItem.loginItemBundleId];
+                    [appsWithEmbeddedItems addObject:localApp.bundlePath];
                 }
             }
         }
-        
+
+        // macOS 13+ SMAppService 支持包内嵌 Contents/Library/LaunchAgents 与 LaunchDaemons
+        if (isMacOS13OrLater) {
+            NSArray<NSString *> *embeddedSubDirs = @[@"/Contents/Library/LaunchAgents", @"/Contents/Library/LaunchDaemons"];
+            for (NSString *subDir in embeddedSubDirs) {
+                NSString *fullSubDir = [localApp.bundlePath stringByAppendingString:subDir];
+                if (![fileManager fileExistsAtPath:fullSubDir]) {
+                    continue;
+                }
+                NSArray<NSString *> *plistNames = [fileManager contentsOfDirectoryAtPath:fullSubDir error:NULL];
+                for (NSString *plistName in plistNames) {
+                    if (![plistName hasSuffix:@".plist"] || [self needFilterFile:plistName]) {
+                        continue;
+                    }
+                    NSString *plistPath = [fullSubDir stringByAppendingPathComponent:plistName];
+                    NSDictionary *plistDict = [NSDictionary dictionaryWithContentsOfFile:plistPath];
+                    if (![plistDict isKindOfClass:NSDictionary.class]) {
+                        continue;
+                    }
+                    NSString *label = plistDict[LAUNCH_SERVICE_LABEL];
+                    if (![label isKindOfClass:NSString.class] || label.length == 0 || [recordedIdentifiers containsObject:label]) {
+                        continue;
+                    }
+                    QMAppLoginItem *embeddedServiceItem = [[QMAppLoginItem alloc] initWithAppPath:localApp.bundlePath
+                                                                                    loginItemPath:plistPath
+                                                                                    loginItemType:LoginItemTypeAppItem];
+                    embeddedServiceItem.loginItemBundleId = label;
+                    embeddedServiceItem.isManagedBySMAppService = YES;
+                    NSNumber *btmEnabled = btmStateMap[label];
+                    if (btmEnabled != nil) {
+                        embeddedServiceItem.isEnable = [btmEnabled boolValue];
+                    } else if ([subDir hasSuffix:@"LaunchDaemons"] &&
+                               [self.delegate respondsToSelector:@selector(isEnableForLaunchServiceLabel:)]) {
+                        embeddedServiceItem.isEnable = [self.delegate isEnableForLaunchServiceLabel:label];
+                    } else {
+                        embeddedServiceItem.isEnable = [loadedUserLabels containsObject:label];
+                    }
+                    if (embeddedServiceItem.isEnable) {
+                        embeddedServiceItem.isDisabledByUser = NO;
+                    }
+                    [loginItemArray addObject:embeddedServiceItem];
+                    [recordedIdentifiers addObject:label];
+                    [appsWithEmbeddedItems addObject:localApp.bundlePath];
+                }
+            }
+        }
     }
+
+    // 补充通过 SMAppService.mainApp 注册且处于启用态的独立主应用登录项
+    if (isMacOS13OrLater && btmMainApps.count > 0) {
+        for (NSDictionary<NSString *, NSString *> *entry in btmMainApps) {
+            NSString *appPath = entry[@"appPath"];
+            NSString *bundleId = entry[@"bundleId"];
+            if (!appPath || !bundleId) {
+                continue;
+            }
+            if ([appsWithEmbeddedItems containsObject:appPath] || [recordedIdentifiers containsObject:bundleId]) {
+                continue;
+            }
+            if ([self needFilterLoginItem:bundleId]) {
+                continue;
+            }
+            if ([self.delegate respondsToSelector:@selector(needFilterLoginItemBundleId:)] &&
+                [self.delegate needFilterLoginItemBundleId:bundleId]) {
+                continue;
+            }
+            QMAppLoginItem *mainAppItem = [[QMAppLoginItem alloc] initWithAppPath:appPath
+                                                                    loginItemPath:appPath
+                                                                    loginItemType:LoginItemTypeAppItem];
+            mainAppItem.loginItemBundleId = bundleId;
+            mainAppItem.isEnable = YES;
+            mainAppItem.isManagedBySMAppService = YES;
+            mainAppItem.isDisabledByUser = NO;
+            [loginItemArray addObject:mainAppItem];
+            [recordedIdentifiers addObject:bundleId];
+            [appsWithEmbeddedItems addObject:appPath];
+        }
+    }
+
     NSLog(@"%s, app loginItem Array count : %lu", __FUNCTION__, (unsigned long)loginItemArray.count);
     return loginItemArray;
 }
@@ -193,24 +478,31 @@ typedef char (*SMLoginItemSetEnabledWithURL_ptr) ( void* ptr, char enabled);
 -(NSMutableArray *)getSystemLoginItems{
     self.loginItemArray = [[NSMutableArray alloc]init];
     UInt32 seedValue;
-    CFURLRef thePath;
+    CFURLRef thePath = NULL;
     LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
+    if (loginItems == NULL) {
+        return self.loginItemArray;
+    }
     CFArrayRef loginItemsArray = LSSharedFileListCopySnapshot(loginItems, &seedValue);
-    for (id item in (__bridge NSArray *)loginItemsArray) {
-        LSSharedFileListItemRef itemRef = (__bridge LSSharedFileListItemRef)item;
-        if (LSSharedFileListItemResolve(itemRef, 0, (CFURLRef*) &thePath, NULL) == noErr) {
-            NSString *filePath = [(__bridge NSURL *)thePath path];
-            QMBaseLoginItem *loginItem = [[QMBaseLoginItem alloc] initWithAppPath:filePath];
-            loginItem.loginItemType = LoginItemTypeSystemItem;
-            loginItem.isEnable = YES;
-            loginItem.isDisabledByUser = NO; // 上次关闭失败，或者该服务会做对抗，例如ioa
-            [self.loginItemArray addObject:loginItem];
-//            NSLog(@"%s, filePath : %@", __FUNCTION__, filePath);
-            CFRelease(thePath);
-           }
-       }
-       CFRelease(loginItemsArray);
-       CFRelease(loginItems);
+    if (loginItemsArray != NULL) {
+        for (id item in (__bridge NSArray *)loginItemsArray) {
+            LSSharedFileListItemRef itemRef = (__bridge LSSharedFileListItemRef)item;
+            if (LSSharedFileListItemResolve(itemRef, 0, (CFURLRef*) &thePath, NULL) == noErr && thePath != NULL) {
+                NSString *filePath = [(__bridge NSURL *)thePath path];
+                if (filePath.length > 0) {
+                    QMBaseLoginItem *loginItem = [[QMBaseLoginItem alloc] initWithAppPath:filePath];
+                    loginItem.loginItemType = LoginItemTypeSystemItem;
+                    loginItem.isEnable = YES;
+                    loginItem.isDisabledByUser = NO; // 上次关闭失败，或者该服务会做对抗，例如ioa
+                    [self.loginItemArray addObject:loginItem];
+                }
+                CFRelease(thePath);
+                thePath = NULL;
+            }
+        }
+        CFRelease(loginItemsArray);
+    }
+    CFRelease(loginItems);
     NSLog(@"%s, system loginItem Array count : %lu", __FUNCTION__, (unsigned long)self.loginItemArray.count);
     return self.loginItemArray;
 }
@@ -284,6 +576,8 @@ typedef char (*SMLoginItemSetEnabledWithURL_ptr) ( void* ptr, char enabled);
 - (NSArray *)getLaunchServiceItems {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSMutableArray *launchServiceItemArray = [[NSMutableArray alloc]init];
+    // 一次性快照当前用户态 launchctl 已加载服务集合，避免逐个 plist 派生 grep 子进程（O(N) 降为 O(1)）
+    NSSet<NSString *> *loadedUserLabels = [self queryUserLaunchctlLoadedLabels];
     for (NSString *directoryPath in self.launchServiceFilePathArray) {
         NSArray *fileNames = [fileManager contentsOfDirectoryAtPath:directoryPath error:NULL];
         for (NSString *fileName in fileNames) {
@@ -307,7 +601,11 @@ typedef char (*SMLoginItemSetEnabledWithURL_ptr) ( void* ptr, char enabled);
             }
             QMAppLaunchItem *launchItem = [[QMAppLaunchItem alloc] initWithLaunchFilePath:filePath itemType:LoginItemTypeService];
             launchItem.label = label;
-            launchItem.isEnable = [self serviceIsEnabledWithItem:launchItem];
+            if (launchItem.domainType == LaunchServiceDomainTypeUser) {
+                launchItem.isEnable = [loadedUserLabels containsObject:label];
+            } else {
+                launchItem.isEnable = [self serviceIsEnabledWithItem:launchItem];
+            }
             if (launchItem.isEnable) {
                 launchItem.isDisabledByUser = NO; // 上次关闭失败，或者该服务会做对抗，例如ioa
             }

@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #import <QMCoreFunction/MdlsToolsHelper.h>
 #import <QMCoreFunction/NSFileManager+iCloudHelper.h>
+#import <QMCoreFunction/McCoreFunction.h>
 
 typedef struct val_attrs {
     uint32_t          length;
@@ -68,13 +69,12 @@ static BOOL isOperatingSystemAtLeastMacOS13 = NO;
  * @return YES表示应该跳过，NO表示可以处理
  */
 - (BOOL)shouldSkipICloudFile:(NSString *)filePath {
-    if (!self.skipICloudFiles) {
+    if (!self.skipICloudFiles || !filePath) {
         return NO;
     }
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ([fileManager qm_isICloudFileAtPath:filePath]) {
-        // 只有已下载的iCloud文件才不跳过
-        return ![fileManager qm_isICloudFileDownloadedAtPath:filePath];
+    const char *fsPath = [filePath fileSystemRepresentation];
+    if (fsPath && LMPathIsCloudDataless(fsPath, NULL)) {
+        return YES;
     }
     return NO;
 }
@@ -188,10 +188,9 @@ static BOOL isOperatingSystemAtLeastMacOS13 = NO;
                         continue;
                     }
                     
-                    if (isOperatingSystemAtLeastMacOS13) {
-                        // 检查是否应该跳过iCloud文件
+                    if (self.skipICloudFiles) {
+                        // 检查是否应该跳过 SF_DATALESS / .icloud 云端无数据存根，避免触发同步
                         if ([self shouldSkipICloudFile:fileItem.fullPath]) {
-                            // 跳过未下载的iCloud文件，避免触发同步
                             continue;
                         }
                     }
@@ -216,31 +215,28 @@ static BOOL isOperatingSystemAtLeastMacOS13 = NO;
                         }
                     }
                     if (fileItem.isDirectory == NO && (attrs.returned.fileattr & ATTR_FILE_ALLOCSIZE)) {
-                        NSFileManager *fileManager = [NSFileManager defaultManager];
-                        
-                        BOOL isICloudFile = NO;
-                        if (isOperatingSystemAtLeastMacOS13) {
-                            // 13及以上调用qm_isICloudFileAtPath，避免多线程问题。
-                            isICloudFile = [fileManager qm_isICloudFileAtPath:fileItem.fullPath];
-                        }
-                        if (isICloudFile) {
-                            // iCloud文件，使用安全方法获取大小，避免触发下载
-                            fileItem.sizeInBytes = [fileManager qm_safeFileSizeAtPath:fileItem.fullPath];
-                            field += sizeof(off_t); // 跳过field指针，不读取可能触发下载的数据
-                        } else {
-                            // 非iCloud文件，正常获取大小
-                            attrs.fileSize = *(off_t *)field;
-                            field += sizeof(off_t);
-                            fileItem.sizeInBytes = attrs.fileSize;
-                        }
-//                        NSLog(@"%@==>%lld",fileItem.fullPath,fileItem.sizeInBytes);
+                        // getattrlistbulk 的 ATTR_FILE_ALLOCSIZE 直接返回内核 VFS 物理分配字节数：
+                        // 1) 纯元数据读取不会触发 fileproviderd 下载；
+                        // 2) SF_DATALESS 云端存根与稀疏文件自动按真实落盘字节（0 B）计量，杜绝云盘逻辑体积虚报数百 GB；
+                        // 3) 消除原先每文件一次 NSURLIsUbiquitousItemKey 查询开销。
+                        attrs.fileSize = *(off_t *)field;
+                        field += sizeof(off_t);
+                        fileItem.sizeInBytes = attrs.fileSize > 0 ? attrs.fileSize : 0;
                     } else {
                         NSString *pathExtension = [[fileItem.fullPath pathExtension] lowercaseString];
                         if (pathExtension.length > 0 && [self.specialFileExtensions containsObject:pathExtension]) {
-                            NSMetadataItem *metadataItem = [[NSMetadataItem alloc] initWithURL:[NSURL fileURLWithPath:fileItem.fullPath]];
-                            fileItem.sizeInBytes = [[metadataItem valueForAttribute:NSMetadataItemFSSizeKey] unsignedLongLongValue];
-                            if (fileItem.sizeInBytes > 0) {
-                                fileItem.isDirectory = NO; // 元数据读取到size将其标记为文件而非目录
+                            const char *pkgFsPath = [fileItem.fullPath fileSystemRepresentation];
+                            if (!pkgFsPath || !LMPathIsCloudDataless(pkgFsPath, NULL)) {
+                                NSMetadataItem *metadataItem = [[NSMetadataItem alloc] initWithURL:[NSURL fileURLWithPath:fileItem.fullPath]];
+                                NSNumber *physSize = [metadataItem valueForAttribute:@"kMDItemPhysicalSize"];
+                                if (physSize != nil) {
+                                    fileItem.sizeInBytes = [physSize unsignedLongLongValue];
+                                } else {
+                                    fileItem.sizeInBytes = [[metadataItem valueForAttribute:NSMetadataItemFSSizeKey] unsignedLongLongValue];
+                                }
+                                if (fileItem.sizeInBytes > 0) {
+                                    fileItem.isDirectory = NO; // 元数据读取到size将其标记为文件而非目录
+                                }
                             }
                         }
                     }

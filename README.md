@@ -52,6 +52,18 @@
 
 ## 版本更新日志 (Changelog)
 
+### `v1.1.0` (2026-11-02)
+
+- **现代 macOS (12.0 ~ 15.x+/26+) 与 Apple Silicon (M1~M5+) 深度内核架构适配**：
+  - **APFS 真实可用空间校准与零子进程存储采集**：状态栏与磁盘分析统一接入 `NSURLVolumeAvailableCapacityForImportantUsageKey`，精准对齐系统访达容量口径；全面废除耗时约 30s 的 `system_profiler SPStorageDataType` Shell 子进程，改用原生挂载卷批量枚举与 SSV 卷组物理去重。
+  - **Time Machine 本地快照智能瘦身**：系统维护模块新增“APFS 快照瘦身”项，自动枚举挂载点本地快照并安全触发 `tmutil thinlocalsnapshots`，一键释放巨额可回收存储空间。
+  - **Apple Silicon 原生热敏传感器采集与无风扇机型适配**：引入 `IOHIDEventSystemClient` 直读 Apple Silicon PMU SOC Die 及能效/性能核传感器温度；集成用户态 `AppleSMC` 接口直读风扇转速（消除向 Root Daemon 频繁发起 XPC 唤醒）；自动识别 MacBook Air 等被动散热无风扇机型，自适应隐藏或显示“被动散热”状态。
+  - **刘海屏自适应与等宽数字紧凑双行状态栏**：`MachineModel` 升级动态 `safeAreaInsets.top` 刘海屏检测；状态栏数字全量升级为 `monospacedDigitSystemFontOfSize` 消除字符跳变抖动；新增紧凑双行并列排版模式（`Compact 2-Row`），勾选多项时自动压缩顶栏占用空间，偏好设置提供手动切换。
+  - **云盘 `SF_DATALESS` / `.icloud` 零下载守护**：核心扫描框架引入系统级 `LMPathIsCloudDataless` 守卫，重复文件、大文件、相似照片、磁盘空间分析四大引擎全面识别 iCloud Drive / OneDrive / Dropbox 等云端按需占位文件，杜绝扫描触发静默海量下载。
+  - **macOS 13+ 登录项（`SMAppService` / BTM）全面兼容**：移除现代系统空返回盲区，结合 BTM 与 `Contents/Library/LoginItems` 深度扫描，支持跳转现代系统设置精准管理；4 大 Launchd Plist 补齐 `AssociatedBundleIdentifiers`，系统设置统一归属在 `cleaner` 名下。
+  - **零唤醒低能耗后台架构（0-Wakeup Architecture）**：`LemonMonitor` 状态栏监听屏幕休眠、合盖与锁屏通知，熄屏或锁屏态彻底挂起硬件轮询定时器实现 0 CPU Wakeup，点亮后即刻热刷新；常驻定时器注入 `timer.tolerance` 允许 XNU 内核合并中断；硬件与内存检测彻底移除 `system_profiler` 临时文件读写，全面改由 `sysctl` 与 `IOKit` 内存直读。
+  - **现代权限引导与通知框架升级**：废除旧版遗留文案，统一适配现代 macOS 13~15+“系统设置 -> 隐私与安全性”路径与协议直达；全面桥接升级至 `UNUserNotificationCenter`，补齐 GitHub 热更新器全流程中英双语国际化支持。
+
 ### `v1.0.3` (2026-11-02)
 
 - **功能列表卡片排版与防裁剪加固**：精简四大扩展工具项中文副标题字长以严格对齐原生卡片视觉节奏，并为 `ToolTableCellView` 增加双层右边界约束与多语言尾部省略守卫，消除固定列宽下的边缘硬切问题。

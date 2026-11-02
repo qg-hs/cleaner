@@ -10,6 +10,25 @@
 #import "McCoreFunctionCommon.h"
 #import "QMFullDiskAccessManager.h"
 
+struct stat;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/// 检测文件是否为 iCloud / FileProvider 云端无数据占位存根 (SF_DATALESS 或 .icloud)，O(1) 免触发下载
+BOOL LMPathIsCloudDataless(const char *path, const struct stat *nullableStat);
+
+/// 检测当前 Mac 是否配备物理散热风扇（MacBook Air 等被动散热机型返回 NO）
+BOOL LMDeviceHasPhysicalFan(void);
+
+/// 用户态读取 Apple Silicon 核心温度（非 arm64 或不可用时返回 -1.0）
+double LMReadAppleSiliconCPUTemperature(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 typedef enum: NSUInteger {
     AppBinaryType_None = 0,
     AppBinaryType_X86,

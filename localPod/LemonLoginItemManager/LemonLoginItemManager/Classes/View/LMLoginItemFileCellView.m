@@ -51,7 +51,9 @@
     [self.switchButton setOnValueChanged:^(COSwitch *button) {
         @strongify(self);
         // 子项被点击
-        self.loginItem.isDisabledByUser = !button.isOn;
+        if (!self.loginItem.isManagedBySMAppService) {
+            self.loginItem.isDisabledByUser = !button.isOn;
+        }
         [super updateLoginItem:self.loginItem switchLabel:self.switchBtnLabel withSwtichBtn:self.switchButton];
         [self.delegate clickSwitchButton:button onCellView:self];
     }];

@@ -112,7 +112,8 @@
         @strongify(self);
         // app级别的被点击
         [self.delegate clickSwitchButton:button onCellView:self];
-        self.loginItemInfo.enableStatus = button.on ? LMAppLoginItemEnableStatusAllEnabled : LMAppLoginItemEnableStatusAllDisabled;
+        [self.loginItemInfo updateEnableStatus];
+        [self updateStatusLabelStyle];
     }];
 }
 

@@ -276,7 +276,7 @@
 
 - (instancetype)init {
     self = [super initWithToolTitle:LMToolLocalized(@"系统维护", @"System Maintenance")
-                         windowSize:NSMakeSize(780, 482)];
+                         windowSize:NSMakeSize(780, 526)];
     return self;
 }
 

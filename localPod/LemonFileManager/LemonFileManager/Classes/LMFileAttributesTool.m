@@ -8,6 +8,7 @@
 #import "LMFileAttributesTool.h"
 #import <sys/stat.h>
 #import <sys/dirent.h>
+#import <QMCoreFunction/McCoreFunction.h>
 
 /** https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/stat.2.html
  st_blocks      The actual number of blocks allocated for the file in
@@ -53,8 +54,12 @@ static NSMutableDictionary * m_cachePathDict = nil;
     uint64 fileSize = 0;
     
     struct stat fileStat;
-    if (lstat([path fileSystemRepresentation], &fileStat) == noErr)
+    const char *fsPath = [path fileSystemRepresentation];
+    if (fsPath && lstat(fsPath, &fileStat) == noErr)
     {
+        if (LMPathIsCloudDataless(fsPath, &fileStat)) {
+            return 0;
+        }
         if (S_ISDIR(fileStat.st_mode)){
             // 通过spotlight快速获取文件夹size。可以过滤一部分kMDItemContentTypeTree包含"com.apple.package"，一般来说该类型路径相结构相对复杂点
             NSMetadataItem *metadataItem = [[NSMetadataItem alloc] initWithURL:[NSURL fileURLWithPath:path]];
@@ -103,7 +108,10 @@ static NSMutableDictionary * m_cachePathDict = nil;
         @autoreleasepool {
             NSString * resultPath = [pathURL path];
             struct stat fileStat;
-            if (lstat([resultPath fileSystemRepresentation], &fileStat) != 0)
+            const char *resultFsPath = [resultPath fileSystemRepresentation];
+            if (!resultFsPath || lstat(resultFsPath, &fileStat) != 0)
+                continue;
+            if (LMPathIsCloudDataless(resultFsPath, &fileStat))
                 continue;
             if (S_ISLNK(fileStat.st_mode) || S_ISDIR(fileStat.st_mode)) { // 软连接 || 目录
                 // 不占用磁盘扇形空间st_blocks，仅存在inode中

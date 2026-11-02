@@ -13,6 +13,337 @@
 #import "McPipeStruct.h"
 #import "LMXpcClient.h"
 #import "NSString+Extension.h"
+#include <sys/stat.h>
+#include <sys/sysctl.h>
+#include <pthread.h>
+#include <dlfcn.h>
+#include <IOKit/IOKitLib.h>
+
+#ifndef SF_DATALESS
+#define SF_DATALESS 0x40000000
+#endif
+
+BOOL LMPathIsCloudDataless(const char *path, const struct stat *nullableStat)
+{
+    struct stat localSt;
+    const struct stat *stPtr = nullableStat;
+
+    if (path != NULL) {
+        const char *slash = strrchr(path, '/');
+        const char *base = slash ? (slash + 1) : path;
+        size_t baseLen = strlen(base);
+        // iCloud Drive 未下载占位符形如 ".filename.icloud"
+        if (baseLen > 8 && base[0] == '.' && strcmp(base + baseLen - 7, ".icloud") == 0) {
+            return YES;
+        }
+    }
+
+    if (stPtr == NULL && path != NULL) {
+        if (lstat(path, &localSt) == 0) {
+            stPtr = &localSt;
+        }
+    }
+
+    if (stPtr != NULL) {
+        if ((stPtr->st_flags & SF_DATALESS) != 0) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+typedef struct {
+    char major;
+    char minor;
+    char build;
+    char reserved[1];
+    uint16_t release;
+} LMSMCVers_t;
+
+typedef struct {
+    uint16_t version;
+    uint16_t length;
+    uint32_t cpuPLimit;
+    uint32_t gpuPLimit;
+    uint32_t memPLimit;
+} LMSMCPLimit_t;
+
+typedef struct {
+    uint32_t dataSize;
+    uint32_t dataType;
+    char dataAttributes;
+} LMSMCKeyInfo_t;
+
+typedef struct {
+    uint32_t key;
+    LMSMCVers_t vers;
+    LMSMCPLimit_t pLimitData;
+    LMSMCKeyInfo_t keyInfo;
+    char result;
+    char status;
+    char data8;
+    uint32_t data32;
+    unsigned char bytes[32];
+} LMSMCKeyData_t;
+
+static uint32_t LMSMCFourCC(const char *s)
+{
+    return ((uint32_t)(unsigned char)s[0] << 24) |
+           ((uint32_t)(unsigned char)s[1] << 16) |
+           ((uint32_t)(unsigned char)s[2] << 8)  |
+           ((uint32_t)(unsigned char)s[3]);
+}
+
+static pthread_mutex_t g_userSmcLock = PTHREAD_MUTEX_INITIALIZER;
+static io_connect_t g_userSmcConn = 0;
+
+static io_connect_t LMGetUserSpaceSMCConnection(void)
+{
+    if (g_userSmcConn != 0) {
+        return g_userSmcConn;
+    }
+    io_service_t svc = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleSMC"));
+    if (!svc) {
+        return 0;
+    }
+    io_connect_t conn = 0;
+    kern_return_t kr = IOServiceOpen(svc, mach_task_self(), 0, &conn);
+    IOObjectRelease(svc);
+    if (kr == kIOReturnSuccess && conn != 0) {
+        g_userSmcConn = conn;
+    }
+    return g_userSmcConn;
+}
+
+static BOOL LMReadUserSpaceSMCKeyLocked(const char *keyStr, LMSMCKeyData_t *outVal, uint32_t *outType, uint32_t *outSize)
+{
+    io_connect_t conn = LMGetUserSpaceSMCConnection();
+    if (!conn || keyStr == NULL || outVal == NULL) {
+        return NO;
+    }
+    LMSMCKeyData_t inS;
+    LMSMCKeyData_t resS;
+    size_t outStructSize = sizeof(LMSMCKeyData_t);
+    memset(&inS, 0, sizeof(inS));
+    memset(&resS, 0, sizeof(resS));
+
+    inS.key = LMSMCFourCC(keyStr);
+    inS.data8 = 9; // SMC_CMD_READ_KEYINFO
+    kern_return_t kr = IOConnectCallStructMethod(conn, 2, &inS, sizeof(inS), &resS, &outStructSize);
+    if (kr != kIOReturnSuccess || resS.result != 0 || resS.keyInfo.dataSize == 0 || resS.keyInfo.dataSize > 32) {
+        return NO;
+    }
+    uint32_t dType = resS.keyInfo.dataType;
+    uint32_t dSize = resS.keyInfo.dataSize;
+
+    inS.keyInfo.dataSize = dSize;
+    inS.data8 = 5; // SMC_CMD_READ_BYTES
+    memset(&resS, 0, sizeof(resS));
+    outStructSize = sizeof(LMSMCKeyData_t);
+    kr = IOConnectCallStructMethod(conn, 2, &inS, sizeof(inS), &resS, &outStructSize);
+    if (kr != kIOReturnSuccess || resS.result != 0) {
+        return NO;
+    }
+    *outVal = resS;
+    if (outType) *outType = dType;
+    if (outSize) *outSize = dSize;
+    return YES;
+}
+
+static int LMQueryPhysicalFanCountOnce(void)
+{
+    int fanCount = -1;
+    pthread_mutex_lock(&g_userSmcLock);
+    io_connect_t conn = LMGetUserSpaceSMCConnection();
+    if (conn != 0) {
+        LMSMCKeyData_t val;
+        uint32_t dType = 0;
+        uint32_t dSize = 0;
+        if (LMReadUserSpaceSMCKeyLocked("FNum", &val, &dType, &dSize) && dSize >= 1) {
+            fanCount = (int)val.bytes[0];
+        } else {
+            // AppleSMC 打开成功但不存在 FNum 键（如无风扇 Apple Silicon 机型）
+            fanCount = 0;
+        }
+    }
+    pthread_mutex_unlock(&g_userSmcLock);
+
+    if (fanCount >= 0) {
+        return fanCount;
+    }
+
+    char modelBuf[64] = {0};
+    size_t len = sizeof(modelBuf) - 1;
+    if (sysctlbyname("hw.model", modelBuf, &len, NULL, 0) == 0) {
+        NSString *model = [NSString stringWithUTF8String:modelBuf];
+        if ([model isEqualToString:@"MacBookAir10,1"] ||
+            [model isEqualToString:@"Mac14,2"] ||
+            [model isEqualToString:@"Mac14,15"] ||
+            [model isEqualToString:@"Mac15,12"] ||
+            [model isEqualToString:@"Mac15,13"] ||
+            [model isEqualToString:@"Mac16,12"] ||
+            [model isEqualToString:@"Mac16,13"]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+BOOL LMDeviceHasPhysicalFan(void)
+{
+    static BOOL sHasFan = YES;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sHasFan = (LMQueryPhysicalFanCountOnce() > 0);
+    });
+    return sHasFan;
+}
+
+static int LMReadUserSpaceSMCFanSpeeds(double *outSpeeds, int maxCount)
+{
+    if (!LMDeviceHasPhysicalFan() || outSpeeds == NULL || maxCount <= 0) {
+        return 0;
+    }
+    int gotCount = 0;
+    pthread_mutex_lock(&g_userSmcLock);
+    LMSMCKeyData_t fnumVal;
+    uint32_t dType = 0;
+    uint32_t dSize = 0;
+    int fanNum = 0;
+    if (LMReadUserSpaceSMCKeyLocked("FNum", &fnumVal, &dType, &dSize) && dSize >= 1) {
+        fanNum = (int)fnumVal.bytes[0];
+    }
+    if (fanNum > maxCount) {
+        fanNum = maxCount;
+    }
+    int i;
+    for (i = 0; i < fanNum; i++) {
+        char keyStr[8];
+        snprintf(keyStr, sizeof(keyStr), "F%dAc", i);
+        LMSMCKeyData_t speedVal;
+        uint32_t sType = 0;
+        uint32_t sSize = 0;
+        if (LMReadUserSpaceSMCKeyLocked(keyStr, &speedVal, &sType, &sSize)) {
+            double rpm = 0.0;
+            if (sType == LMSMCFourCC("flt ") && sSize == 4) {
+                float fVal = 0.0f;
+                memcpy(&fVal, speedVal.bytes, 4);
+                rpm = (double)fVal;
+            } else if (sType == LMSMCFourCC("fpe2") && sSize == 2) {
+                rpm = (double)(((int)speedVal.bytes[0] << 6) + ((int)speedVal.bytes[1] >> 2));
+            } else if (sType == LMSMCFourCC("ui16") && sSize == 2) {
+                rpm = (double)(((int)speedVal.bytes[0] << 8) + (int)speedVal.bytes[1]);
+            }
+            if (rpm >= 0.0 && rpm < 15000.0) {
+                outSpeeds[gotCount++] = rpm;
+            }
+        }
+    }
+    pthread_mutex_unlock(&g_userSmcLock);
+    return gotCount;
+}
+
+double LMReadAppleSiliconCPUTemperature(void)
+{
+#ifdef __arm64__
+    typedef struct __IOHIDEventSystemClient *LMHIDClientRef;
+    typedef struct __IOHIDServiceClient *LMHIDServiceRef;
+    typedef struct __IOHIDEvent *LMHIDEventRef;
+
+    typedef LMHIDClientRef (*CreateFn)(CFAllocatorRef);
+    typedef int (*MatchFn)(LMHIDClientRef, CFDictionaryRef);
+    typedef CFArrayRef (*CopySvcsFn)(LMHIDClientRef);
+    typedef CFTypeRef (*CopyPropFn)(LMHIDServiceRef, CFStringRef);
+    typedef LMHIDEventRef (*CopyEvFn)(LMHIDServiceRef, int64_t, int32_t, int64_t);
+    typedef double (*GetFloatFn)(LMHIDEventRef, int32_t);
+
+    static CreateFn sCreate = NULL;
+    static MatchFn sMatch = NULL;
+    static CopySvcsFn sCopySvcs = NULL;
+    static CopyPropFn sCopyProp = NULL;
+    static CopyEvFn sCopyEv = NULL;
+    static GetFloatFn sGetFloat = NULL;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        void *h = dlopen("/System/Library/Frameworks/IOKit.framework/IOKit", RTLD_LAZY);
+        if (h) {
+            sCreate = (CreateFn)dlsym(h, "IOHIDEventSystemClientCreate");
+            sMatch = (MatchFn)dlsym(h, "IOHIDEventSystemClientSetMatching");
+            sCopySvcs = (CopySvcsFn)dlsym(h, "IOHIDEventSystemClientCopyServices");
+            sCopyProp = (CopyPropFn)dlsym(h, "IOHIDServiceClientCopyProperty");
+            sCopyEv = (CopyEvFn)dlsym(h, "IOHIDServiceClientCopyEvent");
+            sGetFloat = (GetFloatFn)dlsym(h, "IOHIDEventGetFloatValue");
+        }
+    });
+
+    if (!sCreate || !sMatch || !sCopySvcs || !sCopyProp || !sCopyEv || !sGetFloat) {
+        return -1.0;
+    }
+
+    LMHIDClientRef client = sCreate(kCFAllocatorDefault);
+    if (!client) {
+        return -1.0;
+    }
+
+    NSDictionary *matching = @{ @"PrimaryUsagePage": @(0xFF00), @"PrimaryUsage": @(5) };
+    sMatch(client, (__bridge CFDictionaryRef)matching);
+    CFArrayRef services = sCopySvcs(client);
+
+    double primarySum = 0.0;
+    int primaryCount = 0;
+    double fallbackSum = 0.0;
+    int fallbackCount = 0;
+
+    if (services) {
+        CFIndex n = CFArrayGetCount(services);
+        CFIndex i;
+        for (i = 0; i < n; i++) {
+            LMHIDServiceRef svc = (LMHIDServiceRef)CFArrayGetValueAtIndex(services, i);
+            CFTypeRef prod = sCopyProp(svc, CFSTR("Product"));
+            NSString *name = nil;
+            if (prod) {
+                if (CFGetTypeID(prod) == CFStringGetTypeID()) {
+                    name = [(__bridge NSString *)prod copy];
+                }
+                CFRelease(prod);
+            }
+            if (name.length == 0) {
+                continue;
+            }
+            LMHIDEventRef ev = sCopyEv(svc, 15, 0, 0);
+            if (!ev) {
+                continue;
+            }
+            double val = sGetFloat(ev, (15 << 16));
+            CFRelease(ev);
+            if (val <= 20.0 || val >= 115.0) {
+                continue;
+            }
+            if ([name hasPrefix:@"PMU tdie"] ||
+                [name containsString:@"pACC MTR Temp"] ||
+                [name containsString:@"eACC MTR Temp"] ||
+                [name containsString:@"PMGR SOC Die"] ||
+                [name containsString:@"SOC MTR Temp"]) {
+                primarySum += val;
+                primaryCount++;
+            } else if ([name hasPrefix:@"PMU TP"] && ![name containsString:@"tcal"]) {
+                fallbackSum += val;
+                fallbackCount++;
+            }
+        }
+        CFRelease(services);
+    }
+    CFRelease(client);
+
+    if (primaryCount > 0) {
+        return primarySum / (double)primaryCount;
+    }
+    if (fallbackCount > 0) {
+        return fallbackSum / (double)fallbackCount;
+    }
+#endif
+    return -1.0;
+}
 
 @implementation McCoreFunction
 
@@ -251,12 +582,34 @@ static void pack_smc_event(NSMutableArray *fsData, double *fs_data, int ret) {
 
 - (void)getFanSpeeds:(block_v_a)completion
 {
+    if (!LMDeviceHasPhysicalFan()) {
+        if (completion) {
+            completion(@[]);
+        }
+        return;
+    }
+    double localSpeeds[10] = {0};
+    int localCount = LMReadUserSpaceSMCFanSpeeds(localSpeeds, 10);
+    if (localCount > 0) {
+        NSMutableArray *localArr = [NSMutableArray arrayWithCapacity:(NSUInteger)localCount];
+        int i;
+        for (i = 0; i < localCount; i++) {
+            [localArr addObject:@(localSpeeds[i])];
+        }
+        if (completion) {
+            completion([localArr copy]);
+        }
+        return;
+    }
+
     const int per_count = 10;
-    double *fs_data = malloc(sizeof(fs_data)*per_count);
+    double *fs_data = malloc(sizeof(double) * per_count);
     __block NSMutableArray * fsData = [NSMutableArray array];
     block_v_i copyBlock = ^(int return_code) {
         pack_smc_event(fsData, fs_data, return_code);
-        completion([NSArray arrayWithArray:fsData]);
+        if (completion) {
+            completion([NSArray arrayWithArray:fsData]);
+        }
         free(fs_data);
     };
     _dm_get_fan_speed_async(0, per_count, fs_data, copyBlock);
@@ -264,12 +617,23 @@ static void pack_smc_event(NSMutableArray *fsData, double *fs_data, int ret) {
 
 - (void)getCPUTemperature:(block_v_a)completion
 {
+#ifdef __arm64__
+    double hidTemp = LMReadAppleSiliconCPUTemperature();
+    if (hidTemp > 20.0 && hidTemp < 115.0) {
+        if (completion) {
+            completion(@[@(hidTemp)]);
+        }
+        return;
+    }
+#endif
     const int per_count = 1;
-    double *fs_data = malloc(sizeof(fs_data)*per_count);
+    double *fs_data = malloc(sizeof(double) * per_count);
     __block NSMutableArray * fsData = [NSMutableArray array];
     block_v_i copyBlock = ^(int return_code) {
         pack_smc_event(fsData, fs_data, return_code);
-        completion([NSArray arrayWithArray:fsData]);
+        if (completion) {
+            completion([NSArray arrayWithArray:fsData]);
+        }
         free(fs_data);
     };
     _dm_get_cpu_temperature_async(0, per_count, fs_data, copyBlock);

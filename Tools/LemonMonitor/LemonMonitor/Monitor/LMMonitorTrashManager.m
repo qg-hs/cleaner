@@ -7,6 +7,7 @@
 //
 
 #import "LMMonitorTrashManager.h"
+#import <AppKit/AppKit.h>
 #import <LemonClener/QMLiteCleanerManager.h>
 #import <LemonClener/CleanerCantant.h>
 #import <QMCoreFunction/LMReferenceDefines.h>
@@ -18,16 +19,48 @@
     NSTimer          *scanTrashTimer;
     NSLock           *mTrashCleaningLock;
     NSTimeInterval   mLastCleanTime;
+    NSTimeInterval   mLastScanTime;
     NSInteger        _trashSize;  // -1 代表还未扫描. 0-50M 以下代表很干净.
+    BOOL             _isStarted;
+    BOOL             _isScreenSleepingOrLocked;
 }
 
 -(instancetype)init{
     self = [super init];
     if(self){
         mTrashCleaningLock = [[NSLock alloc]init];
+        NSNotificationCenter *wsCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+        [wsCenter addObserver:self selector:@selector(handleScreenSleep:) name:NSWorkspaceScreensDidSleepNotification object:nil];
+        [wsCenter addObserver:self selector:@selector(handleScreenSleep:) name:NSWorkspaceWillSleepNotification object:nil];
+        [wsCenter addObserver:self selector:@selector(handleScreenWake:) name:NSWorkspaceScreensDidWakeNotification object:nil];
+        [wsCenter addObserver:self selector:@selector(handleScreenWake:) name:NSWorkspaceDidWakeNotification object:nil];
+        [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleScreenSleep:) name:@"com.apple.screenIsLocked" object:nil];
+        [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleScreenWake:) name:@"com.apple.screenIsUnlocked" object:nil];
     }
     
     return self;
+}
+
+- (void)handleScreenSleep:(NSNotification *)note
+{
+    _isScreenSleepingOrLocked = YES;
+    if (scanTrashTimer) {
+        [scanTrashTimer invalidate];
+        scanTrashTimer = nil;
+    }
+}
+
+- (void)handleScreenWake:(NSNotification *)note
+{
+    _isScreenSleepingOrLocked = NO;
+    if (_isStarted && !scanTrashTimer) {
+        scanTrashTimer = [NSTimer scheduledTimerWithTimeInterval:ScanInterval target:self selector:@selector(onTrashScan) userInfo:nil repeats:YES];
+        scanTrashTimer.tolerance = 300.0;
+        NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+        if (now - mLastScanTime >= ScanInterval) {
+            [self onTrashScan];
+        }
+    }
 }
 
 
@@ -51,21 +84,37 @@
 
 - (void)startTrashScan
 {
+    _isStarted = YES;
     _trashSize = -1;
     _trashPhase = TrashScanNotStart;
-    scanTrashTimer = [NSTimer scheduledTimerWithTimeInterval:ScanInterval target:self selector:@selector(onTrashScan) userInfo:nil repeats:YES];
-    [scanTrashTimer fire];
+    if (scanTrashTimer) {
+        [scanTrashTimer invalidate];
+        scanTrashTimer = nil;
+    }
+    if (!_isScreenSleepingOrLocked) {
+        scanTrashTimer = [NSTimer scheduledTimerWithTimeInterval:ScanInterval target:self selector:@selector(onTrashScan) userInfo:nil repeats:YES];
+        scanTrashTimer.tolerance = 300.0; // 允许 XNU Timer Coalescing
+        [scanTrashTimer fire];
+    }
     // 注册主界面接收清理完成的通知.
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:MAIN_CLENER_CLEAN_SUCCESS object:nil];
     [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(onReceiveLemonTrashClean:) name:MAIN_CLENER_CLEAN_SUCCESS object:nil];
 }
 
 - (void)dealloc{
+    [scanTrashTimer invalidate];
+    scanTrashTimer = nil;
+    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
     [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
 - (void)onTrashScan
 {
+    if (_isScreenSleepingOrLocked) {
+        return;
+    }
+    mLastScanTime = [[NSDate date] timeIntervalSince1970];
     NSLog(@"monitor trashScan enter.");
     @weakify(self);
     dispatch_async(kQMDEFAULT_GLOBAL_QUEUE, ^{

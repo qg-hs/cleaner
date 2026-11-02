@@ -213,13 +213,26 @@
 }
 
 - (long long)getAllUsableBytes:(NSURL *)fileURL {
-        NSError *error = nil;
-        NSDictionary *results = [fileURL resourceValuesForKeys:@[NSURLVolumeAvailableCapacityKey] error:&error];
-        if (!results) {
-            NSLog(@"Error retrieving resource keys");
-            return 0;
-        }
-        return [[results objectForKey:NSURLVolumeAvailableCapacityKey] longLongValue];
+    if (!fileURL) {
+        return 0;
+    }
+    [fileURL removeAllCachedResourceValues];
+    NSError *error = nil;
+    NSArray<NSURLResourceKey> *keys = @[
+        NSURLVolumeAvailableCapacityForImportantUsageKey,
+        NSURLVolumeAvailableCapacityKey
+    ];
+    NSDictionary *results = [fileURL resourceValuesForKeys:keys error:&error];
+    if (!results) {
+        NSLog(@"Error retrieving resource keys: %@", error);
+        return 0;
+    }
+    // 优先采用 APFS 真实可分配空间口径（含可清除空间），外置 FAT/ExFAT 自动降级至 AvailableCapacity
+    long long importantBytes = [[results objectForKey:NSURLVolumeAvailableCapacityForImportantUsageKey] longLongValue];
+    if (importantBytes > 0) {
+        return importantBytes;
+    }
+    return [[results objectForKey:NSURLVolumeAvailableCapacityKey] longLongValue];
 }
 
 @end

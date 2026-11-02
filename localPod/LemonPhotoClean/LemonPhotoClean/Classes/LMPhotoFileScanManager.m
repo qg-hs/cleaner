@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <sys/attr.h>
 #import <LemonFileManager/LMFileAttributesTool.h>
+#import <QMCoreFunction/McCoreFunction.h>
 
 @implementation LMPhotoFileItem
 
@@ -210,7 +211,11 @@ const float kMaxSearchProgress = 0.2f;
             @autoreleasepool {
                 struct stat fileStat;
                 NSUInteger totalSize = 0;
-                if (lstat([resultPath fileSystemRepresentation], &fileStat) != 0)
+                const char *fsPath = [resultPath fileSystemRepresentation];
+                if (!fsPath || lstat(fsPath, &fileStat) != 0)
+                    continue;
+                // 跳过 iCloud 图库 / FileProvider 仅存云端照片（SF_DATALESS），防止特征提取阶段触发全量原图下载
+                if (LMPathIsCloudDataless(fsPath, &fileStat))
                     continue;
                 
                 LMPhotoFileItem * fileItem = nil;

@@ -49,7 +49,7 @@
 "LMDuplicateResultViewController_updateTitleMessage_NSString_5" = "%@%@%@ 共 %@ ";
 
 
-"LMDuplicateScanResultViewController_Alert_message" = "开启智能选择，Lemon将保留每项中最新的一份文件。其他文件将会被移至废纸篓，确认清理吗?";
+"LMDuplicateScanResultViewController_Alert_message" = "开启智能选择，cleaner 将保留每项中最新的一份文件。其他文件将会被移至废纸篓，确认清理吗?";
 "LMDuplicateScanResultViewController_Alert_button_ok" = "清理";
 "LMDuplicateScanResultViewController_Alert_button_cancel" = "取消";
 "LMDuplicateSelectFoldersViewController_addFolder_button_tips" = "点击或拖拽添加文件夹";

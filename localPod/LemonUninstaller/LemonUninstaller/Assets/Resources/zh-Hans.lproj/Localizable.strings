@@ -67,9 +67,9 @@
 
 "McUninstallWindowController_open_uninstall_trash_check_tips" = "cleaner支持拖动应用到废纸篓卸载时，自动检测并清理残留文件。要试试吗？";
 
-"McUninstallWindowController_open_uninstall_trash_check_sub_tips" = "macOS 10.15系统，需要授权cleaner废纸篓访问权限，点击“前往授权”以开启。";
+"McUninstallWindowController_open_uninstall_trash_check_sub_tips" = "请在“系统设置 -> 隐私与安全性 -> 完全磁盘访问权限”中授权 cleaner，点击“前往授权”以开启。";
 
-"McUninstallWindowController_open_minotor_and_uninstall_trash_check_sub_tips" = "mac OS 10.15系统，需要开启状态栏并且授权cleaner废纸篓访问权限，点击“开启并授权”。";
+"McUninstallWindowController_open_minotor_and_uninstall_trash_check_sub_tips" = "需要开启状态栏并在“系统设置 -> 隐私与安全性 -> 完全磁盘访问权限”中授权 cleaner，点击“开启并授权”。";
 
 "McUninstallWindowController_open_minotor_and_uninstall_trash_check_btn_title" = "开启并授权";
 
@@ -85,5 +85,5 @@
 
 "McUninstallWindowController_monitor_full_disk_access_guide_window_title" = "cleaner不会上传你的文件信息，请放心使用";
 
-"McUninstallWindowController_monitor_full_disk_access_guide_window_desc" = "步骤：【解锁】——【添加】——【应用程序】——【cleaner】";
+"McUninstallWindowController_monitor_full_disk_access_guide_window_desc" = "步骤：【系统设置】→【隐私与安全性】→【完全磁盘访问权限】→ 开启【cleaner】";
 

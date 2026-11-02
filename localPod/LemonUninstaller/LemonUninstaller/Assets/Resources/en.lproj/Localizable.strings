@@ -73,13 +73,13 @@
 
 "McUninstallWindowController_open_uninstall_trash_check_tips" = "cleaner will prompt you to clean leftovers when dragging an application to the trash to uninstall. Wanna try?";
 
-"McUninstallWindowController_open_uninstall_trash_check_sub_tips" = "From macOS 10.15, you have to grant permission \"Full Disk Access\" to clean trash. Please click \"Grant permission\"";
+"McUninstallWindowController_open_uninstall_trash_check_sub_tips" = "Please grant \"Full Disk Access\" to cleaner in System Settings -> Privacy & Security. Click \"Grant permission\".";
 
-"McUninstallWindowController_open_minotor_and_uninstall_trash_check_sub_tips" = "From macOS 10.15, you have to add menu bar icon and grant permission \"Full Disk Access\" to clean trash. Please click \"OK\" to continue.";
+"McUninstallWindowController_open_minotor_and_uninstall_trash_check_sub_tips" = "This feature requires the menu bar monitor and \"Full Disk Access\" in System Settings -> Privacy & Security. Click \"OK\" to continue.";
 
 "McUninstallWindowController_open_minotor_and_uninstall_trash_check_btn_title" = "OK";
 
-"McUninstallWindowController_monitor_full_disk_access_guide_window_title" = "Please rest assured that cleaner never or ever upload your files.";
+"McUninstallWindowController_monitor_full_disk_access_guide_window_title" = "Please rest assured that cleaner never uploads your files.";
 
-"McUninstallWindowController_monitor_full_disk_access_guide_window_desc" = "Click the lock —— Click add icon —— Find \"cleaner\" in Application";
+"McUninstallWindowController_monitor_full_disk_access_guide_window_desc" = "System Settings → Privacy & Security → Full Disk Access → Enable \"cleaner\"";
 

@@ -48,7 +48,7 @@
 "LMDuplicateResultViewController_updateTitleMessage_NSString_4" = "%@ folders, ";
 "LMDuplicateResultViewController_updateTitleMessage_NSString_5" = "%@%@%@ %@ in total";
 
-"LMDuplicateScanResultViewController_Alert_message" = "Turn on \“Smart Select\”,  lemon will keep the latest one in each item, and move the other files to the Trash. Are you sure to clean up?";
+"LMDuplicateScanResultViewController_Alert_message" = "Turn on \"Smart Select\", cleaner will keep the latest one in each item, and move the other files to the Trash. Are you sure to clean up?";
 "LMDuplicateScanResultViewController_Alert_button_ok" = "Clean";
 "LMDuplicateScanResultViewController_Alert_button_cancel" = "Cancel";
 

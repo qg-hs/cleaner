@@ -8,6 +8,8 @@
 
 #import "MachineModel.h"
 #import "BatteryModel.h"
+#import <AppKit/AppKit.h>
+#import <IOKit/IOKitLib.h>
 #include <sys/sysctl.h>
 
 #ifndef APPSTORE_VERSION
@@ -117,11 +119,161 @@
 }
 
 -(BOOL)getMachineInfo{
+    // 优先通过 sysctlbyname + IORegistry (IODeviceTree) 原生内存直读，避免阻塞派生 system_profiler 子进程
+    if ([self populateNativeMachineInfo]) {
+        return YES;
+    }
     [self writeToFile];
     [self readFromFile];
-    
-//    NSLog(@"getMachineInfo = %@", self);
-    
+    return YES;
+}
+
+static NSString *LMFormatCacheBytesString(uint64_t bytes)
+{
+    if (bytes == 0) {
+        return nil;
+    }
+    if (bytes >= 1024ULL * 1024ULL) {
+        double mb = (double)bytes / (1024.0 * 1024.0);
+        if (fabs(mb - round(mb)) < 0.05) {
+            return [NSString stringWithFormat:@"%.0f MB", round(mb)];
+        }
+        return [NSString stringWithFormat:@"%.1f MB", mb];
+    }
+    return [NSString stringWithFormat:@"%.0f KB", (double)bytes / 1024.0];
+}
+
+static NSString *LMCopyIODeviceTreeProductName(void)
+{
+    io_registry_entry_t root = IORegistryGetRootEntry(kIOMasterPortDefault);
+    if (!root) {
+        return nil;
+    }
+    CFTypeRef prop = IORegistryEntrySearchCFProperty(root,
+                                                     kIODeviceTreePlane,
+                                                     CFSTR("product-name"),
+                                                     kCFAllocatorDefault,
+                                                     kIORegistryIterateRecursively);
+    IOObjectRelease(root);
+    if (!prop) {
+        return nil;
+    }
+    NSString *result = nil;
+    if (CFGetTypeID(prop) == CFDataGetTypeID()) {
+        CFDataRef data = (CFDataRef)prop;
+        const char *bytes = (const char *)CFDataGetBytePtr(data);
+        CFIndex len = CFDataGetLength(data);
+        if (bytes != NULL && len > 0) {
+            size_t strLen = strnlen(bytes, (size_t)len);
+            if (strLen > 0) {
+                result = [[NSString alloc] initWithBytes:bytes length:strLen encoding:NSUTF8StringEncoding];
+            }
+        }
+    } else if (CFGetTypeID(prop) == CFStringGetTypeID()) {
+        result = [(__bridge NSString *)prop copy];
+    }
+    CFRelease(prop);
+    return result;
+}
+
+static NSString *LMDeriveMarketingMachineNameFromModelIdentifier(NSString *modelId)
+{
+    if (!modelId || modelId.length == 0) {
+        return nil;
+    }
+    if ([modelId hasPrefix:@"MacBookPro"]) return @"MacBook Pro";
+    if ([modelId hasPrefix:@"MacBookAir"]) return @"MacBook Air";
+    if ([modelId hasPrefix:@"MacBook"]) return @"MacBook";
+    if ([modelId hasPrefix:@"Macmini"]) return @"Mac mini";
+    if ([modelId hasPrefix:@"iMacPro"]) return @"iMac Pro";
+    if ([modelId hasPrefix:@"iMac"]) return @"iMac";
+    if ([modelId hasPrefix:@"MacPro"]) return @"Mac Pro";
+    if ([modelId hasPrefix:@"MacStudio"]) return @"Mac Studio";
+    return nil;
+}
+
+- (BOOL)populateNativeMachineInfo
+{
+    // 1. CPU 品牌名称（Apple Silicon 与 Intel 均原生暴露 machdep.cpu.brand_string）
+    char brandBuf[128] = {0};
+    size_t brandLen = sizeof(brandBuf) - 1;
+    if (sysctlbyname("machdep.cpu.brand_string", brandBuf, &brandLen, NULL, 0) == 0 && brandBuf[0] != '\0') {
+        NSString *brand = [[NSString stringWithUTF8String:brandBuf]
+                           stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        brand = [brand stringByReplacingOccurrencesOfString:@"(R)" withString:@""];
+        brand = [brand stringByReplacingOccurrencesOfString:@"(TM)" withString:@""];
+        while ([brand containsString:@"  "]) {
+            brand = [brand stringByReplacingOccurrencesOfString:@"  " withString:@" "];
+        }
+        self.cpuName = brand;
+    }
+    if (!self.cpuName || self.cpuName.length == 0) {
+        return NO;
+    }
+
+    // 2. 机型名称与年份规格：优先解析 IODeviceTree "product-name"（如 "MacBook Pro (16-inch, 2021)"）
+    NSString *hwModelId = self.machineName;
+    NSString *productDesc = LMCopyIODeviceTreeProductName();
+    if (productDesc.length > 0) {
+        NSRange parenStart = [productDesc rangeOfString:@"("];
+        NSRange parenEnd = [productDesc rangeOfString:@")" options:NSBackwardsSearch];
+        if (parenStart.location != NSNotFound && parenStart.location > 0) {
+            self.machineName = [[productDesc substringToIndex:parenStart.location]
+                                stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            if (parenEnd.location != NSNotFound && parenEnd.location > parenStart.location + 1) {
+                NSString *detail = [productDesc substringWithRange:NSMakeRange(parenStart.location + 1,
+                                                                               parenEnd.location - parenStart.location - 1)];
+                if (detail.length > 0 && self.yearString.length == 0) {
+                    self.yearString = detail;
+                    [SharedPrefrenceManager putString:detail withKey:MAC_MODEL_DETAIL_INFO];
+                }
+            }
+        } else {
+            self.machineName = productDesc;
+        }
+    } else {
+        NSString *derivedName = LMDeriveMarketingMachineNameFromModelIdentifier(hwModelId);
+        if (derivedName.length > 0) {
+            self.machineName = derivedName;
+        }
+    }
+
+    // 3. 物理核心数（支持 Apple Silicon 性能核 P + 能效核 E 异构拓扑展示）
+    int physCores = 0;
+    size_t intSize = sizeof(int);
+    if (sysctlbyname("hw.physicalcpu", &physCores, &intSize, NULL, 0) == 0 && physCores > 0) {
+        int perf0 = 0;
+        int perf1 = 0;
+        size_t p0Size = sizeof(int);
+        size_t p1Size = sizeof(int);
+        BOOL hasPerf0 = (sysctlbyname("hw.perflevel0.physicalcpu", &perf0, &p0Size, NULL, 0) == 0 && perf0 > 0);
+        BOOL hasPerf1 = (sysctlbyname("hw.perflevel1.physicalcpu", &perf1, &p1Size, NULL, 0) == 0 && perf1 > 0);
+        if (hasPerf0 && hasPerf1 && (perf0 + perf1 == physCores)) {
+            self.cpuCores = [NSString stringWithFormat:@"%d (%dP + %dE)", physCores, perf0, perf1];
+        } else {
+            self.cpuCores = [NSString stringWithFormat:@"%d", physCores];
+        }
+    }
+
+    // 4. 主频（Intel 原生暴露 hw.cpufrequency；Apple Silicon 异构动态调频不固定，保持 nil 以由 UI 自适应隐藏）
+    uint64_t cpuFreqHz = 0;
+    size_t freqSize = sizeof(cpuFreqHz);
+    if (sysctlbyname("hw.cpufrequency", &cpuFreqHz, &freqSize, NULL, 0) == 0 && cpuFreqHz > 0) {
+        self.cpuSpeed = [NSString stringWithFormat:@"%.2f GHz", (double)cpuFreqHz / 1e9];
+    }
+
+    // 5. L2 / L3 缓存
+    uint64_t l2Bytes = 0;
+    size_t l2Size = sizeof(l2Bytes);
+    if (sysctlbyname("hw.l2cachesize", &l2Bytes, &l2Size, NULL, 0) == 0 && l2Bytes > 0) {
+        self.L2Cache = LMFormatCacheBytesString(l2Bytes);
+    }
+    uint64_t l3Bytes = 0;
+    size_t l3Size = sizeof(l3Bytes);
+    if (sysctlbyname("hw.l3cachesize", &l3Bytes, &l3Size, NULL, 0) == 0 && l3Bytes > 0) {
+        self.L3Cache = LMFormatCacheBytesString(l3Bytes);
+    }
+
     return YES;
 }
 
@@ -200,13 +352,20 @@
 
 - (NSString *)getCpuName
 {
-    char cpumodel[64];
-    size_t size = sizeof(cpumodel);
+    char cpumodel[128] = {0};
+    size_t size = sizeof(cpumodel) - 1;
     if (sysctlbyname("machdep.cpu.brand_string", cpumodel, &size, NULL, 0))
     {
         cpumodel[0] = '\0';
     }
-    NSString * cpuName = [NSString stringWithUTF8String:cpumodel];
+    NSString * cpuName = [[NSString stringWithUTF8String:cpumodel]
+                          stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (cpuName.length == 0) {
+        return @"Apple Silicon";
+    }
+    if ([cpuName hasPrefix:@"Apple "]) {
+        return cpuName;
+    }
     cpuName = [cpuName stringByReplacingOccurrencesOfString:@"(R)" withString:@""];
     cpuName = [cpuName stringByReplacingOccurrencesOfString:@"(TM)" withString:@""];
     NSRange range = [cpuName rangeOfString:@"-"];
@@ -214,7 +373,7 @@
     {
         return [cpuName substringToIndex:range.location];
     }
-    return @"Intel";
+    return cpuName;
 }
 
 -(BOOL)getThunderInfo{
@@ -460,6 +619,17 @@ NSString * const kMacBookPro_14_7 = @"Mac14,7";
 @implementation MachineModel (LHScreen)
 
 + (BOOL)isLiquidScreen {
+    if (@available(macOS 12.0, *)) {
+        NSArray<NSScreen *> *screens = [NSScreen screens];
+        if (screens.count > 0) {
+            for (NSScreen *screen in screens) {
+                if (screen.safeAreaInsets.top > 0) {
+                    return YES;
+                }
+            }
+            return NO;
+        }
+    }
     static BOOL isLiquid = NO;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

@@ -495,12 +495,13 @@ extern CFAbsoluteTime g_startTime;
     }
     
     //有新版本，但是用户7天没有点击过版本升级，则发出notification
+    BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
     NSUserNotification *notification = [[NSUserNotification alloc] init];
     notification.identifier = @"LemonAppUpdateNotification";
-    notification.title = @"版本升级";
-    notification.informativeText = @"有新版本可以升级";
-    notification.otherButtonTitle = @"取消";
-    notification.actionButtonTitle = @"升级";
+    notification.title = isEnglish ? @"Software Update" : @"版本升级";
+    notification.informativeText = isEnglish ? @"A new version of cleaner is available." : @"有新版本可以升级";
+    notification.otherButtonTitle = isEnglish ? @"Cancel" : @"取消";
+    notification.actionButtonTitle = isEnglish ? @"Update" : @"升级";
     notification.hasActionButton = YES;
     [[QMUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification
                                                                                key:@"LemonResearchNotification"];

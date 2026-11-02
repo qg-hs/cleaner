@@ -24,6 +24,7 @@
 #import <LemonHardware/LemonHardwareWindowController.h>
 #import <QMCoreFunction/LanguageHelper.h>
 #import <QMCoreFunction/NSBundle+LMLanguage.h>
+#import <QMCoreFunction/McCoreFunction.h>
 #import <QMCoreFunction/McStatMonitor.h>
 #import <QMCoreFunction/LMReferenceDefines.h>
 #import <LemonStat/McDiskInfo.h>
@@ -801,10 +802,16 @@ static NSString * const kPidKey = @"pid";
     }];
     
     NSTextField* fanSpeedText = [LMViewHelper createNormalLabel:20 fontColor:[LMAppThemeHelper getTitleColor] fonttype:LMFontTypeRegular];
-    fanSpeedText.stringValue = @"30 R";
+    if (!LMDeviceHasPhysicalFan()) {
+        BOOL isZh = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeChinese);
+        fanSpeedText.font = [NSFontHelper getRegularSystemFont:14];
+        fanSpeedText.stringValue = isZh ? @"被动散热" : @"Fanless";
+    } else {
+        fanSpeedText.stringValue = @"0 R";
+    }
     [colFanContainerView addSubview:fanSpeedText];
     [fanSpeedText mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(colFanContainerView.mas_top).offset(28);
+        make.top.mas_equalTo(colFanContainerView.mas_top).offset(LMDeviceHasPhysicalFan() ? 28 : 32);
         make.centerX.equalTo(colFanContainerView);
     }];
     _fanSpeedText = fanSpeedText;
@@ -945,7 +952,14 @@ static NSString * const kPidKey = @"pid";
     //    NSLog(@"receivedTempCpuIn foChanged:cpuTemp=%f,fanSpeed=%f", tempCpu, fanSpeed);
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        
+        if (!LMDeviceHasPhysicalFan()) {
+            BOOL isZh = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeChinese);
+            _fanSpeedText.font = [NSFontHelper getRegularSystemFont:14];
+            _fanSpeedText.textColor = [LMAppThemeHelper getTitleColor];
+            _fanSpeedText.stringValue = isZh ? @"被动散热" : @"Fanless";
+            return;
+        }
+        _fanSpeedText.font = [NSFontHelper getRegularSystemFont:20];
         if (fanSpeed < fanSpeedThreshold)
         {
             _fanSpeedText.textColor = [LMAppThemeHelper getTitleColor];

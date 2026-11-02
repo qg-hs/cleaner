@@ -10,6 +10,7 @@
 #import <zlib.h>
 #import "QMDuplicateFiles.h"
 #import "SizeHelper.h"
+#import <QMCoreFunction/McCoreFunction.h>
 
 #define kDefaultFilterSize   200 * 1024
 
@@ -235,6 +236,9 @@ const float kDuplicateFolderCalculateProgress = 0.1f;
                     QMFileItem *fileItem = [fileList objectAtIndex:index];
                     if (fileItem.hashStr)
                         return;
+                    // 二次防线：打开文件句柄计算 MD5 前再次校验 SF_DATALESS，确保绝不触发内核云端拉取
+                    if (LMPathIsCloudDataless([fileItem.filePath fileSystemRepresentation], NULL))
+                        return;
                     
                     UInt64 fileSize = [fileItem fileSize];
                     NSFileHandle *innerFileHandle;
@@ -317,6 +321,8 @@ const float kDuplicateFolderCalculateProgress = 0.1f;
                     
                     for (QMFileItem *fileItem in sameHashArray) {
                         @autoreleasepool{
+                        if (LMPathIsCloudDataless([fileItem.filePath fileSystemRepresentation], NULL))
+                            continue;
                         // 计算文件的crc
                          NSFileHandle *fileHandle = [NSFileHandle
                                                     fileHandleForReadingAtPath:fileItem.filePath];

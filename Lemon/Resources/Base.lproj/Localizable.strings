@@ -15,7 +15,7 @@
 "PreferenceViewController_setupViews_1553049563_3" = "When click close icon";
 "PreferenceViewController_setupViews_1553049563_4" = "Get back to Dock and keep cleaner running";
 "PreferenceViewController_setupViews_1553049563_5" = "Quit cleaner";
-"PreferenceViewController_setupViews_1553049563_6" = "On macOS 10.14 or above, the system shows recent 3 applications in dock \nby default.";
+"PreferenceViewController_setupViews_1553049563_6" = "macOS shows recent applications in Dock by default.";
 "PreferenceViewController_setupViews_1553049563_7" = "Change settings";
 "PreferenceViewController_setupViews_tfWindowTitle _8" = "Preferences";
 "PreferenceViewController_setupViews_tfMonitorTitle _9" = "What to show on menu bar";
@@ -45,7 +45,7 @@
 "LMSplashMenuBarViewController_tabbar_system" = " System";
 "LMSplashMenuBarViewController_menu_title" = "Monitor your system state from Menu bar";
 "LMSplashMenuBarViewController_menu_subtitle" = "Provide a quick look at network speed, RAM usage and easy access to free up";
-"LMSplashMainAppViewController_system_title" = "Full scan and clean your Mac by launching Lemon";
+"LMSplashMainAppViewController_system_title" = "Full scan and clean your Mac by launching cleaner";
 "LMSplashMainAppViewController_system_subtitle" = "Analyze and clean your disk deeply. Uninstall unused apps completely";
 "PreferenceViewController_setupViews_languageTitle_1" = "Language";
 "PreferenceViewController_setupViews_languageRadioBtnChDesc_1" = "简体中文";
@@ -55,7 +55,7 @@
 "LemonAsMonitorGuideViewController_setupViews_cancelString _3" = "No";
 "LMSplashMainAppViewController_system_register_button" = "Let' go!";
 "LemonAsMonitorGuideViewController_setupViews_titleLabel_1" = "Do you want to enable the menu bar icon?";
-"LemonAsMonitorGuideViewController_setupViews_descLabel_1" = "It shows real-time network speed and works as a shortcut to launch Lemon.";
+"LemonAsMonitorGuideViewController_setupViews_descLabel_1" = "It shows real-time network speed and works as a shortcut to launch cleaner.";
 "LemonAsMonitorGuideViewController_setupViews_onceTitle_1" = "Show it this time";
 "LemonAsMonitorGuideViewController_setupViews_alwayTitle_1" = "Show it upon startup of my Mac";
 "LemonAsMonitorGuideViewController_setupViews_showString _2" = "Confirm";
@@ -67,8 +67,8 @@
 "PreferenceASViewController_startAlertWindow_alert_2" = "If yes, the icon along with the network speed will quit immediately.";
 "PreferenceASViewController_startAlertWindow_alert_3" = "Cancel";
 "PreferenceASViewController_startAlertWindow_alert_4" = "Yes";
-"PreferenceViewController_startAlertWindow_alert_1" = "Lemon will restart to make the language change come into effect.";
-"PreferenceViewController_startAlertWindow_alert_2" = "You don’t have to reboot the system. It restarts Lemon application.";
+"PreferenceViewController_startAlertWindow_alert_1" = "cleaner will restart to make the language change take effect.";
+"PreferenceViewController_startAlertWindow_alert_2" = "You don’t have to reboot the system. Only cleaner will restart.";
 "PreferenceViewController_startAlertWindow_alert_3" = "Cancel";
 "PreferenceViewController_startAlertWindow_alert_4" = "OK";
 "PreferenceASViewController_initView_openActionTitle_1" = "Show menu bar icon";

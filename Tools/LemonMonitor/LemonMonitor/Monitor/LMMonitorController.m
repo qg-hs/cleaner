@@ -87,7 +87,10 @@ enum
 @property (nonatomic, strong) LemonHardwareWindowController *hardwareController;
 @property (nonatomic, strong) NSString *mainDiskName;
 @property NSTimer *checkFullDiskAccessTimer;
-@property(nonatomic, strong) NSTimer *timer;
+@property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, strong) NSTimer *diskUpdateTimer;
+@property (nonatomic, assign) NSInteger notchOcclusionCheckCount;
+@property (nonatomic, assign) BOOL isScreenSleepingOrLocked;
 @property (nonatomic, strong) dispatch_queue_t updateDiskInfoQueue;
 
 @end
@@ -171,6 +174,36 @@ enum
                                                         selector:@selector(userChangeLanguage:)
                                                             name:USER_LANGUAGE_CHANGE
                                                           object:nil];
+
+    // 熄屏/休眠/锁屏低功耗通知：暂停状态栏与磁盘轮询定时器，实现后台 0 唤醒
+    NSNotificationCenter *wsCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+    [wsCenter addObserver:self selector:@selector(handleScreenOrSystemSleep:) name:NSWorkspaceScreensDidSleepNotification object:nil];
+    [wsCenter addObserver:self selector:@selector(handleScreenOrSystemSleep:) name:NSWorkspaceWillSleepNotification object:nil];
+    [wsCenter addObserver:self selector:@selector(handleScreenOrSystemWake:) name:NSWorkspaceScreensDidWakeNotification object:nil];
+    [wsCenter addObserver:self selector:@selector(handleScreenOrSystemWake:) name:NSWorkspaceDidWakeNotification object:nil];
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleScreenOrSystemSleep:) name:@"com.apple.screenIsLocked" object:nil];
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleScreenOrSystemWake:) name:@"com.apple.screenIsUnlocked" object:nil];
+}
+
+- (void)handleScreenOrSystemSleep:(NSNotification *)notification
+{
+    self.isScreenSleepingOrLocked = YES;
+    if (self.timer) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+    if (self.diskUpdateTimer) {
+        [self.diskUpdateTimer invalidate];
+        self.diskUpdateTimer = nil;
+    }
+}
+
+- (void)handleScreenOrSystemWake:(NSNotification *)notification
+{
+    self.isScreenSleepingOrLocked = NO;
+    if (_isShow) {
+        [self startTimerToUpdateDiskInfo];
+    }
 }
 
 // mark: notification : 交换数据: system info 相关
@@ -214,6 +247,11 @@ enum
 - (void)dealloc
 {
     NSLog(@"%s,dealloc---",__FUNCTION__);
+    [self.timer invalidate];
+    self.timer = nil;
+    [self.diskUpdateTimer invalidate];
+    self.diskUpdateTimer = nil;
+    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
     [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -232,24 +270,33 @@ enum
 {
     [self setupStatusItem];
     [self configureMenuBarForDarkModeChange];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (!self.timer && [MachineModel isLiquidScreen]) {
-            self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(processAnimate) userInfo:nil repeats:YES];
-            [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
-        }
-    });
+    BOOL alreadyTip = [[NSUserDefaults standardUserDefaults] boolForKey:kLMMonitorControllerTip];
+    if (!alreadyTip && [MachineModel isLiquidScreen]) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            BOOL tipped = [[NSUserDefaults standardUserDefaults] boolForKey:kLMMonitorControllerTip];
+            if (!self.timer && !tipped && !self.isScreenSleepingOrLocked && [MachineModel isLiquidScreen]) {
+                self.notchOcclusionCheckCount = 0;
+                self.timer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(processAnimate) userInfo:nil repeats:YES];
+                self.timer.tolerance = 0.4;
+                [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+            }
+        });
+    }
 }
 
 - (void)processAnimate {
     BOOL alreadyTip = [[NSUserDefaults standardUserDefaults] boolForKey:kLMMonitorControllerTip];
-    
-    if (!(statusView.window.occlusionState & NSApplicationOcclusionStateVisible) && (alreadyTip == NO)) {
+    self.notchOcclusionCheckCount += 1;
+    if (alreadyTip || self.notchOcclusionCheckCount > 10) {
+        [self.timer invalidate];
+        self.timer = nil;
+        return;
+    }
+    if (statusView.window && !(statusView.window.occlusionState & NSApplicationOcclusionStateVisible)) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kLMMonitorControllerTip];
+        [self.timer invalidate];
+        self.timer = nil;
         [self alert];
-        if (self.timer) {
-            [self.timer invalidate];
-            self.timer = nil;
-        }
     }
 }
 
@@ -269,11 +316,13 @@ enum
         if (result == 1000) {
             if ([NSRunningApplication runningApplicationsWithBundleIdentifier:MAIN_APP_BUNDLEID].count == 0)
             {
-                NSArray *arguments = @[[NSString stringWithFormat:@"2"]];
-                [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:DEFAULT_APP_PATH]
-                                                              options:NSWorkspaceLaunchWithoutAddingToRecents
-                                                        configuration:@{NSWorkspaceLaunchConfigurationArguments: arguments}
-                                                                error:NULL];
+                NSURL *appURL = [NSURL fileURLWithPath:DEFAULT_APP_PATH];
+                NSWorkspaceOpenConfiguration *openCfg = [NSWorkspaceOpenConfiguration configuration];
+                openCfg.createsNewApplicationInstance = NO;
+                openCfg.arguments = @[@"2"];
+                [[NSWorkspace sharedWorkspace] openApplicationAtURL:appURL
+                                                      configuration:openCfg
+                                                  completionHandler:nil];
             }
             else
             {
@@ -483,6 +532,10 @@ enum
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kStatGpuInfoNotification object:nil];
     
     [[McStatMonitor shareMonitor] stopRunMonitor];
+    [self.timer invalidate];
+    self.timer = nil;
+    [self.diskUpdateTimer invalidate];
+    self.diskUpdateTimer = nil;
     [dataCenter setBool:YES forKey:kQMMonitorClosed];
     
     //关闭界面
@@ -565,10 +618,20 @@ enum
 }
 
 -(void)startTimerToUpdateDiskInfo{
-    [[NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(updateDiskInfoForTimer) userInfo:nil repeats:YES] fire];
+    [self.diskUpdateTimer invalidate];
+    self.diskUpdateTimer = nil;
+    if (self.isScreenSleepingOrLocked) {
+        return;
+    }
+    self.diskUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:30.0 target:self selector:@selector(updateDiskInfoForTimer) userInfo:nil repeats:YES];
+    self.diskUpdateTimer.tolerance = 6.0; // 20% Timer Coalescing 容差
+    [self updateDiskInfoForTimer];
 }
 
 - (void)updateDiskInfoForTimer {
+    if (self.isScreenSleepingOrLocked) {
+        return;
+    }
     McStatMonitor *monitor = [McStatMonitor shareMonitor];
     if((monitor.trayType & STATUS_TYPE_DISK) || monitor.isTrayPageOpen) {
         [self updateDiskInfo];

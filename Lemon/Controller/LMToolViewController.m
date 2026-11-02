@@ -339,8 +339,8 @@
                 [NSBundle setLanguage:language bundle:[NSBundle bundleForClass:NSClassFromString(className)]];
             }
             if([self isNeedCheckFullDiskAccessWithClassName:className]){
-                //检查完全磁盘访问权限
-                if([FullDiskAccessPermissionViewController showFullDiskAccessRequestIfNeededWithParentController:self title:NSLocalizedString(@"10.15系统上，Lemon无权限访问废纸篓、桌面等文件夹，需要开启“完全磁盘访问权限”才能扫描并清理垃圾。", nil) sourceType:SMALL_TOOLS_VIEW]) return;
+                // 检查完全磁盘访问权限（适配现代 macOS 系统设置引导文案）
+                if([FullDiskAccessPermissionViewController showFullDiskAccessRequestIfNeededWithParentController:self title:NSLocalizedString(@"cleaner 需要开启“完全磁盘访问权限”（系统设置 -> 隐私与安全性 -> 完全磁盘访问权限）才能扫描并清理废纸篓与桌面等受保护目录。", nil) sourceType:SMALL_TOOLS_VIEW]) return;
             }
             
             QMBaseWindowController *controller = [weakSelf getWindowControllerByClassname:className];
