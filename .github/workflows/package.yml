@@ -17,26 +17,9 @@ permissions:
   contents: write
 
 jobs:
-  build-matrix:
-    name: Build (${{ matrix.display_name }})
-    runs-on: macos-15
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: arm64
-            archs: "arm64"
-            display_name: "Apple Silicon M1/M2/M3/M4 (arm64)"
-            artifact_name: "cleaner-macos-arm64"
-          - target: x86_64
-            archs: "x86_64"
-            display_name: "Intel (x86_64)"
-            artifact_name: "cleaner-macos-x86_64"
-          - target: universal
-            archs: "arm64 x86_64"
-            display_name: "Universal (arm64 + x86_64)"
-            artifact_name: "cleaner-macos-universal"
-
+  build-and-release:
+    name: Build & Package All Architectures
+    runs-on: macos-14
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -52,45 +35,25 @@ jobs:
             pod install --no-repo-update || pod install
           fi
 
-      - name: Build and package (${{ matrix.target }})
+      - name: Build and package all architectures (arm64 / x86_64 / universal)
         env:
-          DERIVED_DATA_PATH: ${{ runner.temp }}/DerivedData-${{ matrix.target }}
-          DIST_DIR: ${{ runner.temp }}/dist-${{ matrix.target }}
+          DIST_DIR: dist
         run: |
           chmod +x ./scripts/package.sh
-          ./scripts/package.sh "${{ matrix.target }}"
+          ./scripts/package.sh all
 
-      - name: Upload ${{ matrix.display_name }} artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact_name }}
+          name: cleaner-all-dist
           path: |
-            ${{ runner.temp }}/dist-${{ matrix.target }}/cleaner-macos-${{ matrix.target }}.dmg
-            ${{ runner.temp }}/dist-${{ matrix.target }}/cleaner-macos-${{ matrix.target }}.zip
-            ${{ runner.temp }}/dist-${{ matrix.target }}/SHA256SUMS.txt
-          if-no-files-found: error
+            dist/cleaner-macos-*.dmg
+            dist/cleaner-macos-*.zip
+            dist/SHA256SUMS.txt
           retention-days: 30
 
-  release:
-    name: Publish GitHub Release
-    needs: build-matrix
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download all architecture artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: release-assets
-
-      - name: Consolidate release files & SHA256SUMS
-        run: |
-          mkdir -p dist
-          find release-assets -type f \( -name "*.dmg" -o -name "*.zip" \) -exec cp {} dist/ \;
-          cat release-assets/*/SHA256SUMS.txt > dist/SHA256SUMS.txt
-          ls -lh dist/
-          cat dist/SHA256SUMS.txt
-
-      - name: Create GitHub Release
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
