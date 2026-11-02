@@ -14,6 +14,9 @@ cd "$ROOT_DIR"
 TARGET_MODE="${1:-all}"
 DERIVED_DATA_PATH="${DERIVED_DATA_PATH:-$ROOT_DIR/build/DerivedData}"
 DIST_DIR="${DIST_DIR:-$ROOT_DIR/dist}"
+if [[ "$DIST_DIR" != /* ]]; then
+  DIST_DIR="$ROOT_DIR/$DIST_DIR"
+fi
 ENTITLEMENTS_MAIN="$ROOT_DIR/Lemon/Tencent Lemon.entitlements"
 ENTITLEMENTS_MONITOR="$ROOT_DIR/Tools/LemonMonitor/LemonMonitor/LemonMonitor.entitlements"
 
@@ -118,7 +121,7 @@ create_archives() {
   # 生成 SHA256 校验值
   (
     cd "$DIST_DIR"
-    shasum -a 256 "$dmg_name" "$zip_name" >> "$DIST_DIR/SHA256SUMS.txt"
+    shasum -a 256 "$dmg_name" "$zip_name" >> SHA256SUMS.txt
   )
   log "Finished packaging [$arch_label]: $dmg_path & $zip_path"
 }

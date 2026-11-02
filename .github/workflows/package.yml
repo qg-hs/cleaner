@@ -37,7 +37,7 @@ jobs:
 
       - name: Build and package all architectures (arm64 / x86_64 / universal)
         env:
-          DIST_DIR: dist
+          DIST_DIR: ${{ github.workspace }}/dist
         run: |
           chmod +x ./scripts/package.sh
           ./scripts/package.sh all
