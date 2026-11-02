@@ -858,7 +858,7 @@ static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos
     if (ver.length == 0) {
         ver = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     }
-    return ver ?: @"1.0.2";
+    return ver ?: @"1.0.3";
 }
 
 - (NSString *)normalizeVersionString:(NSString *)rawVersion {

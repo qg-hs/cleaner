@@ -52,6 +52,10 @@
 
 ## 版本更新日志 (Changelog)
 
+### `v1.0.3` (2026-11-02)
+
+- **功能列表卡片排版与防裁剪加固**：精简四大扩展工具项中文副标题字长以严格对齐原生卡片视觉节奏，并为 `ToolTableCellView` 增加双层右边界约束与多语言尾部省略守卫，消除固定列宽下的边缘硬切问题。
+
 ### `v1.0.2` (2026-10-30)
 
 - **新增四大原生工具箱模块**（统一原生极简视觉规范，完整适配 Light / Dark 暗黑模式）：
@@ -158,17 +162,17 @@ pod install
 
 项目通过 [`.github/workflows/package.yml`](.github/workflows/package.yml) 配置了完整的 GitHub Actions 流水线：
 
-1. 修改 [`Lemon/Info.plist`](Lemon/Info.plist) 与 [`Tools/LemonMonitor/LemonMonitor/LemonMonitor-Info.plist`](Tools/LemonMonitor/LemonMonitor/LemonMonitor-Info.plist) 中的 `CFBundleShortVersionString`（当前版本 `1.0.2`）。
+1. 修改 [`Lemon/Info.plist`](Lemon/Info.plist) 与 [`Tools/LemonMonitor/LemonMonitor/LemonMonitor-Info.plist`](Tools/LemonMonitor/LemonMonitor/LemonMonitor-Info.plist) 中的 `CFBundleShortVersionString`（当前版本 `1.0.3`）。
 2. 提交代码并推送带有 `v` 前缀的 Git Tag：
    ```bash
    git add -A
-   git commit -m "release: v1.0.2"
-   git tag v1.0.2
+   git commit -m "release: v1.0.3"
+   git tag v1.0.3
    git push origin master
-   git push origin v1.0.2
+   git push origin v1.0.3
    ```
-3. GitHub Actions 将自动触发并行构建矩阵（`arm64` / `x86_64` / `universal`），并在构建完成后自动创建 `v1.0.2` GitHub Release 挂载全部 `.dmg`、`.zip` 和 `SHA256SUMS.txt`。
-4. 已运行的 `cleaner` 状态栏客户端 (`LMGitHubUpdater`) 检测到新版本后将自动亮起设置红点，用户点击 **`发现新版本 v1.0.2（点击热更）`** 即可直接完成流式下载、解压替换与自动重启。
+3. GitHub Actions 将自动触发并行构建矩阵（`arm64` / `x86_64` / `universal`），并在构建完成后自动创建 `v1.0.3` GitHub Release 挂载全部 `.dmg`、`.zip` 和 `SHA256SUMS.txt`。
+4. 已运行的 `cleaner` 状态栏客户端 (`LMGitHubUpdater`) 检测到新版本后将自动亮起设置红点，用户点击 **`发现新版本 v1.0.3（点击热更）`** 即可直接完成流式下载、解压替换与自动重启。
 
 ---
 

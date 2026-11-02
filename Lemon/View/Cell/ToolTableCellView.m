@@ -144,6 +144,14 @@ const int LMToolCellTopSpace = 10;
     if (@available(macOS 10.11, *)) {
         [_descLabel setFont:[NSFont systemFontOfSize:14 weight:NSFontWeightLight]];
     }
+    // 边界防裁剪守卫：兼容英文双行排版，超长文本自动尾部省略，严禁半字硬切
+    _descLabel.maximumNumberOfLines = 2;
+    _descLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    if (_descLabel.cell) {
+        _descLabel.cell.truncatesLastVisibleLine = YES;
+    }
+    [_descLabel setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow
+                                         forOrientation:NSLayoutConstraintOrientationHorizontal];
     
     self.tagImage =  [[NSImageView alloc] init];
     [self.tagImage setImage:[NSImage imageNamed:@"icon_new_tag"]];
@@ -219,6 +227,9 @@ const int LMToolCellTopSpace = 10;
     
     [_descLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.imgView.mas_right).offset(7);
+        // 同时约束不超出内层动画容器与外层表格列视图右边界，防止列宽收窄时发生边缘硬切
+        make.right.lessThanOrEqualTo(self.aniContentView.mas_right).offset(-4);
+        make.right.lessThanOrEqualTo(self.mas_right).offset(-4);
         make.top.equalTo(self.titleLabel.mas_bottom).offset(3);
     }];
     

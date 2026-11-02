@@ -132,7 +132,7 @@
 		<key>toolName</key>
 		<string>项目构建清理</string>
 		<key>toolDesc</key>
-		<string>清理node_modules等构建产物</string>
+		<string>清理项目构建与依赖</string>
 		<key>recommend</key>
 		<true/>
 		<key>reportId</key>
@@ -149,7 +149,7 @@
 		<key>toolName</key>
 		<string>安装包清理</string>
 		<key>toolDesc</key>
-		<string>查找残留DMG与PKG安装包</string>
+		<string>查找残留磁盘安装包</string>
 		<key>recommend</key>
 		<true/>
 		<key>reportId</key>
@@ -166,7 +166,7 @@
 		<key>toolName</key>
 		<string>系统维护</string>
 		<key>toolDesc</key>
-		<string>Touch ID 免密与系统修复</string>
+		<string>系统缓存与配置维护</string>
 		<key>recommend</key>
 		<false/>
 		<key>reportId</key>
@@ -183,7 +183,7 @@
 		<key>toolName</key>
 		<string>应用架构瘦身</string>
 		<key>toolDesc</key>
-		<string>剥离冗余非本机架构二进制</string>
+		<string>剥离应用冗余架构包</string>
 		<key>recommend</key>
 		<false/>
 		<key>reportId</key>
