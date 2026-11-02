@@ -42,3 +42,4 @@
 #import "QMCheckboxButton.h"
 
 #import "LMCommonHelper.h"
+#import "LMAppUpdater.h"

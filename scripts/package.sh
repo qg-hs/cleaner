@@ -28,6 +28,22 @@ sign_app_bundle() {
   local app_bundle="$1"
   log "Signing bundle (inside-out): $app_bundle"
 
+  # 0. 编译并嵌入通用多架构 cleaner_relauncher 独立替换重启辅助程序
+  local relauncher_src="$ROOT_DIR/Tools/cleaner_relauncher/cleaner_relauncher.m"
+  if [ -f "$relauncher_src" ]; then
+    log "Compiling universal cleaner_relauncher helper..."
+    mkdir -p "$app_bundle/Contents/Resources"
+    clang -O2 -arch arm64 -arch x86_64 -framework Foundation \
+      "$relauncher_src" \
+      -o "$app_bundle/Contents/Resources/cleaner_relauncher"
+    chmod 0755 "$app_bundle/Contents/Resources/cleaner_relauncher"
+    codesign --force --sign - --timestamp=none "$app_bundle/Contents/Resources/cleaner_relauncher"
+    if [ -n "${BUILT_APP:-}" ] && [ -d "${BUILT_APP:-}" ] && [ "$BUILT_APP" != "$app_bundle" ]; then
+      mkdir -p "$BUILT_APP/Contents/Resources"
+      cp -f "$app_bundle/Contents/Resources/cleaner_relauncher" "$BUILT_APP/Contents/Resources/cleaner_relauncher"
+    fi
+  fi
+
   # 1. 签名内部嵌套应用 LemonMonitor.app 及其 Frameworks
   local monitor_app="$app_bundle/Contents/Library/LoginItems/LemonMonitor.app"
   if [ -d "$monitor_app" ]; then

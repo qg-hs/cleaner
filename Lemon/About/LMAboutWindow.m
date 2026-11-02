@@ -13,6 +13,7 @@
 #import <QMCoreFunction/LanguageHelper.h>
 #import "QMDataConst.h"
 #import <Masonry/Masonry.h>
+#import <QMUICommon/LMAppUpdater.h>
 
 @implementation LMAboutWindow
 
@@ -80,6 +81,28 @@
         make.top.equalTo(LemonProductName.mas_bottom).offset(5);
     }];
     
+    // 检查更新按钮
+    LMHoverButton *checkUpdateBtn = [[LMHoverButton alloc] init];
+    [checkUpdateBtn setTarget:self];
+    [checkUpdateBtn setAction:@selector(onCheckUpdateBtn)];
+    BOOL isEng = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
+    NSMutableAttributedString *updateAttrStr = [[NSMutableAttributedString alloc]
+                                                initWithString:isEng ? @"Check for Updates" : @"检查新版本"
+                                                attributes:@{
+                                                    NSForegroundColorAttributeName : [NSColor colorWithHex:0x007AFF alpha:1.0],
+                                                    NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)
+                                                }];
+    [checkUpdateBtn setAttributedTitle:updateAttrStr];
+    checkUpdateBtn.font = [NSFont systemFontOfSize:11.0f];
+    checkUpdateBtn.bordered = NO;
+    checkUpdateBtn.imagePosition = NSNoImage;
+    [windowAbout.contentView addSubview:checkUpdateBtn];
+    [checkUpdateBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(windowAbout.contentView);
+        make.top.equalTo(LemonProductVersion.mas_bottom).offset(4);
+        make.height.equalTo(@16);
+    }];
+
     //服务协议
     LMHoverButton *serviceAgreeButton = [[LMHoverButton alloc] init];
     [serviceAgreeButton setTarget:self];
@@ -98,7 +121,7 @@
     }
     [serviceAgreeButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(windowAbout.contentView).offset(-width);
-        make.top.equalTo(LemonProductVersion.mas_bottom).offset(17);
+        make.top.equalTo(checkUpdateBtn.mas_bottom).offset(12);
         make.height.equalTo(@17);
     }];
 
@@ -181,6 +204,10 @@
     }];
     
     return windowAbout;
+}
+
++ (void)onCheckUpdateBtn {
+    [[LMAppUpdater sharedUpdater] checkForUpdatesWithManualTrigger:YES];
 }
 
 + (void)serviceAgreeBtn {

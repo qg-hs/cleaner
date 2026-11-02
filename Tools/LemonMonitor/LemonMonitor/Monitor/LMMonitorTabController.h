@@ -8,6 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 #import <QMUICommon/QMBaseViewController.h>
+#import <QMUICommon/LMAppUpdater.h>
+
+@compatibility_alias LMGitHubUpdater LMAppUpdater;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LMMonitorTabController : QMBaseViewController
@@ -29,16 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @interface LMSettingsViewController : NSViewController
-@end
-
-@interface LMGitHubUpdater : NSObject <NSURLSessionDownloadDelegate>
-@property (nonatomic, assign, readonly) BOOL hasUpdate;
-@property (nonatomic, copy, readonly, nullable) NSString *latestVersion;
-@property (nonatomic, copy, readonly, nullable) NSString *downloadURL;
-+ (instancetype)sharedUpdater;
-- (void)startPeriodicCheck;
-- (void)checkForUpdatesWithManualTrigger:(BOOL)isManual;
-- (void)startHotUpdate;
 @end
 
 NS_ASSUME_NONNULL_END

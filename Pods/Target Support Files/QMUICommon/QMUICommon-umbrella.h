@@ -53,6 +53,7 @@
 #import "QMDuplicateProgressLayer.h"
 #import "LemonSuiteUserDefaults.h"
 #import "LMAppThemeHelper.h"
+#import "LMAppUpdater.h"
 #import "LMCommonHelper.h"
 #import "LMiCloudPathHelper.h"
 #import "LMViewHelper.h"

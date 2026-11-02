@@ -49,6 +49,7 @@
 #import "LemonDNCClient.h"
 #import "LemonDNCServier.h"
 #import <QMCoreFunction/MdlsToolsHelper.h>
+#import <QMUICommon/LMAppUpdater.h>
 
 #define IS_INIT_PREFRENCE_CONFIGURERATION @"is_init_prefrence_configureration"
 #define DOCK_ON_OFF_STATE @"dock_on_off_state"
@@ -250,6 +251,10 @@ extern "C" int CmcGetCurrentAppVersion(char *version, int version_size, char *bu
         if (@available(macOS 13.0, *)) {
             [self checkFullDiskAccessAndRestartMonitorIfNeeded];
         }
+
+        // 统一注入应用菜单项“检查更新...”并启动后台低频定时检测
+        [self setupApplicationMenu];
+        [[LMAppUpdater sharedUpdater] startPeriodicCheck];
     }
     
     /// 检测完全磁盘访问权限是否变化
@@ -804,45 +809,35 @@ extern "C" int CmcGetCurrentAppVersion(char *version, int version_size, char *bu
         });
     }
     
-#pragma mark - lemon menu
-    - (BOOL)hasNewVersion{
-        NSBundle *mainAppBundle = [NSBundle bundleWithPath:[[[[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent] stringByDeletingLastPathComponent] stringByDeletingLastPathComponent]];
-        NSString *myVer = [[mainAppBundle infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-        NSDictionary *versionInfo = [[NSUserDefaults standardUserDefaults] objectForKey:kLemonNewVersionInfo];
-        NSString *strNewVersion = [versionInfo objectForKey:@"version"];
-        if (myVer && [strNewVersion compareVersion:myVer])
-        {
-            //has new version
-            return YES;
-        } else {
-            return NO;
+#pragma mark - cleaner update & menu
+    - (void)setupApplicationMenu {
+        NSMenu *mainMenu = [NSApp mainMenu];
+        if (mainMenu.itemArray.count == 0) return;
+        NSMenuItem *appMenuItem = [mainMenu itemAtIndex:0];
+        NSMenu *appSubmenu = [appMenuItem submenu];
+        if (!appSubmenu) return;
+
+        for (NSMenuItem *item in appSubmenu.itemArray) {
+            if (item.action == @selector(update:)) {
+                return;
+            }
         }
+
+        BOOL isEnglish = ([LanguageHelper getCurrentSystemLanguageType] == SystemLanguageTypeEnglish);
+        NSString *title = isEnglish ? @"Check for Updates..." : @"检查更新...";
+        NSMenuItem *updateItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(update:) keyEquivalent:@""];
+        [updateItem setTarget:self];
+
+        NSInteger insertIdx = (appSubmenu.itemArray.count > 1) ? 1 : 0;
+        [appSubmenu insertItem:updateItem atIndex:insertIdx];
+    }
+
+    - (BOOL)hasNewVersion {
+        return [LMAppUpdater sharedUpdater].hasUpdate;
     }
     
     - (IBAction)update:(id)sender {
-        NSLog(@"installLemon");
-        
-        CFPreferencesAppSynchronize((__bridge CFStringRef)(MONITOR_APP_BUNDLEID));
-        NSString *strNewVersion = (__bridge_transfer NSString *)CFPreferencesCopyAppValue((__bridge CFStringRef)(kLemonNewVersion), (__bridge CFStringRef)(MONITOR_APP_BUNDLEID));
-        if (strNewVersion) {
-            CFPreferencesSetAppValue((__bridge CFStringRef)(kIgnoreLemonNewVersion), (__bridge CFStringRef)strNewVersion, (__bridge CFStringRef)(MONITOR_APP_BUNDLEID));
-            CFPreferencesAppSynchronize((__bridge CFStringRef)(MONITOR_APP_BUNDLEID));
-        }
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSString * bundlePath = [[NSBundle mainBundle] bundlePath];
-            NSLog(@"update bundlePath=%@", bundlePath);
-            NSString *updatePath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Frameworks"];
-            updatePath = [updatePath stringByAppendingPathComponent:UPDATE_APP_NAME];
-            NSArray *arguments = @[];
-            if ([self hasNewVersion]) {
-                NSDictionary *versionInfo = (__bridge_transfer NSDictionary *)CFPreferencesCopyAppValue((__bridge CFStringRef)(kLemonNewVersionInfo), (__bridge CFStringRef)(MONITOR_APP_BUNDLEID));
-            }
-            NSLog(@"installLemon: %@, %@", updatePath, arguments);
-            [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:updatePath]
-                                                          options:NSWorkspaceLaunchWithoutAddingToRecents
-                                                    configuration:@{NSWorkspaceLaunchConfigurationArguments: arguments}
-                                                            error:NULL];
-        });
+        [[LMAppUpdater sharedUpdater] checkForUpdatesWithManualTrigger:YES];
     }
     
     - (void)lemonPeferenceShow {
