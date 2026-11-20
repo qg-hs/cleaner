@@ -19,7 +19,7 @@ permissions:
 jobs:
   build-and-release:
     name: Build & Package All Architectures
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
