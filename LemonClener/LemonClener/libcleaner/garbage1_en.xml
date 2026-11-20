@@ -1,4 +1,4 @@
-<garbage version="2026.10.31.1">
+<garbage version="2026.11.20.1">
     <filters>
         <!--临时目录下的缓存过滤-->
         <filter id="1" column="filename" relation="is" value="com.apple.dock" action="exclude"/>
@@ -378,7 +378,7 @@
                 <path type="abs" level="1" value="~/Library/Application Support/Cursor/Crashpad/completed/"/>
             </action>
         </item>
-        <item id="2207" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+        <item id="2207" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="com.jetbrains.">
             <title><![CDATA[JetBrains IDE]]></title>
             <tips><![CDATA[IDEA / PyCharm / GoLand caches and logs]]></tips>
             <action id="22071" type="file" recommend="YES">
@@ -390,7 +390,7 @@
                 <path type="abs" level="1" value="~/Library/Caches/JetBrains/"/>
             </action>
         </item>
-        <item id="2208" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1">
+        <item id="2208" recommend="YES" fastmode="YES" showaction="YES" defaultstate="1" bundleid="com.electron.lark,com.bytedance.lark,com.larksuite.larkApp">
             <title><![CDATA[Feishu / Lark]]></title>
             <tips><![CDATA[Web and GPU rendering caches]]></tips>
             <action id="22081" type="file" recommend="YES">

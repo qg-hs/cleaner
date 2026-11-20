@@ -544,16 +544,14 @@
     return _cleanerStatus;
 }
 
-//删除自适配软件 item size为0的项目
+//删除应用垃圾分类下扫描结果 size 为 0 的项目（含自适配应用与无缓存的工具链项）
 -(void)removeSoftAdaptSubItemSizeIsZero{
     for (QMCategoryItem *cateItem in _categoryArr) {
         if([cateItem.categoryID integerValue] == CategoryIdTypeApplication){
             NSMutableArray *showArr = [[NSMutableArray alloc] init];
             for (QMCategorySubItem *subItem in cateItem.m_categorySubItemArray) {
-                if(([subItem resultFileSize] != 0) || (subItem.bundleId == nil)){
+                if([subItem resultFileSize] != 0){
                     [showArr addObject:subItem];
-                }else{
-//                    NSLog(@"remove subitem = %@", [subItem title]);
                 }
             }
             

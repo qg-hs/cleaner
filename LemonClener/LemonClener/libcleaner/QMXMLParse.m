@@ -2,7 +2,6 @@
 //  QMXMLParse.m
 //  QMCleanDemo
 //
-
 //  Copyright (c) 2013年 yuanwen. All rights reserved.
 //
 
@@ -195,6 +194,101 @@
     m_curFilterItem.action = [attributeDict objectForKey:kXMLKeyAction];
 }
 
+/// 匹配并从已安装字典中消费 Bundle ID（支持逗号分隔多 ID 及以 '.' 结尾的前缀通配符，如 com.jetbrains.）
+- (NSString *)matchAndConsumeInstalledBundleForSpec:(NSString *)bundleSpec
+                                      secondarySpec:(NSString *)secondarySpec
+{
+    if (m_installBundleIdDic == nil || m_installBundleIdDic.count == 0) {
+        return nil;
+    }
+    NSMutableArray<NSString *> *specs = [[NSMutableArray alloc] init];
+    if (bundleSpec.length > 0) {
+        [specs addObjectsFromArray:[bundleSpec componentsSeparatedByString:@","]];
+    }
+    if (secondarySpec.length > 0) {
+        [specs addObjectsFromArray:[secondarySpec componentsSeparatedByString:@","]];
+    }
+    if (specs.count == 0) {
+        return nil;
+    }
+
+    NSString *primaryMatchedBundleId = nil;
+    NSMutableArray<NSString *> *keysToRemove = [[NSMutableArray alloc] init];
+    NSArray<NSString *> *installedKeys = [m_installBundleIdDic allKeys];
+
+    for (NSString *rawToken in specs) {
+        NSString *token = [rawToken stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (token.length == 0) {
+            continue;
+        }
+        if ([token hasSuffix:@"."]) {
+            for (NSString *installedKey in installedKeys) {
+                if ([installedKey hasPrefix:token]) {
+                    if (primaryMatchedBundleId == nil) {
+                        primaryMatchedBundleId = installedKey;
+                    }
+                    [keysToRemove addObject:installedKey];
+                }
+            }
+        } else {
+            if ([m_installBundleIdDic objectForKey:token] != nil) {
+                if (primaryMatchedBundleId == nil) {
+                    primaryMatchedBundleId = token;
+                }
+                [keysToRemove addObject:token];
+            }
+        }
+    }
+
+    for (NSString *key in keysToRemove) {
+        [m_installBundleIdDic removeObjectForKey:key];
+    }
+
+    return primaryMatchedBundleId;
+}
+
+/// 在 </item> 解析完成且包含完整 action/path 树后，校验本地应用安装状态与缓存路径存在性
+- (void)finalizeAndCommitCurrentSubItem
+{
+    if (m_curCategorySubItem == nil || m_curCategoryItem == nil) {
+        return;
+    }
+    if ([m_curCategorySubItem.subCategoryID isEqualToString:@"22222"]) {
+        return;
+    }
+
+    BOOL isAppGarbageCategory = [m_curCategoryItem.categoryID isEqualToString:@"2"];
+    BOOL hasBundleConstraint = (m_curCategorySubItem.bundleId.length > 0 || m_curCategorySubItem.appStoreBundleId.length > 0);
+
+    if (hasBundleConstraint) {
+        NSString *matchedBundleId = [self matchAndConsumeInstalledBundleForSpec:m_curCategorySubItem.bundleId
+                                                                  secondarySpec:m_curCategorySubItem.appStoreBundleId];
+        if (matchedBundleId == nil) {
+            // 本地未安装该应用，直接剔除
+            return;
+        }
+        m_curCategorySubItem.bundleId = matchedBundleId;
+        for (QMActionItem *actionItem in m_curCategorySubItem.m_actionItemArray) {
+            actionItem.bundleID = matchedBundleId;
+        }
+        if (isAppGarbageCategory) {
+            // 应用垃圾分类下，仅当该已安装应用在磁盘上实际存在可清理路径时才挂载，避免 0 B 空白项
+            if (![QMItemCreateHelper subItemHasAnyCleanablePath:m_curCategorySubItem]) {
+                return;
+            }
+        }
+        [m_curCategoryItem addSubCategoryItem:m_curCategorySubItem];
+    } else {
+        if (isAppGarbageCategory) {
+            // 无 bundleId 的开发工具链缓存项（Node/Python/Rust/Go/包管理器），必须本地实际存在对应非空缓存目录才挂载
+            if (![QMItemCreateHelper subItemHasAnyCleanablePath:m_curCategorySubItem]) {
+                return;
+            }
+        }
+        [m_curCategoryItem addSubCategoryItem:m_curCategorySubItem];
+    }
+}
+
 /*
  根据XML获取子项清理对象
  */
@@ -210,6 +304,7 @@
         m_curCategorySubItem.os = [attributeDict objectForKey:kXMLKeyOS];
     }
     if (![m_curCategorySubItem checkVersion:m_curSysVersion]) {
+        m_curCategorySubItem = nil;
         return;
     }
     m_curCategorySubItem.subCategoryID = [attributeDict objectForKey:kXMLKeyID];
@@ -232,23 +327,6 @@
         //NOTE:之前一级勾选默认是mix,需改为on
         m_curCategorySubItem.defaultState = 1;//[[attributeDict objectForKey:kXMLKeyDefaultState] integerValue];
     }
-    
-    //如果当前是其他应用垃圾 则插入 未适配的软件 自适配
-    if ([m_curCategorySubItem.subCategoryID isEqualToString:@"22222"]) {
-        [QMItemCreateHelper createAllSoftAdaptCategorySubItemWithInstallArr:m_installBundleIdDic curCategoryItem:m_curCategoryItem];
-    }
-    
-    //判读bundleid不为空，并且没有安装 --- 将已经适配过的软件加入进来
-    if ((m_curCategorySubItem.bundleId == nil) || ([m_installBundleIdDic objectForKey:m_curCategorySubItem.bundleId]) || [m_installBundleIdDic objectForKey:m_curCategorySubItem.appStoreBundleId]) {
-        [m_curCategoryItem addSubCategoryItem:m_curCategorySubItem];
-        //加入进来的软件进行移除 剩余的软件进行自适配
-        if (m_curCategorySubItem.bundleId != nil) {
-            [m_installBundleIdDic removeObjectForKey:m_curCategorySubItem.bundleId];
-        }
-        if (m_curCategorySubItem.appStoreBundleId != nil) {
-            [m_installBundleIdDic removeObjectForKey:m_curCategorySubItem.appStoreBundleId];
-        }
-    }
 }
 
 /*
@@ -268,6 +346,8 @@
  */
 - (void)createActionItem:(NSDictionary *)attributeDict
 {
+    if (!m_curCategorySubItem)
+    return;
     NSArray * allKeys = [attributeDict allKeys];
     if (![allKeys containsObject:kXMLKeyType])
     return;
@@ -459,8 +539,6 @@
 ///元素开始解析时调用
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict
 {
-    //the parser found an XML tag and is giving you some information about it
-    //what are you going to do?
     if (!elementName)
     return;
     
@@ -540,12 +618,18 @@
     }
     if ([elementName isEqualToString:kXMLKeyCategory])
     {
+        // 在“应用垃圾”分类结束时，自动扫描并注入本地已安装的其他第三方应用
+        if ([m_curCategoryItem.categoryID isEqualToString:@"2"]) {
+            [QMItemCreateHelper createAllSoftAdaptCategorySubItemWithInstallArr:m_installBundleIdDic
+                                                                curCategoryItem:m_curCategoryItem];
+        }
         [delegagte xmlParseDidEndCategory:m_curCategoryItem];
         [m_curCategoryItem refreshStateValue];
         m_curCategoryItem = nil;
     }
     if (curParserLevel == 3 && [elementName isEqualToString:kXMLKeyItem])
     {
+        [self finalizeAndCommitCurrentSubItem];
         m_curCategorySubItem = nil;
     }
     if (curParserLevel == 4 && [elementName isEqualToString:kXMLKeyAction])
@@ -595,7 +679,6 @@
 
 - (void)parserDidEndDocument:(NSXMLParser *)parser
 {
-    //the parser finished. what are you going to do?
     [delegagte xmlParseDidEnd];
 }
 

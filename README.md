@@ -52,6 +52,13 @@
 
 ## 版本更新日志 (Changelog)
 
+### `v1.1.2` (2026-11-20)
+
+- **“应用垃圾”本地动态识别与前置剪枝引擎（Dynamic Local App Discovery & Pre-Scan Pruning）**：
+  - **多源本地应用自动探测**：扩展 `InstallAppHelper` 枚举范围，全面覆盖 `/Applications`（含二级子目录）、用户级 `~/Applications`、`Setapp` 订阅目录与第三方输入法，并通过真实符号链接解析物理隔离 `/System/Applications` 系统只读核心组件。
+  - **全自动第三方应用缓存与日志挂载**：重构 `QMItemCreateHelper` 与 `QMXMLParse` 后置提交流水线，自动为本机安装的第三方桌面应用探测 `~/Library/Caches`、沙盒 `~/Library/Containers`、Electron / Chromium 安全缓存子目录（`Cache` / `Code Cache` / `GPUCache` / `CachedData` / `DawnCache` / `Service Worker/CacheStorage`）、系统临时缓存及 `~/Library/Logs`；严格屏蔽 `com.apple.*` 原生系统应用。
+  - **$O(1)$ 非空预检与 `0 B` 噪音项剪枝**：基于 POSIX `opendir` / `readdir` / `lstat` 短路式非空探测，对未安装的软件（支持多 Bundle ID 与 `com.jetbrains.` 前缀通配符）及本地无缓存目录的 CLI 工具链在解析期直接剪枝，彻底消除未安装应用固定显示 `0 B` 的问题。
+
 ### `v1.1.1` (2026-11-02)
 
 - **原生无感就地自动更新（Seamless In-Place Auto Update & Native Relauncher）**：
