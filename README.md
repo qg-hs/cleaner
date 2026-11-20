@@ -52,6 +52,13 @@
 
 ## 版本更新日志 (Changelog)
 
+### `v1.1.3` (2026-11-20)
+
+- **“上网垃圾”深度重构与多 Profile 浏览器引擎升级**：
+  - **Chromium 多用户 Profile 与深层缓存全覆盖**：`QMItemCreateHelper` 支持 `(Default|Profile .+)` 正则递归展开校验，Chrome / Edge / Arc / Brave / Vivaldi / 夸克浏览器 / QQ浏览器全面覆盖多用户 Profile 下的 `Cache`、`Code Cache`、`GPUCache`、`DawnCache`、`GraphiteDawnCache`、`Service Worker/CacheStorage`、`Service Worker/ScriptCache` 与 `ShaderCache`。
+  - **现代 macOS Safari 沙盒路径与新兴浏览器补齐**：Safari 升级适配现代沙盒容器 `~/Library/Containers/com.apple.Safari/Data/Library/Caches/`；新增 **夸克浏览器 (`com.quark.desktop`)**、**Vivaldi (`com.vivaldi.Vivaldi`)**、**Zen Browser (`app.zen-browser.zen`)**、**Orion (`com.kagi.kagimacOS`)** 清理规则；修复现代 Opera (v100+) 版本号正则匹配失效问题；全面开启浏览器缓存 `fastmode="YES"` 快速扫描支持。
+  - **Apple Mail 真实附件预检与 `0 B` 剪枝**：新增 `LMMailDirectoryHasAttachments` 校验真实邮件账户与 `Attachments` 目录，并将“上网垃圾”纳入解析期前置非空预检与扫描后 `0 B` 自动剔除，消除未配置邮箱时固定显示 `Mail缓存 0 B` 的问题。
+
 ### `v1.1.2` (2026-11-20)
 
 - **“应用垃圾”本地动态识别与前置剪枝引擎（Dynamic Local App Discovery & Pre-Scan Pruning）**：

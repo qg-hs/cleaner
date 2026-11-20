@@ -257,30 +257,31 @@
         return;
     }
 
-    BOOL isAppGarbageCategory = [m_curCategoryItem.categoryID isEqualToString:@"2"];
+    BOOL isDynamicPruneCategory = ([m_curCategoryItem.categoryID isEqualToString:@"2"] ||
+                                   [m_curCategoryItem.categoryID isEqualToString:@"3"]);
     BOOL hasBundleConstraint = (m_curCategorySubItem.bundleId.length > 0 || m_curCategorySubItem.appStoreBundleId.length > 0);
 
     if (hasBundleConstraint) {
         NSString *matchedBundleId = [self matchAndConsumeInstalledBundleForSpec:m_curCategorySubItem.bundleId
                                                                   secondarySpec:m_curCategorySubItem.appStoreBundleId];
         if (matchedBundleId == nil) {
-            // 本地未安装该应用，直接剔除
+            // 本地未安装该应用或浏览器，直接剔除
             return;
         }
         m_curCategorySubItem.bundleId = matchedBundleId;
         for (QMActionItem *actionItem in m_curCategorySubItem.m_actionItemArray) {
             actionItem.bundleID = matchedBundleId;
         }
-        if (isAppGarbageCategory) {
-            // 应用垃圾分类下，仅当该已安装应用在磁盘上实际存在可清理路径时才挂载，避免 0 B 空白项
+        if (isDynamicPruneCategory) {
+            // 应用垃圾与上网垃圾分类下，仅当该已安装应用在磁盘上实际存在可清理路径时才挂载，避免 0 B 空白项
             if (![QMItemCreateHelper subItemHasAnyCleanablePath:m_curCategorySubItem]) {
                 return;
             }
         }
         [m_curCategoryItem addSubCategoryItem:m_curCategorySubItem];
     } else {
-        if (isAppGarbageCategory) {
-            // 无 bundleId 的开发工具链缓存项（Node/Python/Rust/Go/包管理器），必须本地实际存在对应非空缓存目录才挂载
+        if (isDynamicPruneCategory) {
+            // 无 bundleId 的开发工具链缓存项、Mail 缓存及下载日志，必须本地实际存在对应非空缓存文件才挂载
             if (![QMItemCreateHelper subItemHasAnyCleanablePath:m_curCategorySubItem]) {
                 return;
             }

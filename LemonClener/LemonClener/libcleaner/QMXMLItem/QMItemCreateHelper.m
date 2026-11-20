@@ -66,17 +66,83 @@ static BOOL LMDirectoryHasNonEmptyFileRecursive(const char *dirPath, int depth) 
     return found;
 }
 
+/// 校验 Apple Mail 是否存在实际邮件账户及已下载的邮件附件（排除仅有默认 MailData 的空白状态）
+static BOOL LMMailDirectoryHasAttachments(NSString *rawMailPath) {
+    if (rawMailPath.length == 0) {
+        return NO;
+    }
+    NSString *mailPath = [rawMailPath stringByExpandingTildeInPath];
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSString *plistPath = [mailPath stringByAppendingPathComponent:@"PersistenceInfo.plist"];
+    NSDictionary *mailDict = [NSDictionary dictionaryWithContentsOfFile:plistPath];
+    NSString *lastVersionName = [mailDict objectForKey:@"LastUsedVersionDirectoryName"];
+    if (![lastVersionName isKindOfClass:[NSString class]] || lastVersionName.length == 0) {
+        return NO;
+    }
+    NSString *versionDir = [mailPath stringByAppendingPathComponent:lastVersionName];
+    NSArray<NSString *> *accountEntries = [fm contentsOfDirectoryAtPath:versionDir error:nil];
+    for (NSString *accountName in accountEntries) {
+        if ([accountName isEqualToString:@"MailData"] || [accountName hasPrefix:@"."]) {
+            continue;
+        }
+        NSString *accountPath = [versionDir stringByAppendingPathComponent:accountName];
+        NSDirectoryEnumerator *enumerator = [fm enumeratorAtURL:[NSURL fileURLWithPath:accountPath isDirectory:YES]
+                                     includingPropertiesForKeys:@[NSURLIsDirectoryKey, NSURLIsHiddenKey]
+                                                        options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                   errorHandler:nil];
+        for (NSURL *fileURL in enumerator) {
+            NSNumber *isDir = nil;
+            [fileURL getResourceValue:&isDir forKey:NSURLIsDirectoryKey error:nil];
+            if ([isDir boolValue]) {
+                continue;
+            }
+            if ([[fileURL pathComponents] containsObject:@"Attachments"]) {
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
 + (BOOL)hasCleanableFilesAtPath:(NSString *)rawPath {
     if (rawPath == nil || rawPath.length == 0) {
         return NO;
     }
     NSString *expandedPath = [rawPath stringByExpandingTildeInPath];
-    // 若路径包含正则分组（如 CoreSimulator Volumes/(.+)/...），截取静态前缀目录进行存在性判断
-    NSRange regexRange = [expandedPath rangeOfString:@"("];
-    if (regexRange.location != NSNotFound) {
-        NSString *prefix = [expandedPath substringToIndex:regexRange.location];
-        expandedPath = [prefix stringByDeletingLastPathComponent];
+    // 若路径包含正则分组（如 Chromium 多 Profile: (Default|Profile .+)），逐项展开校验目标子目录是否非空
+    NSRange openParen = [expandedPath rangeOfString:@"("];
+    NSRange closeParen = [expandedPath rangeOfString:@")"];
+    if (openParen.location != NSNotFound &&
+        closeParen.location != NSNotFound &&
+        closeParen.location > openParen.location) {
+        NSString *pattern = [expandedPath substringWithRange:NSMakeRange(openParen.location + 1, closeParen.location - openParen.location - 1)];
+        NSString *parentDir = [expandedPath substringToIndex:openParen.location];
+        NSString *suffix = [expandedPath substringFromIndex:closeParen.location + 1];
+        NSArray<NSString *> *entries = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:parentDir error:nil];
+        if (entries.count == 0) {
+            return NO;
+        }
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^(?:%@)$", pattern]
+                                                                               options:0
+                                                                                 error:nil];
+        for (NSString *entry in entries) {
+            if ([entry hasPrefix:@"."]) {
+                continue;
+            }
+            BOOL matched = [entry isEqualToString:pattern];
+            if (!matched && regex != nil) {
+                matched = ([regex numberOfMatchesInString:entry options:0 range:NSMakeRange(0, entry.length)] > 0);
+            }
+            if (matched) {
+                NSString *candidate = [[parentDir stringByAppendingPathComponent:entry] stringByAppendingPathComponent:suffix];
+                if ([self hasCleanableFilesAtPath:candidate]) {
+                    return YES;
+                }
+            }
+        }
+        return NO;
     }
+
     if (expandedPath.length == 0) {
         return NO;
     }
@@ -103,6 +169,14 @@ static BOOL LMDirectoryHasNonEmptyFileRecursive(const char *dirPath, int depth) 
     }
     NSString *sysTempCPath = [[NSTemporaryDirectory() stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"C"];
     for (QMActionItem *actionItem in subItem.m_actionItemArray) {
+        if (actionItem.type == QMActionMailType) {
+            for (QMActionPathItem *pathItem in actionItem.pathItemArray) {
+                if (LMMailDirectoryHasAttachments(pathItem.value)) {
+                    return YES;
+                }
+            }
+            continue;
+        }
         for (QMActionPathItem *pathItem in actionItem.pathItemArray) {
             if ([pathItem.type isEqualToString:@"abs"]) {
                 if ([self hasCleanableFilesAtPath:pathItem.value]) {
@@ -136,7 +210,11 @@ static NSSet<NSString *> *LMBrowserBundleIdBlacklist(void) {
             @"com.quark.desktop",
             @"com.microsoft.edgemac",
             @"company.thebrowser.Browser",
-            @"com.brave.Browser"
+            @"company.thebrowser.dia",
+            @"com.brave.Browser",
+            @"com.vivaldi.Vivaldi",
+            @"app.zen-browser.zen",
+            @"com.kagi.kagimacOS"
         ]];
     });
     return browserSet;

@@ -1,4 +1,4 @@
-<garbage version="2026.11.20.1">
+<garbage version="2026.11.20.2">
     <filters>
         <!--临时目录下的缓存过滤-->
         <filter id="1" column="filename" relation="is" value="com.apple.dock" action="exclude"/>
@@ -426,8 +426,8 @@
     
     <category id="3">
         <title><![CDATA[上网垃圾]]></title>
-        <tips><![CDATA[清理Chrome，Opera，Safari，Firefox和QQ浏览器产生的缓存文件。]]></tips>
-        <item id="301" recommend="NO"  fastmode="NO">
+        <tips><![CDATA[清理浏览器加载网页产生的多 Profile 缓存、编译缓存与 GPU 渲染缓存。]]></tips>
+        <item id="301" recommend="NO" fastmode="NO">
             <title><![CDATA[Mail缓存]]></title>
             <tips><![CDATA[收发邮件会下载大量的附件，可以将不会用到的缓存移除]]></tips>
             <action type="file">
@@ -437,92 +437,158 @@
                 <path type="abs" level="1" value="~/Library/Mail/"/>
             </action>
         </item>
-        <item id="306" recommend="YES"  showresult="YES" fastmode="NO" bundleid="com.apple.Safari">
+        <item id="306" recommend="YES" showresult="YES" fastmode="YES" bundleid="com.apple.Safari">
             <title><![CDATA[Safari]]></title>
-            <tips><![CDATA[Safari 加载页面时缓存的一些网页或资源]]></tips>
-            <!--Internet Cache下的缓存文件-->
+            <tips><![CDATA[Safari 网页资源、WebKit 网络缓存与站点缩略图缓存]]></tips>
             <action id="3061" type="file" recommend="YES">
+                <path type="abs" level="1" value="~/Library/Containers/com.apple.Safari/Data/Library/Caches/"/>
                 <path type="abs" level="1" value="~/Library/Caches/com.apple.Safari/"/>
                 <path type="abs" level="1" value="~/Library/Caches/Metadata/Safari/"/>
-                <path type="abs" level="1" value="~/Library/Containers/com.apple.Safari.CacheDeleteExtension/"/>
+                <path type="abs" level="1" value="~/Library/Containers/com.apple.Safari.CacheDeleteExtension/Data/Library/Caches/"/>
                 <path type="abs" level="1" value="~/Library/Caches/com.apple.Safari.SafeBrowsing/"/>
                 <path type="abs" level="1" value="~/Library/Caches/com.apple.safaridavclient/"/>
             </action>
         </item>
-        <item id="307" recommend="YES"  showresult="YES" fastmode="NO" bundleid="com.google.Chrome">
+        <item id="307" recommend="YES" showresult="YES" fastmode="YES" bundleid="com.google.Chrome,com.google.Chrome.canary">
             <title><![CDATA[Chrome]]></title>
-            <tips><![CDATA[Chrome 加载页面时缓存的一些网页或资源]]></tips>
-            <!--Internet Cache-->
+            <tips><![CDATA[Chrome 多用户配置文件网页缓存、V8 编译缓存与 GPU 缓存]]></tips>
             <action id="3071" type="file" recommend="YES">
-                <path type="abs" level="0" value="~/Library/Caches/Google/Chrome/Default/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Caches/Google/Chrome/(Default|Profile .+)/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Caches/Google/Chrome/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.google.Chrome/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/GPUCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/DawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/GraphiteDawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/Service Worker/CacheStorage/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/Service Worker/ScriptCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/ShaderCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/GrShaderCache/"/>
             </action>
         </item>
-        <item id="308" recommend="YES"  showresult="NO" fastmode="NO" bundleid="com.tencent.QQBrowser">
-            <title><![CDATA[QQ浏览器]]></title>
-            <tips><![CDATA[QQ浏览器 加载页面时缓存的一些网页或资源]]></tips>
-            <!--Internet Cache-->
-            <action id="841" type="file" recommend="YES">
-                <title><![CDATA[浏览器缓存]]></title>
-                <path type="abs" level="0" value="~/Library/Caches/QQBrowser2/Default/Cache/"/>
-            </action>
-        </item>
-        <item id="309" recommend="YES"  showresult="NO" fastmode="NO" bundleid="com.operasoftware.Opera">
-            <title><![CDATA[Opera]]></title>
-            <tips><![CDATA[Opera 加载页面时缓存的一些网页或资源]]></tips>
-            <!--Cache-->
-            <action id="3091" type="file" recommend="YES" appversion="((1[0-2])|([0-9]))\..*" bundle="com.operasoftware.Opera" apppath="/Applications/Opera.app">
-                <title><![CDATA[浏览器缓存]]></title>
-                <path type="abs" level="0" value="~/Library/Caches/Opera/"/>
-            </action>
-            <action id="3092" type="file" recommend="YES" appversion="((1[3-9])|([2-9][0-9]))\..*" bundle="com.operasoftware.Opera" apppath="/Applications/Opera.app">
-                <title><![CDATA[浏览器缓存]]></title>
-                <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/GPUCache"/>
-                <path type="abs" level="0" value="~/Library/Caches/com.operasoftware.Opera"/>
-            </action>
-            <!--Application Cache-->
-            <action id="3093" type="file" recommend="YES" appversion="((1[0-2])|([0-9]))\..*" bundle="com.operasoftware.Opera" apppath="/Applications/Opera.app">
-                <title><![CDATA[应用程序缓存]]></title>
-                <path type="abs" level="0" value="~/Library/Application Support/Opera/application_cache"/>
-            </action>
-        </item>
-        <item id="310" recommend="YES"  showresult="NO" fastmode="NO" bundleid="org.mozilla.firefox">
-            <title><![CDATA[FireFox]]></title>
-            <tips><![CDATA[FireFox 加载页面时缓存的一些网页或资源]]></tips>
-            <!--~/Library/Caches/Google/Chrome/Default/Cache/下的缓存文件-->
-            <action id="3101" type="file" recommend="YES">
-                <title><![CDATA[浏览器缓存]]></title>
-                <path type="abs" level="0" value="~/Library/Caches/Firefox/"/>
-            </action>
-        </item>
-        <item id="311" recommend="YES"  showresult="YES" fastmode="NO" bundleid="com.microsoft.edgemac">
+        <item id="311" recommend="YES" showresult="YES" fastmode="YES" bundleid="com.microsoft.edgemac">
             <title><![CDATA[Microsoft Edge]]></title>
-            <tips><![CDATA[Microsoft Edge 加载页面时缓存的一些网页或资源]]></tips>
-            <!--Internet Cache-->
+            <tips><![CDATA[Edge 多用户配置文件网页缓存、Code Cache 与 GPU 缓存]]></tips>
             <action id="3111" type="file" recommend="YES">
-                <path type="abs" level="0" value="~/Library/Caches/Microsoft Edge/Default/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Caches/Microsoft Edge/(Default|Profile .+)/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Caches/Microsoft Edge/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.microsoft.edgemac/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/GPUCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/DawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/GraphiteDawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/Service Worker/CacheStorage/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/Service Worker/ScriptCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/ShaderCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/GrShaderCache/"/>
             </action>
         </item>
-        <item id="313" recommend="YES" showresult="YES" fastmode="NO" bundleid="company.thebrowser.Browser">
+        <item id="313" recommend="YES" showresult="YES" fastmode="YES" bundleid="company.thebrowser.Browser">
             <title><![CDATA[Arc]]></title>
-            <tips><![CDATA[Arc 浏览器加载网页时缓存的静态资源与 GPU 缓存]]></tips>
+            <tips><![CDATA[Arc 浏览器多 Profile 网页静态资源、Code Cache 与 GPU 缓存]]></tips>
             <action id="3131" type="file" recommend="YES">
                 <path type="abs" level="1" value="~/Library/Caches/Arc/"/>
                 <path type="abs" level="1" value="~/Library/Caches/company.thebrowser.Browser/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/Default/Cache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/Default/Code Cache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/Default/GPUCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/GPUCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/DawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/GraphiteDawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/Service Worker/CacheStorage/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/Service Worker/ScriptCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/ShaderCache/"/>
             </action>
         </item>
-        <item id="314" recommend="YES" showresult="YES" fastmode="NO" bundleid="com.brave.Browser">
+        <item id="314" recommend="YES" showresult="YES" fastmode="YES" bundleid="com.brave.Browser">
             <title><![CDATA[Brave]]></title>
-            <tips><![CDATA[Brave 浏览器加载网页时产生的缓存文件]]></tips>
+            <tips><![CDATA[Brave 浏览器多 Profile 网页缓存、Code Cache 与 GPU 缓存]]></tips>
             <action id="3141" type="file" recommend="YES">
-                <path type="abs" level="0" value="~/Library/Caches/BraveSoftware/Brave-Browser/Default/Cache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Code Cache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/Default/GPUCache/"/>
+                <path type="abs" level="0" value="~/Library/Caches/BraveSoftware/Brave-Browser/(Default|Profile .+)/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Caches/BraveSoftware/Brave-Browser/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.brave.Browser/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/GPUCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/DawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/GraphiteDawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/Service Worker/CacheStorage/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/Service Worker/ScriptCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/ShaderCache/"/>
             </action>
         </item>
-        <item id="312" recommend="YES" fastmode="NO">
+        <item id="310" recommend="YES" showresult="YES" fastmode="YES" bundleid="org.mozilla.firefox">
+            <title><![CDATA[Firefox]]></title>
+            <tips><![CDATA[Firefox 多配置文件网页缓存与编译着色器缓存]]></tips>
+            <action id="3101" type="file" recommend="YES">
+                <title><![CDATA[浏览器缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/Firefox/Profiles/"/>
+                <path type="abs" level="1" value="~/Library/Caches/org.mozilla.firefox/"/>
+            </action>
+        </item>
+        <item id="309" recommend="YES" showresult="YES" fastmode="YES" bundleid="com.operasoftware.Opera">
+            <title><![CDATA[Opera]]></title>
+            <tips><![CDATA[Opera 加载页面时缓存的网页资源与 GPU 缓存]]></tips>
+            <action id="3091" type="file" recommend="YES">
+                <title><![CDATA[浏览器缓存]]></title>
+                <path type="abs" level="1" value="~/Library/Caches/com.operasoftware.Opera/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/GPUCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/DawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/Service Worker/CacheStorage/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/ShaderCache/"/>
+            </action>
+        </item>
+        <item id="315" recommend="YES" showresult="YES" fastmode="YES" bundleid="com.vivaldi.Vivaldi">
+            <title><![CDATA[Vivaldi]]></title>
+            <tips><![CDATA[Vivaldi 浏览器多 Profile 网页缓存与 GPU 缓存]]></tips>
+            <action id="3151" type="file" recommend="YES">
+                <path type="abs" level="0" value="~/Library/Caches/Vivaldi/(Default|Profile .+)/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Caches/Vivaldi/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.vivaldi.Vivaldi/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/(Default|Profile .+)/GPUCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/(Default|Profile .+)/DawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/(Default|Profile .+)/Service Worker/CacheStorage/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/ShaderCache/"/>
+            </action>
+        </item>
+        <item id="316" recommend="YES" showresult="YES" fastmode="YES" bundleid="com.quark.desktop">
+            <title><![CDATA[夸克浏览器]]></title>
+            <tips><![CDATA[夸克浏览器网页缓存、Code Cache 与 GPU 渲染缓存]]></tips>
+            <action id="3161" type="file" recommend="YES">
+                <path type="abs" level="0" value="~/Library/Caches/Quark/(Default|Profile .+)/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.quark.desktop/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Quark/(Default|Profile .+)/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Quark/(Default|Profile .+)/Code Cache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Quark/(Default|Profile .+)/GPUCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Quark/(Default|Profile .+)/DawnCache/"/>
+                <path type="abs" level="0" value="~/Library/Application Support/Quark/(Default|Profile .+)/Service Worker/CacheStorage/"/>
+            </action>
+        </item>
+        <item id="317" recommend="YES" showresult="YES" fastmode="YES" bundleid="app.zen-browser.zen">
+            <title><![CDATA[Zen Browser]]></title>
+            <tips><![CDATA[Zen Browser 多配置文件网页缓存]]></tips>
+            <action id="3171" type="file" recommend="YES">
+                <path type="abs" level="1" value="~/Library/Caches/zen/Profiles/"/>
+                <path type="abs" level="1" value="~/Library/Caches/app.zen-browser.zen/"/>
+            </action>
+        </item>
+        <item id="318" recommend="YES" showresult="YES" fastmode="YES" bundleid="com.kagi.kagimacOS">
+            <title><![CDATA[Orion]]></title>
+            <tips><![CDATA[Orion 浏览器网页资源与 WebKit 缓存]]></tips>
+            <action id="3181" type="file" recommend="YES">
+                <path type="abs" level="1" value="~/Library/Caches/com.kagi.kagimacOS/"/>
+            </action>
+        </item>
+        <item id="308" recommend="YES" showresult="YES" fastmode="YES" bundleid="com.tencent.QQBrowser">
+            <title><![CDATA[QQ浏览器]]></title>
+            <tips><![CDATA[QQ浏览器加载页面时缓存的网页或资源]]></tips>
+            <action id="841" type="file" recommend="YES">
+                <title><![CDATA[浏览器缓存]]></title>
+                <path type="abs" level="0" value="~/Library/Caches/QQBrowser2/(Default|Profile .+)/Cache/"/>
+                <path type="abs" level="1" value="~/Library/Caches/com.tencent.QQBrowser/"/>
+            </action>
+        </item>
+        <item id="312" recommend="YES" fastmode="YES">
             <title><![CDATA[下载日志]]></title>
             <tips><![CDATA[不可信来源下载应用程序的日志]]></tips>
             <action id="3121" type="file">
