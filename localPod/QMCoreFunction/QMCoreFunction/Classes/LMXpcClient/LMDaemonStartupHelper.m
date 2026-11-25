@@ -94,8 +94,8 @@
     }
 
     NSString *cmd = [NSString stringWithFormat:
-        @"do shell script \"/bin/launchctl load -w %@\" with administrator privileges",
-        DAEMON_PLIST_PATH];
+        @"do shell script \"/usr/sbin/chown root:wheel '%@' && /bin/chmod 644 '%@' && /bin/launchctl enable system/%@ 2>/dev/null || true; /bin/launchctl bootstrap system '%@' 2>/dev/null || /bin/launchctl kickstart -k system/%@ 2>/dev/null || /bin/launchctl load -w '%@'\" with administrator privileges",
+        DAEMON_PLIST_PATH, DAEMON_PLIST_PATH, DAEMON_MACH_SERVICE_NAME, DAEMON_PLIST_PATH, DAEMON_MACH_SERVICE_NAME, DAEMON_PLIST_PATH];
 
     NSAppleScript *script = [[NSAppleScript alloc] initWithSource:cmd];
     NSDictionary *error = nil;

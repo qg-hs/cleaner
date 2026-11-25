@@ -320,8 +320,7 @@
     [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:nil];
     [[QMUserNotificationCenter defaultUserNotificationCenter] removeAllDeliveredNotifications];
     [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
-    
-    [[LMDaemonStartupHelper shareInstance] notiflyDaemonClientExit];
+    // CleanerDaemon 已常驻留守（exitDaemon 为空操作），退出时不主动发起同步 XPC 避免触发提权弹框
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag

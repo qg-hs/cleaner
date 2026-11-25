@@ -52,6 +52,13 @@
 
 ## 版本更新日志 (Changelog)
 
+### `v2.0.1` (2026-11-25)
+
+- **守护进程加载链路与状态栏拉起稳定性修复**：
+  - **消除手动退出误弹提权授权框**：移除 `Cleaner` 与 `CleanerMonitor` 在 `applicationWillTerminate` 中同步触发 `notiflyDaemonClientExit` 的冗余 XPC 调用（`CleanerDaemon` 已常驻留守），避免 Daemon 未连接时退出应用触发 `loadDaemonPlist` 弹窗并阻塞退出。
+  - **阻止 `keepMonitorAlive` 无限重试弹窗**：`Cleaner/AppDelegate.mm` 优先定位当前宿主内的 `CleanerMonitor.app`；当系统取消/拒绝启动或等待回调超时时立即中止循环，不再每秒重试轰炸。
+  - **现代 macOS `launchd` 服务加载与权限对齐**：`McUninstall` 安装 `com.cleaner.daemon.plist` 与 `com.cleaner.monitor.plist` 统一使用标准 `root:wheel` `0644` 权限（`CleanerDaemon` 设为 `0755 root:wheel`），`LMDaemonStartupHelper` 与 `LMPlistHelper` 优先采用 `launchctl enable` + `launchctl bootstrap system` / `kickstart` 加载守护进程。
+
 ### `v2.0.0` (2026-11-25)
 
 - **全量品牌重构与工程去 Lemon 化（Full Cleaner Rebranding & Architecture Refactoring）**：
@@ -201,17 +208,17 @@ pod install
 
 项目通过 [`.github/workflows/package.yml`](.github/workflows/package.yml) 配置了完整的 GitHub Actions 流水线：
 
-1. 修改 [`Cleaner/Info.plist`](Cleaner/Info.plist) 与 [`Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist`](Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist) 中的 `CFBundleShortVersionString`（当前版本 `2.0.0`）。
+1. 修改 [`Cleaner/Info.plist`](Cleaner/Info.plist) 与 [`Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist`](Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist) 中的 `CFBundleShortVersionString`（当前版本 `2.0.1`）。
 2. 提交代码并推送带有 `v` 前缀的 Git Tag：
    ```bash
    git add -A
-   git commit -m "release: v2.0.0"
-   git tag v2.0.0
+   git commit -m "release: v2.0.1"
+   git tag v2.0.1
    git push origin master
-   git push origin v2.0.0
+   git push origin v2.0.1
    ```
-3. GitHub Actions 将自动触发并行构建矩阵（`arm64` / `x86_64` / `universal`），并在构建完成后自动创建 `v2.0.0` GitHub Release 挂载全部 `.dmg`、`.zip` 和 `SHA256SUMS.txt`。
-4. 已运行的 `cleaner` 状态栏客户端 (`LMGitHubUpdater`) 检测到新版本后将自动亮起设置红点，用户点击 **`发现新版本 v2.0.0（点击热更）`** 即可直接完成流式下载、解压替换与自动重启。
+3. GitHub Actions 将自动触发并行构建矩阵（`arm64` / `x86_64` / `universal`），并在构建完成后自动创建 `v2.0.1` GitHub Release 挂载全部 `.dmg`、`.zip` 和 `SHA256SUMS.txt`。
+4. 已运行的 `cleaner` 状态栏客户端 (`LMGitHubUpdater`) 检测到新版本后将自动亮起设置红点，用户点击 **`发现新版本 v2.0.1（点击热更）`** 即可直接完成流式下载、解压替换与自动重启。
 
 ---
 

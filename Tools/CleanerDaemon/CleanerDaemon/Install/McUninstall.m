@@ -456,13 +456,16 @@ int intsallSub(const char *szUserName, const char *szVersion, int nUserPid)
     }
     
     // 将自身拷贝过去
+    NSDictionary *daemonAttr = @{NSFileOwnerAccountName:@"root",
+                                 NSFileGroupOwnerAccountName:@"wheel",
+                                 NSFilePosixPermissions:@(0755)};
     NSString *agentPath = [supportPath stringByAppendingPathComponent:[selfPath lastPathComponent]];
     [fileMgr removeItemAtPath:agentPath error:nil];
     if (![fileMgr copyItemAtPath:selfPath toPath:agentPath error:nil])
     {
         return QMINST_ERR_COPYSELF;
     }
-    [fileMgr setAttributes:rootAttr ofItemAtPath:agentPath error:nil];
+    [fileMgr setAttributes:daemonAttr ofItemAtPath:agentPath error:nil];
     
     //MARK: 拷贝monitor
     NSString *monitorSrcPath = MONITOR_SRC_APP_PATH;
@@ -483,14 +486,17 @@ int intsallSub(const char *szUserName, const char *szVersion, int nUserPid)
     if (![fileMgr fileExistsAtPath:monitorFolder])
         [fileMgr createDirectoryAtPath:monitorFolder withIntermediateDirectories:NO attributes:nil error:nil];
     
-    // 拷贝launchd配置文件
+    // 拷贝launchd配置文件（标准 root:wheel 0644 权限，确保 modern launchd 正常加载）
+    NSDictionary *plistAttr = @{NSFileOwnerAccountName:@"root",
+                                NSFileGroupOwnerAccountName:@"wheel",
+                                NSFilePosixPermissions:@(0644)};
     NSString *agentLaunchdSrcPath = [selfFolder stringByAppendingPathComponent:[DAEMON_LAUNCHD_PATH lastPathComponent]];
     [fileMgr removeItemAtPath:DAEMON_LAUNCHD_PATH error:nil];
     if (![fileMgr copyItemAtPath:agentLaunchdSrcPath toPath:DAEMON_LAUNCHD_PATH error:nil])
     {
         return QMINST_ERR_COPYPLIST;
     }
-    [fileMgr setAttributes:rootAttr ofItemAtPath:DAEMON_LAUNCHD_PATH error:nil];
+    [fileMgr setAttributes:plistAttr ofItemAtPath:DAEMON_LAUNCHD_PATH error:nil];
     // 无条件 load daemon plist，确保安装后 daemon 立即以 root 启动
     {
         int result = loadPlist(DAEMON_LAUNCHD_PATH);
@@ -510,7 +516,7 @@ int intsallSub(const char *szUserName, const char *szVersion, int nUserPid)
     {
         return QMINST_ERR_COPYPLIST;
     }
-    [fileMgr setAttributes:rootAttr ofItemAtPath:MONITOR_LAUNCHD_PATH error:nil];
+    [fileMgr setAttributes:plistAttr ofItemAtPath:MONITOR_LAUNCHD_PATH error:nil];
     
     // 写入版本文件
     NSString *versionPath = [supportPath stringByAppendingPathComponent:INST_VERSION_NAME];
@@ -639,13 +645,16 @@ int InstallCastleOld(const char *szUserName, const char *szVersion, int nUserPid
     }
     
     // 将自身拷贝过去
+    NSDictionary *daemonAttr = @{NSFileOwnerAccountName:@"root",
+                                 NSFileGroupOwnerAccountName:@"wheel",
+                                 NSFilePosixPermissions:@(0755)};
     NSString *agentPath = [supportPath stringByAppendingPathComponent:[selfPath lastPathComponent]];
     [fileMgr removeItemAtPath:agentPath error:nil];
     if (![fileMgr copyItemAtPath:selfPath toPath:agentPath error:nil])
     {
         return QMINST_ERR_COPYSELF;
     }
-    [fileMgr setAttributes:rootAttr ofItemAtPath:agentPath error:nil];
+    [fileMgr setAttributes:daemonAttr ofItemAtPath:agentPath error:nil];
     
     //MARK: 拷贝monitor
 //    NSString *monitorSrcPath = MONITOR_SRC_APP_PATH;

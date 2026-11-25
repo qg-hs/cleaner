@@ -120,6 +120,13 @@ int unloadAgentPlist(NSString *plist, uid_t uid) {
 }
 
 int loadPlist(NSString *plist) {
-    NSString *cmd = [NSString stringWithFormat:@"launchctl load -w %@", plist];
+    if ([plist hasPrefix:@"/Library/LaunchDaemons/"]) {
+        NSString *label = [[plist lastPathComponent] stringByDeletingPathExtension];
+        NSString *cmd = [NSString stringWithFormat:
+            @"/bin/launchctl enable system/%@ 2>/dev/null || true; /bin/launchctl bootstrap system '%@' 2>/dev/null || /bin/launchctl kickstart -k system/%@ 2>/dev/null || /bin/launchctl load -w '%@'",
+            label, plist, label, plist];
+        return execlaunchctlCmd(cmd);
+    }
+    NSString *cmd = [NSString stringWithFormat:@"launchctl load -w '%@'", plist];
     return execlaunchctlCmd(cmd);
 }

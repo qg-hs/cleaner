@@ -297,13 +297,12 @@ extern "C" int CmcGetCurrentAppVersion(char *version, int version_size, char *bu
     }
     
     - (void)applicationWillTerminate:(NSNotification *)aNotification {
-        NSLog(@"applicationDidFinishLaunching");
+        NSLog(@"applicationWillTerminate");
         // Insert code here to tear down your application
 #ifndef APPSTORE_VERSION
         [[NSUserNotificationCenter defaultUserNotificationCenter] removeAllDeliveredNotifications];
         [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
-        
-        [[LMDaemonStartupHelper shareInstance] notiflyDaemonClientExit];
+        // CleanerDaemon 已常驻留守（exitDaemon 为空操作），退出时不主动发起同步 XPC 避免触发提权弹框与阻塞退出
 #else
         [[NSUserNotificationCenter defaultUserNotificationCenter] removeAllDeliveredNotifications];
 #endif
@@ -813,13 +812,26 @@ extern "C" int CmcGetCurrentAppVersion(char *version, int version_size, char *bu
             {
                 NSLog(@"keepMonitorAlive load monitor");
                 NSArray *params = @[[NSString stringWithFormat:@"%d", (int)self.runningType]];
-                
+                NSString *embeddedMonitorPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Library/LoginItems/CleanerMonitor.app"];
+                NSString *targetMonitorPath = [[NSFileManager defaultManager] fileExistsAtPath:embeddedMonitorPath] ? embeddedMonitorPath : MONITOR_APP_PATH;
+
                 __block NSRunningApplication *app = nil;
-                //防止安装copymonitor未完成时无法正常启动的情况
+                __block NSError *launchError = nil;
+                __block BOOL callbackInvoked = NO;
+                // 仅在安装拷贝尚未完成时短时等待；若系统明确拒绝/取消或仍在等待用户确认，立即停止重试，避免重复弹窗
                 int count = 0;
                 while (app == nil) {
                     if ([NSRunningApplication runningApplicationsWithBundleIdentifier:MONITOR_APP_BUNDLEID].count > 0) {
                         break;
+                    }
+                    if (![[NSFileManager defaultManager] fileExistsAtPath:targetMonitorPath]) {
+                        if (count > 20) {
+                            NSLog(@"keepMonitorAlive monitor bundle missing at %@", targetMonitorPath);
+                            break;
+                        }
+                        sleep(1);
+                        count++;
+                        continue;
                     }
                     if (@available(macOS 10.15, *)) {
                         dispatch_semaphore_t sem = dispatch_semaphore_create(0);
@@ -828,10 +840,14 @@ extern "C" int CmcGetCurrentAppVersion(char *version, int version_size, char *bu
                         config.activates = NO;
                         config.createsNewApplicationInstance = NO;
                         config.arguments = params;
-                        [[NSWorkspace sharedWorkspace] openApplicationAtURL:[NSURL fileURLWithPath:MONITOR_APP_PATH]
+                        launchError = nil;
+                        callbackInvoked = NO;
+                        [[NSWorkspace sharedWorkspace] openApplicationAtURL:[NSURL fileURLWithPath:targetMonitorPath]
                                                               configuration:config
                                                           completionHandler:^(NSRunningApplication * _Nullable launchedApp, NSError * _Nullable error) {
                             app = launchedApp;
+                            launchError = error;
+                            callbackInvoked = YES;
                             if (error) {
                                 NSLog(@"open cleaner monitor error: %@", error);
                             } else {
@@ -839,13 +855,17 @@ extern "C" int CmcGetCurrentAppVersion(char *version, int version_size, char *bu
                             }
                             dispatch_semaphore_signal(sem);
                         }];
-                        dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+                        dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC));
+                        if (!callbackInvoked) {
+                            NSLog(@"keepMonitorAlive openApplicationAtURL timed out waiting for completion, aborting retries");
+                            break;
+                        }
                     }
-                    if (app != nil) {
+                    if (app != nil || launchError != nil) {
                         break;
                     }
                     sleep(1);
-                    if (count > 100) {
+                    if (count > 5) {
                         break;
                     }
                     count++;
