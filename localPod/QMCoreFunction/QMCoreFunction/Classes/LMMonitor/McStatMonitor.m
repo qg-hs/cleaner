@@ -63,7 +63,7 @@
         m_monitorFunction = [[McMonitorFuction alloc] init];
         isExistBattery = [McStatInfoHelp checkBatteryExist];
         
-        self.loopQueue = dispatch_queue_create("com.tecent.lemonmonitor.loopgetdataqueue", DISPATCH_QUEUE_SERIAL);
+        self.loopQueue = dispatch_queue_create("com.tecent.cleanermonitor.loopgetdataqueue", DISPATCH_QUEUE_SERIAL);
         [self _registerPowerAndLockNotifications];
 
         // 首次立即执行, 后续由可挂起的 Coalesced Dispatch Timer 驱动（熄屏/锁屏零唤醒）

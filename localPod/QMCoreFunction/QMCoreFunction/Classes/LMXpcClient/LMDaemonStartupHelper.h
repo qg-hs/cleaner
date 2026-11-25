@@ -1,6 +1,6 @@
 //
 //  LMDaemonStartupHelper.h
-//  Lemon
+//  Cleaner
 //
 //  
 //  Copyright © 2018 Tencent. All rights reserved.

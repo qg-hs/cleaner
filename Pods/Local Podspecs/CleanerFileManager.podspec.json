@@ -1,0 +1,26 @@
+{
+  "name": "CleanerFileManager",
+  "version": "0.1.0",
+  "summary": "A short description of CleanerFileManager.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/Cleaner/CleanerFileManager",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Cleaner": "cleaner@users.noreply.github.com"
+  },
+  "source": {
+    "git": "https://github.com/Cleaner/CleanerFileManager.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "osx": "10.11"
+  },
+  "source_files": "CleanerFileManager/Classes/**/*",
+  "public_header_files": "CleanerFileManager/Classes/**/*.h",
+  "dependencies": {
+    "QMCoreFunction": []
+  }
+}

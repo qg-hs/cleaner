@@ -1,0 +1,6 @@
+framework module CleanerLoginItemManager {
+  umbrella header "CleanerLoginItemManager-umbrella.h"
+
+  export *
+  module * { export * }
+}

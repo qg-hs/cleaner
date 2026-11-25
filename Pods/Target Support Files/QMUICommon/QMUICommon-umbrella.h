@@ -51,7 +51,7 @@
 #import "QMDuplicateCoverLayer.h"
 #import "QMDuplicateDropLayer.h"
 #import "QMDuplicateProgressLayer.h"
-#import "LemonSuiteUserDefaults.h"
+#import "CleanerSuiteUserDefaults.h"
 #import "LMAppThemeHelper.h"
 #import "LMAppUpdater.h"
 #import "LMCommonHelper.h"

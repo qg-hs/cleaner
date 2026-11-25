@@ -1,6 +1,6 @@
 //
 //  QMMiniWindowFileSizeFormatter.h
-//  LemonMonitor
+//  CleanerMonitor
 //
 //  
 //  Copyright (c) 2014年 Tencent. All rights reserved.

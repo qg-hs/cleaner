@@ -27,7 +27,7 @@
 
 //获取多语言 --- 读取主工程的pref 主要是升级程序和托盘来使用
 +(NSString *)getCurrentUserLanguageByReadFile{
-//    NSString *filePath = [@"~/Library/Preferences/com.tencent.Lemon.plist" stringByStandardizingPath];
+//    NSString *filePath = [@"~/Library/Preferences/com.cleaner.app.plist" stringByStandardizingPath];
 //    NSFileManager *fileManager = [NSFileManager defaultManager];
 //    if(![fileManager fileExistsAtPath:filePath]){
 //        return nil;
@@ -40,13 +40,13 @@
 //
 //    NSString *language = [dic objectForKey:USER_DEFAULTS_LANGUAGE_KEY];
 //    return language;
-    CFPreferencesAppSynchronize((__bridge CFStringRef)(@"com.tencent.Lemon"));
-    NSString *language = (__bridge_transfer NSString *)CFPreferencesCopyAppValue((__bridge CFStringRef)(USER_DEFAULTS_LANGUAGE_KEY), (__bridge CFStringRef)(@"com.tencent.Lemon"));
+    CFPreferencesAppSynchronize((__bridge CFStringRef)(@"com.cleaner.app"));
+    NSString *language = (__bridge_transfer NSString *)CFPreferencesCopyAppValue((__bridge CFStringRef)(USER_DEFAULTS_LANGUAGE_KEY), (__bridge CFStringRef)(@"com.cleaner.app"));
     return language;
 }
 
 +(SystemLanguageType)getCurrentSystemLanguageType{
-    NSString *lanStr = NSLocalizedString(@"LEMON_LANGUAGE", @"");
+    NSString *lanStr = NSLocalizedString(@"CLEANER_LANGUAGE", @"");
     if ([lanStr isEqualToString:@"EN"]) {
         return SystemLanguageTypeEnglish;
     }else if([lanStr isEqualToString:@"中文"]){

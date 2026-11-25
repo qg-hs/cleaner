@@ -22,7 +22,7 @@
     }
     NSFileManager *fm = [NSFileManager defaultManager];
     NSString *home = NSHomeDirectory();
-    NSString *supportPath = [home stringByAppendingPathComponent:@"Library/Application Support/com.tencent.lemon/Owl/Image"];
+    NSString *supportPath = [home stringByAppendingPathComponent:@"Library/Application Support/com.cleaner.app/Owl/Image"];
     
     // 创建目录（如果不存在）
     if (![fm fileExistsAtPath:supportPath]) {

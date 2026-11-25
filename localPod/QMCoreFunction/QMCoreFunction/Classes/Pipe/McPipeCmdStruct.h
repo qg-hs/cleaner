@@ -100,7 +100,7 @@ typedef struct
     char            name[100];
     int             time_count;
     char            path[300];
-} lemon_com_process_info;
+} cleaner_com_process_info;
 
 
 typedef struct

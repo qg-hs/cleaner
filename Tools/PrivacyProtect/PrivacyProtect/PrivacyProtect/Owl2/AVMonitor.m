@@ -16,7 +16,7 @@
 #include <sys/sysctl.h>
 #import <QMCoreFunction/LMReferenceDefines.h>
 
-#define kLemonUseAVMonitorNotification 0
+#define kCleanerUseAVMonitorNotification 0
 #define kSend_Automatic_Event_Min_Interval  60  // 同一个应用控制另一个pid，最小通知间隔，已和产品确认
 #define kAutomationExecutionTime 1 // 暂定其它应用使用自动化打开另一个程序窗口最大耗时1s
 #define kStoreLogDelayTimeInSeconds 6 // ai报告离线日志一般有1-5s延时
@@ -81,7 +81,7 @@ typedef NS_ENUM(NSUInteger, LMControlCenterLogStatusType) {
 //init
 -(id)init
 {
-#if kLemonUseAVMonitorNotification
+#if kCleanerUseAVMonitorNotification
     //action: ok
     UNNotificationAction *ok = nil;
     
@@ -106,7 +106,7 @@ typedef NS_ENUM(NSUInteger, LMControlCenterLogStatusType) {
     if(nil != self)
     {
         // 创建串行队列确保设备访问的线程安全
-        self.deviceAccessQueue = dispatch_queue_create("com.tencent.lemon.device.access", DISPATCH_QUEUE_SERIAL);
+        self.deviceAccessQueue = dispatch_queue_create("com.cleaner.device.access", DISPATCH_QUEUE_SERIAL);
         
         //init log monitor
         self.logMonitor = [[LogMonitor alloc] init]; // 旧版 audio video
@@ -130,7 +130,7 @@ typedef NS_ENUM(NSUInteger, LMControlCenterLogStatusType) {
         //init event queue
         self.eventQueue = dispatch_queue_create([[NSString stringWithFormat:@"%s.eventQueue", BUNDLE_ID] UTF8String], DISPATCH_QUEUE_CONCURRENT);
         
-#if kLemonUseAVMonitorNotification
+#if kCleanerUseAVMonitorNotification
         //set up delegate
         UNUserNotificationCenter.currentNotificationCenter.delegate = self;
         
@@ -2041,7 +2041,7 @@ bail:
         self.eventCallback(event);
         return;
     }
-#if kLemonUseAVMonitorNotification
+#if kCleanerUseAVMonitorNotification
     //result
     NSInteger result = NOTIFICATION_ERROR;
     
@@ -2077,7 +2077,7 @@ bail:
 #endif
 }
 
-#if kLemonUseAVMonitorNotification
+#if kCleanerUseAVMonitorNotification
 //build and display notification
 -(void)showNotification:(Event*)event
 {
@@ -2402,7 +2402,7 @@ bail:
 }
 
 # pragma mark UNNotificationCenter Delegate Methods
-#if kLemonUseAVMonitorNotification
+#if kCleanerUseAVMonitorNotification
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
     
     completionHandler(UNNotificationPresentationOptionAlert);

@@ -59,9 +59,9 @@
         // 过滤被结束的应用
         NSRunningApplication *app = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
         // 过滤自身/插件与Agent
-        if ([app.bundleIdentifier hasPrefix:@"com.tencent.LemonMonitor"]) return NO;
-        if ([app.bundleIdentifier hasPrefix:@"com.tencent.Lemon"]) return NO;
-        if ([[path lastPathComponent] isEqualToString:@"LemonDaemon"]) return NO;
+        if ([app.bundleIdentifier hasPrefix:@"com.cleaner.monitor"]) return NO;
+        if ([app.bundleIdentifier hasPrefix:@"com.cleaner.app"]) return NO;
+        if ([[path lastPathComponent] isEqualToString:@"CleanerDaemon"]) return NO;
         
         pid_t ppid = processInfo.ppid;
         NSRunningApplication *parentApp = [NSRunningApplication runningApplicationWithProcessIdentifier:ppid];

@@ -43,7 +43,7 @@ extern NSNotificationName const OwlLogChangeNotication;
 - (NSArray<Owl2AppItem *>*)getAllAppInfo;
 
 - (BOOL)isMonitorRunning;
-- (BOOL)isLemonRunning;
+- (BOOL)isCleanerRunning;
 - (void)startOwlProtect;
 - (void)stopOwlProtect;
 

@@ -1,6 +1,6 @@
 //
 //  LoginItemManager.h
-//  LemonGroup
+//  CleanerGroup
 //
 //  
 //  Copyright © 2020 Tencent. All rights reserved.

@@ -8,7 +8,7 @@
 #import "Owl2Manager+Notification.h"
 #import "NSUserNotification+QMExtensions.h"
 #import "OwlConstant.h"
-#import "LemonDaemonConst.h"
+#import "CleanerDaemonConst.h"
 #import "Owl2Manager+Database.h"
 #import <QMCoreFunction/LMReferenceDefines.h>
 #import "utilities.h"

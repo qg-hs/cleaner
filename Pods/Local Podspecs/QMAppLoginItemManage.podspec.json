@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "summary": "A short description of QMAppLoginItemManage.",
   "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/lemon/QMAppLoginItemManage",
+  "homepage": "https://github.com/qg-hs/QMAppLoginItemManage",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
   },
   "authors": {
-    "lemon": "lemon@tencent.com"
+    "cleaner": "cleaner@users.noreply.github.com"
   },
   "source": {
-    "git": "https://github.com/lemon/QMAppLoginItemManage.git",
+    "git": "https://github.com/qg-hs/QMAppLoginItemManage.git",
     "tag": "0.1.0"
   },
   "platforms": {

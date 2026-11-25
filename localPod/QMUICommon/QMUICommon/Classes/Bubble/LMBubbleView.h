@@ -1,6 +1,6 @@
 //
 //  LMBubbleView.h
-//  LemonAIAssistant
+//  CleanerAIAssistant
 //
 //
 

@@ -1,0 +1,11 @@
+/* 
+  Localizable.strings
+  CleanerMonitor
+
+  
+  Copyright © 2019 Tencent. All rights reserved.
+*/
+"CLEANER_LANGUAGE" = "中文";
+"打开 Cleaner" = "打开 cleaner";
+"打开 cleaner" = "打开 cleaner";
+"检查更新..." = "检查更新...";

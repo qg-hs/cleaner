@@ -1,6 +1,6 @@
 //
 //  LoginItemManager.m
-//  LemonGroup
+//  CleanerGroup
 //
 //  
 //  Copyright © 2020 Tencent. All rights reserved.
@@ -647,10 +647,10 @@ typedef char (*SMLoginItemSetEnabledWithURL_ptr) ( void* ptr, char enabled);
 
 - (BOOL)needFilterFile:(NSString *)fileName {
     fileName = [fileName lowercaseString];
-    if ([fileName containsString:@"com.tencent.lemon."]) {
+    if ([fileName containsString:@"com.cleaner.app."]) {
         return YES;
     }
-    if ([fileName containsString:@"com.tencent.lemonmonitor"]) {
+    if ([fileName containsString:@"com.cleaner.monitor"]) {
         return YES;
     }
     if ([fileName containsString:@"com.teamviewer"]) {
@@ -666,10 +666,10 @@ typedef char (*SMLoginItemSetEnabledWithURL_ptr) ( void* ptr, char enabled);
 }
 
 - (BOOL)needFilterLoginItem:(NSString *)bundleId {
-    if ([bundleId isEqualToString:@"com.tencent.Lemon"]) {
+    if ([bundleId isEqualToString:@"com.cleaner.app"]) {
         return YES;
     }
-    if ([bundleId isEqualToString:@"com.tencent.LemonMonitor"]) {
+    if ([bundleId isEqualToString:@"com.cleaner.monitor"]) {
         return YES;
     }
     return NO;

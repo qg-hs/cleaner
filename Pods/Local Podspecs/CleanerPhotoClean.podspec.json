@@ -1,0 +1,38 @@
+{
+  "name": "CleanerPhotoClean",
+  "version": "0.1.0",
+  "summary": "A short description of CleanerPhotoClean.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/qg-hs/CleanerPhotoClean",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "cleaner": "cleaner@users.noreply.github.com"
+  },
+  "source": {
+    "git": "https://github.com/qg-hs/CleanerPhotoClean.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "osx": "10.11"
+  },
+  "source_files": "CleanerPhotoClean/Classes/**/*.{h,m}",
+  "public_header_files": "CleanerPhotoClean/Classes/Controller/LMPhotoCleanerWndController.h",
+  "resources": [
+    "CleanerPhotoClean/Assets/**/*"
+  ],
+  "dependencies": {
+    "Masonry": [
+      "1.1.0"
+    ],
+    "FMDB": [
+      "2.7.5"
+    ],
+    "QMUICommon": [],
+    "QMCoreFunction": [],
+    "CleanerStat": [],
+    "CleanerFileManager": []
+  }
+}

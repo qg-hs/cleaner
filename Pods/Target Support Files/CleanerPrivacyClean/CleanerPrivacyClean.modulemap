@@ -1,0 +1,6 @@
+framework module CleanerPrivacyClean {
+  umbrella header "CleanerPrivacyClean-umbrella.h"
+
+  export *
+  module * { export * }
+}

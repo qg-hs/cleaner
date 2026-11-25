@@ -10,7 +10,7 @@
 #import "QMDistributedLock.h"
 #import "LMXpcClientManager.h"
 
-const char *g_szDaemonPath = "/Library/Application Support/Lemon/LemonDaemon";
+const char *g_szDaemonPath = "/Library/Application Support/Cleaner/CleanerDaemon";
 
 int g_mapsize = 1024*1024*2;
 
@@ -977,7 +977,7 @@ int change_owl_device_proc_info(int device_type,
 // get owl device process info
 int get_owl_device_proc_info(int device_type,
                              int device_state,
-                             lemon_com_process_info **odp_proc_info)
+                             cleaner_com_process_info **odp_proc_info)
 {
     if (odp_proc_info == NULL)
         return -1;
@@ -1014,8 +1014,8 @@ int get_owl_device_proc_info(int device_type,
     int ret = presult->cmd_ret;
     if (ret > 0)
     {
-        lemon_com_result *pcmd_result = (lemon_com_result *)(presult + 1);
-        lemon_com_process_info *pinfo = (lemon_com_process_info *)malloc(pcmd_result->info_size);
+        cleaner_com_result *pcmd_result = (cleaner_com_result *)(presult + 1);
+        cleaner_com_process_info *pinfo = (cleaner_com_process_info *)malloc(pcmd_result->info_size);
         memcpy(pinfo, pcmd_result->odp_info, pcmd_result->info_size);
         
         *odp_proc_info = pinfo;

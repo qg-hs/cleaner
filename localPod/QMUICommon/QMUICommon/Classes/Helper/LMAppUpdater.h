@@ -2,7 +2,7 @@
 //  LMAppUpdater.h
 //  QMUICommon
 //
-//  Modern GitHub Releases in-place auto updater for cleaner & LemonMonitor.
+//  Modern GitHub Releases in-place auto updater for cleaner & CleanerMonitor.
 //
 
 #import <Cocoa/Cocoa.h>

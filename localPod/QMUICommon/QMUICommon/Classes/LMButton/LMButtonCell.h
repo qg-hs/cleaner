@@ -1,6 +1,6 @@
 //
 //  LMButtonCell.h
-//  LemonClener
+//  CleanerCore
 //
 //  
 //  Copyright © 2018年 Tencent. All rights reserved.

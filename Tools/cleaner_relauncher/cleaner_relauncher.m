@@ -86,8 +86,8 @@ int main(int argc, const char * argv[]) {
             }
         }
 
-        // 3. 清理残留的相关常驻进程（LemonMonitor / cleaner），释放文件句柄
-        system("/usr/bin/killall -9 LemonMonitor cleaner 2>/dev/null || true");
+        // 3. 清理残留的相关常驻进程（CleanerMonitor / cleaner），释放文件句柄
+        system("/usr/bin/killall -9 CleanerMonitor cleaner 2>/dev/null || true");
         usleep(300000); // 等待 300ms 确保内核释放文件锁
 
         NSFileManager *fm = [NSFileManager defaultManager];
@@ -163,12 +163,12 @@ int main(int argc, const char * argv[]) {
         NSString *openAppCmd = [NSString stringWithFormat:@"/usr/bin/open -n \"%@\"", relaunchApp];
         system([openAppCmd UTF8String]);
 
-        // 7. 若原本在运行状态栏监控，重新唤醒内置 LemonMonitor
+        // 7. 若原本在运行状态栏监控，重新唤醒内置 CleanerMonitor（传入 CleanerMonitorRunningMenu = 1024）
         if (relaunchMonitor) {
-            NSString *monitorAppPath = [dstApp stringByAppendingPathComponent:@"Contents/Library/LoginItems/LemonMonitor.app"];
+            NSString *monitorAppPath = [dstApp stringByAppendingPathComponent:@"Contents/Library/LoginItems/CleanerMonitor.app"];
             if ([fm fileExistsAtPath:monitorAppPath]) {
                 LogUpdate(@"Relaunching status bar monitor: %@", monitorAppPath);
-                NSString *openMonitorCmd = [NSString stringWithFormat:@"/usr/bin/open -a \"%@\" --args 1 2>/dev/null || true", monitorAppPath];
+                NSString *openMonitorCmd = [NSString stringWithFormat:@"/usr/bin/open -a \"%@\" --args 1024 2>/dev/null || true", monitorAppPath];
                 system([openMonitorCmd UTF8String]);
             }
         }

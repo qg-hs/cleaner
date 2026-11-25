@@ -89,7 +89,7 @@
         return NO;
     
     //不处理自身软件
-    if ([bundle.bundleIdentifier hasPrefix:@"com.tencent.Lemon"])
+    if ([bundle.bundleIdentifier hasPrefix:@"com.cleaner.app"])
         return NO;
     
     return YES;

@@ -1,6 +1,6 @@
 //
 //  FullDiskAccessPermissionViewController.h
-//  Lemon
+//  Cleaner
 //
 //  
 //  Copyright © 2019 Tencent. All rights reserved.
@@ -27,7 +27,7 @@ typedef enum {
 
 + (BOOL) needShowRequestFullDiskAccessPermissionAlert;
 
-/// 如果没有授权Lemon，则弹出引导窗口，采用通用的title
+/// 如果没有授权Cleaner，则弹出引导窗口，采用通用的title
 /// @param parentController parentController
 //+ (BOOL)showFullDiskAccessRequestIfNeededWithParentController:(NSViewController *)parentController;
 

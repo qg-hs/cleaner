@@ -6,7 +6,7 @@
 //
 
 #import "Owl2LogProcessItem.h"
-#import "LemonDaemonConst.h"
+#import "CleanerDaemonConst.h"
 
 static NSString * const kSuffixApp = @".app/";
 static NSString * const kSuffixAppex = @".appex/";

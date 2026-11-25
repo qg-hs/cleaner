@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "summary": "A short description of QMUICommon.",
   "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/lemon/QMUICommon",
+  "homepage": "https://github.com/qg-hs/QMUICommon",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
   },
   "authors": {
-    "lemon": "lemon@tencent.com"
+    "cleaner": "cleaner@users.noreply.github.com"
   },
   "source": {
-    "git": "https://github.com/lemon/QMUICommon.git",
+    "git": "https://github.com/qg-hs/QMUICommon.git",
     "tag": "0.1.0"
   },
   "platforms": {

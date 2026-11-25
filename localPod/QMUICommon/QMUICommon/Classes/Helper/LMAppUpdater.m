@@ -2,7 +2,7 @@
 //  LMAppUpdater.m
 //  QMUICommon
 //
-//  Modern GitHub Releases in-place auto updater for cleaner & LemonMonitor.
+//  Modern GitHub Releases in-place auto updater for cleaner & CleanerMonitor.
 //
 
 #import "LMAppUpdater.h"
@@ -18,8 +18,8 @@ extern char **environ;
 
 NSString * const LMAppUpdateStateDidChangeNotification = @"LMAppUpdateStateDidChangeNotification";
 static NSString * const kGitHubLatestReleaseAPI = @"https://api.github.com/repos/qg-hs/cleaner/releases/latest";
-static NSString * const kLemonNewVersionKey = @"kLemonHasVersion";
-static NSString * const kLemonNewVersionInfoKey = @"kLemonNewVersionInfo";
+static NSString * const kCleanerNewVersionKey = @"kCleanerHasVersion";
+static NSString * const kCleanerNewVersionInfoKey = @"kCleanerNewVersionInfo";
 
 @interface LMAppUpdater () <NSURLSessionDownloadDelegate>
 
@@ -82,7 +82,7 @@ static NSString * const kLemonNewVersionInfoKey = @"kLemonNewVersionInfo";
     if ([mainBundlePath.lastPathComponent isEqualToString:@"cleaner.app"]) {
         return mainBundlePath;
     }
-    // 2. 若作为内嵌 Helper (如 LemonMonitor) 运行，向上追溯定位外层宿主 cleaner.app
+    // 2. 若作为内嵌 Helper (如 CleanerMonitor) 运行，向上追溯定位外层宿主 cleaner.app
     NSString *cursor = [mainBundlePath stringByDeletingLastPathComponent];
     while (cursor.length > 1 && ![cursor isEqualToString:@"/"]) {
         if ([cursor.lastPathComponent isEqualToString:@"cleaner.app"] && [[NSFileManager defaultManager] fileExistsAtPath:cursor]) {
@@ -127,7 +127,7 @@ static NSString * const kLemonNewVersionInfoKey = @"kLemonNewVersionInfo";
 }
 
 - (void)restoreCachedUpdateState {
-    NSDictionary *cachedInfo = [[NSUserDefaults standardUserDefaults] objectForKey:kLemonNewVersionInfoKey];
+    NSDictionary *cachedInfo = [[NSUserDefaults standardUserDefaults] objectForKey:kCleanerNewVersionInfoKey];
     if ([cachedInfo isKindOfClass:[NSDictionary class]]) {
         NSString *cachedVer = cachedInfo[@"version"];
         NSString *cachedURL = cachedInfo[@"downloadURL"];
@@ -144,8 +144,8 @@ static NSString * const kLemonNewVersionInfoKey = @"kLemonNewVersionInfo";
     self.hasUpdate = NO;
     self.latestVersion = nil;
     self.downloadURL = nil;
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kLemonNewVersionKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kLemonNewVersionInfoKey];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCleanerNewVersionKey];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCleanerNewVersionInfoKey];
 }
 
 #pragma mark - Periodic Check
@@ -290,12 +290,12 @@ static NSString * const kLemonNewVersionInfoKey = @"kLemonNewVersionInfo";
                     @"downloadURL": matchedZipURL,
                     @"body": releaseBody
                 };
-                [[NSUserDefaults standardUserDefaults] setObject:cleanRemoteVer forKey:kLemonNewVersionKey];
-                [[NSUserDefaults standardUserDefaults] setObject:infoDict forKey:kLemonNewVersionInfoKey];
+                [[NSUserDefaults standardUserDefaults] setObject:cleanRemoteVer forKey:kCleanerNewVersionKey];
+                [[NSUserDefaults standardUserDefaults] setObject:infoDict forKey:kCleanerNewVersionInfoKey];
                 [[NSUserDefaults standardUserDefaults] synchronize];
 
                 [[NSNotificationCenter defaultCenter] postNotificationName:LMAppUpdateStateDidChangeNotification object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"LemonHasNewVersion" object:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"CleanerHasNewVersion" object:nil];
 
                 if (isManual) {
                     [strongSelf showAvailableStateUIWithVersion:cleanRemoteVer notes:releaseBody];
@@ -304,12 +304,12 @@ static NSString * const kLemonNewVersionInfoKey = @"kLemonNewVersionInfo";
                 strongSelf.hasUpdate = NO;
                 strongSelf.latestVersion = nil;
                 strongSelf.downloadURL = nil;
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:kLemonNewVersionKey];
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:kLemonNewVersionInfoKey];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCleanerNewVersionKey];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCleanerNewVersionInfoKey];
                 [[NSUserDefaults standardUserDefaults] synchronize];
 
                 [[NSNotificationCenter defaultCenter] postNotificationName:LMAppUpdateStateDidChangeNotification object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"LemonHasNewVersion" object:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"CleanerHasNewVersion" object:nil];
 
                 if (isManual) {
                     [strongSelf showMessageStateWithTitle:isEnglish ? @"Already Up to Date" : @"当前已是最新版本"
@@ -721,14 +721,14 @@ didCompleteWithError:(NSError *)error {
     NSString *extractedApp   = self.extractedAppTempPath;
 
     // 清理缓存标记
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kLemonNewVersionKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kLemonNewVersionInfoKey];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCleanerNewVersionKey];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCleanerNewVersionInfoKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    // 检测当前是否有 LemonMonitor 运行
+    // 检测当前是否有 CleanerMonitor 运行
     BOOL isMonitorRunning = NO;
     for (NSRunningApplication *app in [[NSWorkspace sharedWorkspace] runningApplications]) {
-        if ([app.bundleIdentifier isEqualToString:@"com.tencent.LemonMonitor"]) {
+        if ([app.bundleIdentifier isEqualToString:@"com.cleaner.monitor"]) {
             isMonitorRunning = YES;
             break;
         }
@@ -793,15 +793,15 @@ didCompleteWithError:(NSError *)error {
     NSString *scriptContent = [NSString stringWithFormat:
         @"#!/bin/sh\n"
         @"sleep 0.8\n"
-        @"killall -9 LemonMonitor cleaner 2>/dev/null || true\n"
+        @"killall -9 CleanerMonitor cleaner 2>/dev/null || true\n"
         @"sleep 0.4\n"
         @"rm -rf \"%@\"\n"
         @"/usr/bin/ditto \"%@\" \"%@\"\n"
         @"/usr/bin/xattr -dr com.apple.quarantine \"%@\" 2>/dev/null || true\n"
         @"/bin/chmod -R a+rX \"%@\" 2>/dev/null || true\n"
         @"/usr/bin/open -n \"%@\"\n"
-        @"if [ \"%d\" -eq 1 ] && [ -d \"%@/Contents/Library/LoginItems/LemonMonitor.app\" ]; then\n"
-        @"  /usr/bin/open -a \"%@/Contents/Library/LoginItems/LemonMonitor.app\" --args 1 2>/dev/null || true\n"
+        @"if [ \"%d\" -eq 1 ] && [ -d \"%@/Contents/Library/LoginItems/CleanerMonitor.app\" ]; then\n"
+        @"  /usr/bin/open -a \"%@/Contents/Library/LoginItems/CleanerMonitor.app\" --args 1 2>/dev/null || true\n"
         @"fi\n"
         @"rm -rf \"%@\"\n",
         targetAppPath,

@@ -1,6 +1,6 @@
 //
 //  QMINOUTAnimation.h
-//  Lemon
+//  Cleaner
 //
 //  
 //  Copyright (c) 2014年 Tencent. All rights reserved.

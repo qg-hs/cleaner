@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/lemon/QMCoreFunction'
+  s.homepage         = 'https://github.com/qg-hs/QMCoreFunction'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'lemon' => 'lemon@tencent.com' }
-  s.source           = { :git => 'https://github.com/lemon/QMCoreFunction.git', :tag => s.version.to_s }
+  s.author           = { 'cleaner' => 'cleaner@users.noreply.github.com' }
+  s.source           = { :git => 'https://github.com/qg-hs/QMCoreFunction.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.platform = :osx
@@ -34,7 +34,7 @@ TODO: Add long description of the pod here.
   s.source_files = 'QMCoreFunction/Classes/**/*'
   s.public_header_files = 'QMCoreFunction/Classes/*.h', 'QMCoreFunction/Classes/**/*.h', 'QMCoreFunction/Classes/**/**/*.h'
   
-  s.dependency "LemonStat"
+  s.dependency "CleanerStat"
 
   s.libraries  = "pcap"
 

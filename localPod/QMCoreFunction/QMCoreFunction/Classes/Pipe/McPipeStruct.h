@@ -2,12 +2,12 @@
 #import "McPipeCmdStruct.h"
 
 // defines for structures
-#define MCPIPE_DIR                  "/Library/Application Support/Lemon/pipe"
+#define MCPIPE_DIR                  "/Library/Application Support/Cleaner/pipe"
 
 // name for different purpose
-#define MCPIPE_NAME_FSMON           @"/Library/Application Support/Lemon/pipe/lemon_fsmon"
-#define MCPIPE_NAME_PROC            @"/Library/Application Support/Lemon/pipe/lemon_proc"
-#define MCPIPE_NAME_SOCK            @"/Library/Application Support/Lemon/pipe/lemon_sock"
+#define MCPIPE_NAME_FSMON           @"/Library/Application Support/Cleaner/pipe/cleaner_fsmon"
+#define MCPIPE_NAME_PROC            @"/Library/Application Support/Cleaner/pipe/cleaner_proc"
+#define MCPIPE_NAME_SOCK            @"/Library/Application Support/Cleaner/pipe/cleaner_sock"
 
 // postfix for pipe name
 #define MCREAD_POSTFIX              @"_rd"
@@ -250,7 +250,7 @@ typedef struct _owl_watch_device_param
 #define MCCMD_GET_FILE_INFO           8020
 #define MCCMD_UNINSTALL_KEXT_WITH_BUNDLEID          8022
 #define MCCMD_REMOVE_Login_Item       8023
-#define MCCMD_COLLECT_LEMON_LOGINFO   8024
+#define MCCMD_COLLECT_CLEANER_LOGINFO   8024
 #define MCCMD_NETWORK_FIREWALL_PF     8025
 #define MCCMD_STAT_PORT_INFO          8026
 #define MCCMD_UNINSTALL_KEXT_WITH_PATH          8027
@@ -301,12 +301,12 @@ typedef struct _lm_sz_com_param
     char                szParam2[512];
 } lm_sz_com_param;
 
-typedef struct _lemon_com_result
+typedef struct _cleaner_com_result
 {
     int                     count;
     int                     info_size;
-    lemon_com_process_info    odp_info[1];
-} lemon_com_result;
+    cleaner_com_process_info    odp_info[1];
+} cleaner_com_result;
 
 typedef struct _manage_launch_system_param
 {

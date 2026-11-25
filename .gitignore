@@ -35,4 +35,4 @@ xcuserdata
 .idea/*
 /build/
 /dist/
-build-lemon_local.sh
+build-cleaner_local.sh

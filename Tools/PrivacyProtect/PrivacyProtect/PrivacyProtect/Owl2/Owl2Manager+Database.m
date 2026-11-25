@@ -93,7 +93,7 @@ static NSInteger kDatabaseVersion = 3;
 {
     NSFileManager *fm = [NSFileManager defaultManager];
     NSString *home = NSHomeDirectory();
-    NSString *support = [home stringByAppendingPathComponent:@"Library/Application Support/com.tencent.lemon/Owl"];
+    NSString *support = [home stringByAppendingPathComponent:@"Library/Application Support/com.cleaner.app/Owl"];
     dbPath = [support stringByAppendingPathComponent:@"owl.db"];
     if (![fm fileExistsAtPath:support]){
         NSError *error = nil;

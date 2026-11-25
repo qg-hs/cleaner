@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Lemon/Assets.xcassets/AppIcon.appiconset/appIcon256@2x.png" width="112" height="112" alt="cleaner icon" />
+  <img src="Cleaner/Assets.xcassets/AppIcon.appiconset/appIcon256@2x.png" width="112" height="112" alt="cleaner icon" />
 </p>
 
 <h1 align="center">cleaner</h1>
@@ -32,16 +32,16 @@
   - **系统维护 (`LMSystemOptimize`)**：集成终端 `sudo` Touch ID 指纹认证开关、外置与网络卷 `.DS_Store` 生成抑制、VPN 感知的 DNS 缓存刷新、QuickLook 缩略图缓存重建、离线 SQLite 数据库 `VACUUM` 碎片整理及损坏 `.plist` 偏好设置校验隔离。
   - **应用架构瘦身 (`LMAppSlim`)**：解析 Universal 通用二进制 `<mach-o/fat.h>` 头部，精准核算可剥离的非本机架构体积；内置 Apple 系统签名、App Store 回执、iOS Wrapper 等 6 重安全豁免，通过 APFS `clonefile` 写时复制副本剥离与深度重签校验，原应用移入废纸篓可逆还原。
 - **多维磁盘空间治理**：
-  - **大文件清理 (`LemonBigOldFile`)**：快速定位占用超过 50MB 的大文件与陈旧文件，支持自定义目录扫描。
-  - **重复文件清理 (`LemonDuplicateFile`)**：基于哈希特征智能比对重复文件，安全释放冗余存储。
-  - **相似照片清理 (`LemonPhotoClean`)**：智能识别相似与连拍照片，整理本地图库。
-  - **磁盘空间分析 (`LemonSpaceAnalyse`)**：可视化树状图（TreeMap）直观展示磁盘目录占用分布。
-  - **文件搬家 (`LemonFileMove`)**：一键将微信、QQ 等大体积应用产出文件迁移至外置存储。
+  - **大文件清理 (`CleanerBigOldFile`)**：快速定位占用超过 50MB 的大文件与陈旧文件，支持自定义目录扫描。
+  - **重复文件清理 (`CleanerDuplicateFile`)**：基于哈希特征智能比对重复文件，安全释放冗余存储。
+  - **相似照片清理 (`CleanerPhotoClean`)**：智能识别相似与连拍照片，整理本地图库。
+  - **磁盘空间分析 (`CleanerSpaceAnalyse`)**：可视化树状图（TreeMap）直观展示磁盘目录占用分布。
+  - **文件搬家 (`CleanerFileMove`)**：一键将微信、QQ 等大体积应用产出文件迁移至外置存储。
 - **系统守护与全量卸载**：
-  - **应用彻底卸载 (`LemonUninstaller`)**：连根清除应用本体、偏好设置、LaunchAgents 与残留缓存，支持废纸篓拖入自动触发残留检测。
-  - **开机启动项管理 (`LemonLoginItemManager`)**：统一管理系统 Login Items 与后台 LaunchAgents / LaunchDaemons 服务。
-  - **浏览器隐私清理 (`LemonPrivacyClean`)**：支持 Safari、Chrome、Edge、Firefox 等多款浏览器的浏览记录、Cookie 与本地痕迹清理。
-- **原生状态栏实时监控 (`LemonMonitor`)**：
+  - **应用彻底卸载 (`CleanerUninstaller`)**：连根清除应用本体、偏好设置、LaunchAgents 与残留缓存，支持废纸篓拖入自动触发残留检测。
+  - **开机启动项管理 (`CleanerLoginItemManager`)**：统一管理系统 Login Items 与后台 LaunchAgents / LaunchDaemons 服务。
+  - **浏览器隐私清理 (`CleanerPrivacyClean`)**：支持 Safari、Chrome、Edge、Firefox 等多款浏览器的浏览记录、Cookie 与本地痕迹清理。
+- **原生状态栏实时监控 (`CleanerMonitor`)**：
   - 支持在 macOS 状态栏实时展示品牌 Logo、内存占用、磁盘空间、CPU/GPU 占用、CPU 温度、风扇转速与实时上下行网速，全面适配浅色与暗黑模式。
   - 浮窗支持一键深度释放内存（`purge` + `vm_stat` 释放量量化反馈）、快速清理系统垃圾、监控高占网速与高占资源进程。
 - **GitHub Releases 原生热更新 (`LMGitHubUpdater`)**：
@@ -51,6 +51,12 @@
 ---
 
 ## 版本更新日志 (Changelog)
+
+### `v2.0.0` (2026-11-25)
+
+- **全量品牌重构与工程去 Lemon 化（Full Cleaner Rebranding & Architecture Refactoring）**：
+  - **工程与模块体系统一**：全面将主工作区与工程重构为 `Cleaner.xcworkspace`、`Cleaner.xcodeproj`、`CleanerCore`、`Tools/CleanerMonitor`、`Tools/CleanerDaemon`，并将 `localPod/` 下所有功能组件（`CleanerBigOldFile`、`CleanerDuplicateFile`、`CleanerFileManager`、`CleanerFileMove`、`CleanerHardware`、`CleanerLoginItemManager`、`CleanerNetSpeed`、`CleanerPhotoClean`、`CleanerPrivacyClean`、`CleanerSpaceAnalyse`、`CleanerStat`、`CleanerUninstaller`）及 `Podfile` / `scripts/package.sh` 完成全量迁移对齐。
+  - **Bundle ID、XPC 与配置域独立化**：统一主应用（`com.cleaner.app`）、状态栏监控（`com.cleaner.monitor`）、守护进程 Mach 服务（`com.cleaner.daemon` / `LMCleanerXPCProtocol`）及套件偏好存储（`CleanerSuiteUserDefaults`）标识；更新 `LMAppUpdater` 进程检测与通知标识，并在守护进程卸载清理链路保留对历史遗留服务的兼容卸载清理。
 
 ### `v1.1.3` (2026-11-20)
 
@@ -82,7 +88,7 @@
   - **刘海屏自适应与等宽数字紧凑双行状态栏**：`MachineModel` 升级动态 `safeAreaInsets.top` 刘海屏检测；状态栏数字全量升级为 `monospacedDigitSystemFontOfSize` 消除字符跳变抖动；新增紧凑双行并列排版模式（`Compact 2-Row`），勾选多项时自动压缩顶栏占用空间，偏好设置提供手动切换。
   - **云盘 `SF_DATALESS` / `.icloud` 零下载守护**：核心扫描框架引入系统级 `LMPathIsCloudDataless` 守卫，重复文件、大文件、相似照片、磁盘空间分析四大引擎全面识别 iCloud Drive / OneDrive / Dropbox 等云端按需占位文件，杜绝扫描触发静默海量下载。
   - **macOS 13+ 登录项（`SMAppService` / BTM）全面兼容**：移除现代系统空返回盲区，结合 BTM 与 `Contents/Library/LoginItems` 深度扫描，支持跳转现代系统设置精准管理；4 大 Launchd Plist 补齐 `AssociatedBundleIdentifiers`，系统设置统一归属在 `cleaner` 名下。
-  - **零唤醒低能耗后台架构（0-Wakeup Architecture）**：`LemonMonitor` 状态栏监听屏幕休眠、合盖与锁屏通知，熄屏或锁屏态彻底挂起硬件轮询定时器实现 0 CPU Wakeup，点亮后即刻热刷新；常驻定时器注入 `timer.tolerance` 允许 XNU 内核合并中断；硬件与内存检测彻底移除 `system_profiler` 临时文件读写，全面改由 `sysctl` 与 `IOKit` 内存直读。
+  - **零唤醒低能耗后台架构（0-Wakeup Architecture）**：`CleanerMonitor` 状态栏监听屏幕休眠、合盖与锁屏通知，熄屏或锁屏态彻底挂起硬件轮询定时器实现 0 CPU Wakeup，点亮后即刻热刷新；常驻定时器注入 `timer.tolerance` 允许 XNU 内核合并中断；硬件与内存检测彻底移除 `system_profiler` 临时文件读写，全面改由 `sysctl` 与 `IOKit` 内存直读。
   - **现代权限引导与通知框架升级**：废除旧版遗留文案，统一适配现代 macOS 13~15+“系统设置 -> 隐私与安全性”路径与协议直达；全面桥接升级至 `UNUserNotificationCenter`，补齐 GitHub 热更新器全流程中英双语国际化支持。
 
 ### `v1.0.3` (2026-11-02)
@@ -128,23 +134,23 @@
 
 ```text
 cleaner
-├── Lemon/                          # 主应用容器、主窗口 UI 控制层与扩展工具箱 (ProjectPurge / InstallerClean / SystemOptimize / AppSlim)
-├── LemonClener/                    # 核心扫描规则解析与清理执行引擎 (Framework)
+├── Cleaner/                          # 主应用容器、主窗口 UI 控制层与扩展工具箱 (ProjectPurge / InstallerClean / SystemOptimize / AppSlim)
+├── CleanerCore/                    # 核心扫描规则解析与清理执行引擎 (Framework)
 ├── Tools/
-│   ├── LemonMonitor/               # macOS 状态栏常驻监控应用 & GitHub 热更新器 (LMGitHubUpdater)
-│   ├── LemonDaemon/                # Root 提权辅助守护进程 (XPC 通信)
+│   ├── CleanerMonitor/               # macOS 状态栏常驻监控应用 & GitHub 热更新器 (LMGitHubUpdater)
+│   ├── CleanerDaemon/                # Root 提权辅助守护进程 (XPC 通信)
 │   └── PrivacyProtect/             # 摄像头与麦克风隐私调用监控组件
 ├── localPod/                       # 模块化功能组件库 (CocoaPods 本地子模块)
-│   ├── LemonBigOldFile/            # 大文件扫描与清理
-│   ├── LemonDuplicateFile/         # 重复文件扫描与清理
-│   ├── LemonPhotoClean/            # 相似照片识别与清理
-│   ├── LemonUninstaller/           # 应用卸载与废纸篓残留监听
-│   ├── LemonPrivacyClean/          # 浏览器隐私清理
-│   ├── LemonLoginItemManager/      # 开机启动项与后台服务管理
-│   ├── LemonSpaceAnalyse/          # 磁盘空间可视化分析
-│   ├── LemonFileMove/              # 大文件外置存储迁移
-│   ├── LemonHardware/              # 硬件传感器与系统信息采集
-│   ├── LemonNetSpeed/              # 网络接口实时流量统计
+│   ├── CleanerBigOldFile/            # 大文件扫描与清理
+│   ├── CleanerDuplicateFile/         # 重复文件扫描与清理
+│   ├── CleanerPhotoClean/            # 相似照片识别与清理
+│   ├── CleanerUninstaller/           # 应用卸载与废纸篓残留监听
+│   ├── CleanerPrivacyClean/          # 浏览器隐私清理
+│   ├── CleanerLoginItemManager/      # 开机启动项与后台服务管理
+│   ├── CleanerSpaceAnalyse/          # 磁盘空间可视化分析
+│   ├── CleanerFileMove/              # 大文件外置存储迁移
+│   ├── CleanerHardware/              # 硬件传感器与系统信息采集
+│   ├── CleanerNetSpeed/              # 网络接口实时流量统计
 │   ├── QMCoreFunction/             # 基础系统能力、XPC 客户端与通用工具
 │   └── QMUICommon/                 # 公共 UI 组件库
 ├── scripts/
@@ -195,17 +201,17 @@ pod install
 
 项目通过 [`.github/workflows/package.yml`](.github/workflows/package.yml) 配置了完整的 GitHub Actions 流水线：
 
-1. 修改 [`Lemon/Info.plist`](Lemon/Info.plist) 与 [`Tools/LemonMonitor/LemonMonitor/LemonMonitor-Info.plist`](Tools/LemonMonitor/LemonMonitor/LemonMonitor-Info.plist) 中的 `CFBundleShortVersionString`（当前版本 `1.0.3`）。
+1. 修改 [`Cleaner/Info.plist`](Cleaner/Info.plist) 与 [`Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist`](Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist) 中的 `CFBundleShortVersionString`（当前版本 `2.0.0`）。
 2. 提交代码并推送带有 `v` 前缀的 Git Tag：
    ```bash
    git add -A
-   git commit -m "release: v1.0.3"
-   git tag v1.0.3
+   git commit -m "release: v2.0.0"
+   git tag v2.0.0
    git push origin master
-   git push origin v1.0.3
+   git push origin v2.0.0
    ```
-3. GitHub Actions 将自动触发并行构建矩阵（`arm64` / `x86_64` / `universal`），并在构建完成后自动创建 `v1.0.3` GitHub Release 挂载全部 `.dmg`、`.zip` 和 `SHA256SUMS.txt`。
-4. 已运行的 `cleaner` 状态栏客户端 (`LMGitHubUpdater`) 检测到新版本后将自动亮起设置红点，用户点击 **`发现新版本 v1.0.3（点击热更）`** 即可直接完成流式下载、解压替换与自动重启。
+3. GitHub Actions 将自动触发并行构建矩阵（`arm64` / `x86_64` / `universal`），并在构建完成后自动创建 `v2.0.0` GitHub Release 挂载全部 `.dmg`、`.zip` 和 `SHA256SUMS.txt`。
+4. 已运行的 `cleaner` 状态栏客户端 (`LMGitHubUpdater`) 检测到新版本后将自动亮起设置红点，用户点击 **`发现新版本 v2.0.0（点击热更）`** 即可直接完成流式下载、解压替换与自动重启。
 
 ---
 
@@ -224,8 +230,8 @@ pod install
 
 本项目遵循 **GPLv2 / GPLv3** 开源协议，并附加 **GPLv3 第 7(b) 条强制署名与来源标注条款 ([`NOTICE`](NOTICE) / [`LICENSE.txt`](LICENSE.txt))**：
 
-1. `Tools/LemonDaemon` 模块遵循 **GNU General Public License v2.0 (GPLv2)** 协议。
-2. 主工程 `Lemon`、`LemonMonitor` 及其他功能模块遵循 **GNU General Public License v3.0 (GPLv3)** 协议。
+1. `Tools/CleanerDaemon` 模块遵循 **GNU General Public License v2.0 (GPLv2)** 协议。
+2. 主工程 `Cleaner`、`CleanerMonitor` 及其他功能模块遵循 **GNU General Public License v3.0 (GPLv3)** 协议。
 3. **强制署名要求（Mandatory Attribution Requirement）**：
    任何个人、团队或组织在使用、复制、修改、二次打包、分发本仓库代码，或基于本仓库开发衍生作品时，**必须在项目主页文档底部（README）、软件“关于”界面以及发行产物说明中显著保留并带上本仓库地址与作者介绍**，严禁移除、遮挡或篡改：
 

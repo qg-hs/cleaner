@@ -17,8 +17,8 @@ DIST_DIR="${DIST_DIR:-$ROOT_DIR/dist}"
 if [[ "$DIST_DIR" != /* ]]; then
   DIST_DIR="$ROOT_DIR/$DIST_DIR"
 fi
-ENTITLEMENTS_MAIN="$ROOT_DIR/Lemon/Tencent Lemon.entitlements"
-ENTITLEMENTS_MONITOR="$ROOT_DIR/Tools/LemonMonitor/LemonMonitor/LemonMonitor.entitlements"
+ENTITLEMENTS_MAIN="$ROOT_DIR/Cleaner/Cleaner.entitlements"
+ENTITLEMENTS_MONITOR="$ROOT_DIR/Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor.entitlements"
 
 mkdir -p "$DIST_DIR"
 
@@ -47,8 +47,8 @@ sign_app_bundle() {
     fi
   fi
 
-  # 1. 签名内部嵌套应用 LemonMonitor.app 及其 Frameworks
-  local monitor_app="$app_bundle/Contents/Library/LoginItems/LemonMonitor.app"
+  # 1. 签名内部嵌套应用 CleanerMonitor.app 及其 Frameworks
+  local monitor_app="$app_bundle/Contents/Library/LoginItems/CleanerMonitor.app"
   if [ -d "$monitor_app" ]; then
     if [ -d "$monitor_app/Contents/Frameworks" ]; then
       find "$monitor_app/Contents/Frameworks" -maxdepth 1 \( -name "*.framework" -o -name "*.dylib" \) -print0 | while IFS= read -r -d '' item; do
@@ -62,7 +62,7 @@ sign_app_bundle() {
     fi
   fi
 
-  # 2. 签名主应用 Frameworks 目录内所有子项（含 .framework、LemonDaemon 及嵌入的 Launchd plist）
+  # 2. 签名主应用 Frameworks 目录内所有子项（含 .framework、CleanerDaemon 及嵌入的 Launchd plist）
   if [ -d "$app_bundle/Contents/Frameworks" ]; then
     find "$app_bundle/Contents/Frameworks" -maxdepth 1 -mindepth 1 -print0 | while IFS= read -r -d '' item; do
       codesign --force --sign - --timestamp=none "$item"
@@ -91,8 +91,8 @@ create_archives() {
   log "Verifying binary architectures for [$arch_label]..."
   lipo -info \
     "$app_bundle/Contents/MacOS/cleaner" \
-    "$app_bundle/Contents/Frameworks/LemonDaemon" \
-    "$app_bundle/Contents/Library/LoginItems/LemonMonitor.app/Contents/MacOS/LemonMonitor"
+    "$app_bundle/Contents/Frameworks/CleanerDaemon" \
+    "$app_bundle/Contents/Library/LoginItems/CleanerMonitor.app/Contents/MacOS/CleanerMonitor"
 
   sign_app_bundle "$app_bundle"
 
@@ -134,8 +134,8 @@ build_xcode() {
   fi
   log "Building cleaner.app with ARCHS='$archs_arg'..."
   xcodebuild \
-    -workspace "$ROOT_DIR/Lemon.xcworkspace" \
-    -scheme Lemon \
+    -workspace "$ROOT_DIR/Cleaner.xcworkspace" \
+    -scheme Cleaner \
     -configuration Release \
     -derivedDataPath "$DERIVED_DATA_PATH" \
     ARCHS="$archs_arg" \

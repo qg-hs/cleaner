@@ -118,7 +118,7 @@ typedef NS_ENUM(NSUInteger, Owl2LogHardware) {
  *****************************************************/
 #define OWLMAINCLIENTNAME               @"owl_main_client_name"
 #define OWLDAEMONNAME                   @"owl_daemon_name"
-#define COM_TENCENT_OWLHELPER           @"com.tencent.LemonOwlHelper"
+#define COM_CLEANER_OWLHELPER           @"com.cleaner.owlhelper"
 
 //common key of the parameter's NSDictionary
 #define FUNCTIONKEY                     @"function_key"

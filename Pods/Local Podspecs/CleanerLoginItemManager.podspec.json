@@ -1,0 +1,37 @@
+{
+  "name": "CleanerLoginItemManager",
+  "version": "0.1.0",
+  "summary": "A short description of CleanerLoginItemManager.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/qg-hs/CleanerLoginItemManager",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "cleaner": "cleaner@users.noreply.github.com"
+  },
+  "source": {
+    "git": "https://github.com/qg-hs/CleanerLoginItemManager.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "osx": "10.11"
+  },
+  "source_files": "CleanerLoginItemManager/Classes/**/*",
+  "resources": [
+    "CleanerLoginItemManager/Assets/**/*"
+  ],
+  "dependencies": {
+    "QMAppLoginItemManage": [],
+    "QMUICommon": [],
+    "QMCoreFunction": [],
+    "Masonry": [
+      "1.1.0"
+    ],
+    "FMDB": [
+      "2.7.5"
+    ]
+  },
+  "public_header_files": "Pod/Classes/**/*.h"
+}

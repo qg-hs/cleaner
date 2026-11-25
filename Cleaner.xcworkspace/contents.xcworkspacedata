@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Cleaner.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:CleanerCore/CleanerCore.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Tools/CleanerDaemon/CleanerDaemon.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Tools/CleanerMonitor/CleanerMonitor.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Tools/PrivacyProtect/PrivacyProtect.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+</Workspace>

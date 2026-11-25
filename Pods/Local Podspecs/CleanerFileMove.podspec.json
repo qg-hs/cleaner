@@ -1,0 +1,34 @@
+{
+  "name": "CleanerFileMove",
+  "version": "0.1.0",
+  "summary": "A short description of CleanerFileMove.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/qg-hs/CleanerFileMove",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "cleaner": "cleaner@users.noreply.github.com"
+  },
+  "source": {
+    "git": "https://github.com/qg-hs/CleanerFileMove.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "osx": "10.11"
+  },
+  "source_files": "CleanerFileMove/Classes/**/*",
+  "resources": [
+    "CleanerFileMove/Assets/**/*"
+  ],
+  "public_header_files": "Pod/Classes/LMFileMoveWnController.h",
+  "dependencies": {
+    "QMCoreFunction": [],
+    "Masonry": [
+      "1.1.0"
+    ],
+    "QMUICommon": [],
+    "CleanerFileManager": []
+  }
+}

@@ -1,13 +1,13 @@
 //
 //  McStatInfoConst.h
-//  LemonMonitor
+//  CleanerMonitor
 //
 //  
 //  Copyright (c) 2014年 Tencent. All rights reserved.
 //
 
-#ifndef LemonMonitor_McStatInfoConst_h
-#define LemonMonitor_McStatInfoConst_h
+#ifndef CleanerMonitor_McStatInfoConst_h
+#define CleanerMonitor_McStatInfoConst_h
 
 #define kStatCPUInfoNotification    @"StatCPUInfoNotification"
 #define kMemoryCPUInfoNotification  @"StatMemoryInfoNotification"

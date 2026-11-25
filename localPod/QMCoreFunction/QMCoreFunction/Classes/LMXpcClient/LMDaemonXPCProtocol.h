@@ -1,6 +1,6 @@
 //
 //  LMDaemonXPCProtocol.h
-//  LemonDaemon
+//  CleanerDaemon
 //
 //  
 //  Copyright © 2018年 Tencent. All rights reserved.
@@ -27,9 +27,9 @@
  int clent :
  To use the service from an application or other process, use NSXPCConnection to establish a connection to the service by doing something like this:
  
- //_connectionToService = [[NSXPCConnection alloc] initWithServiceName:@"com.tencent.Lemon"];
+ //_connectionToService = [[NSXPCConnection alloc] initWithServiceName:@"com.cleaner.app"];
  //for daemon/agent must use initWithMachServiceName to init, and the plist must set the (chown root:wheel plist)
- _connectionToService = [[NSXPCConnection alloc] initWithMachServiceName:@"com.tencent.LemonDaemon"
+ _connectionToService = [[NSXPCConnection alloc] initWithMachServiceName:@"com.cleaner.daemon"
  _connectionToService.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(LMDaemonXPCProtocol)];
  [_connectionToService resume];
  
@@ -49,7 +49,7 @@
  LMDaemonListenerDelegate *delegate = [LMDaemonListenerDelegate new];
  
  // Set up the one NSXPCListener for this service. It will handle all incoming connections.
- listener = [[NSXPCListener alloc] initWithMachServiceName:@"com.tencent.LemonDaemon"];
+ listener = [[NSXPCListener alloc] initWithMachServiceName:@"com.cleaner.daemon"];
  listener.delegate = delegate;
  
  // Resuming the serviceListener starts this service. This method does not return.

@@ -808,7 +808,7 @@ static void getVersionByPath(NSString **fullVersion, NSString *newAppPath) {
     _change_owl_device_proc_info_async(deviceType, deviceState, block_i);
 }
 
-static NSMutableArray *packOwlDeviceProcInfo(int fun_ret, lemon_com_process_info *owl_proc_info) {
+static NSMutableArray *packOwlDeviceProcInfo(int fun_ret, cleaner_com_process_info *owl_proc_info) {
     NSMutableArray * result = [[NSMutableArray alloc] init];
     for (int i = 0; i < fun_ret; i++) {
         NSMutableDictionary* dicItem = [[NSMutableDictionary alloc] init];
@@ -825,7 +825,7 @@ static NSMutableArray *packOwlDeviceProcInfo(int fun_ret, lemon_com_process_info
 
 - (NSArray *)getOwlDeviceProcInfo:(int)deviceType deviceState:(int)deviceState
 {
-    __block lemon_com_process_info *owl_proc_info = NULL;
+    __block cleaner_com_process_info *owl_proc_info = NULL;
     int fun_ret = _get_owl_device_proc_info(deviceType, deviceState, &owl_proc_info);
     if (fun_ret <= 0)
     {
@@ -839,7 +839,7 @@ static NSMutableArray *packOwlDeviceProcInfo(int fun_ret, lemon_com_process_info
 
 - (void)getOwlDeviceProcInfo:(int)deviceType deviceState:(int)deviceState block:(block_v_a)block_a
 {
-    __block lemon_com_process_info *owl_proc_info = NULL;
+    __block cleaner_com_process_info *owl_proc_info = NULL;
     block_v_i copyBlock = ^(int fun_ret) {
         if (fun_ret <= 0)
         {
@@ -994,39 +994,39 @@ static NSMutableArray *packOwlDeviceProcInfo(int fun_ret, lemon_com_process_info
 }
 
 /*
- collect the lemon log info.
+ collect the cleaner log info.
  */
-- (BOOL)collectLemonLogInfo:(NSString *)homeDir
+- (BOOL)collectCleanerLogInfo:(NSString *)homeDir
 {
-    int result = _collect_lemon_loginfo([homeDir UTF8String]);
+    int result = _collect_cleaner_loginfo([homeDir UTF8String]);
     return result >= 0;
 }
-- (void)collectLemonLogInfo:(NSString *)homeDir block:(block_v_b)block
+- (void)collectCleanerLogInfo:(NSString *)homeDir block:(block_v_b)block
 {
     block_v_i copyBlock = ^(int return_code) {
         BOOL flag = (return_code > 0);
         block(flag);
     };
     
-    _collect_lemon_loginfo_async([homeDir UTF8String], copyBlock);
+    _collect_cleaner_loginfo_async([homeDir UTF8String], copyBlock);
 }
 
 //pf is control the ipfw(or iptable)
-- (BOOL)setLemonFirewallPortPF:(NSString *)strTcpPort udpPort:(NSString *)strUdpPort{
-    int result = _set_lemon_firewall_port_pf([strTcpPort UTF8String], [strUdpPort UTF8String]);
+- (BOOL)setCleanerFirewallPortPF:(NSString *)strTcpPort udpPort:(NSString *)strUdpPort{
+    int result = _set_cleaner_firewall_port_pf([strTcpPort UTF8String], [strUdpPort UTF8String]);
     return result >= 0;
 }
-- (void)setLemonFirewallPortPF:(NSString *)strTcpPort udpPort:(NSString *)strUdpPort block:(block_v_b)block{
+- (void)setCleanerFirewallPortPF:(NSString *)strTcpPort udpPort:(NSString *)strUdpPort block:(block_v_b)block{
     block_v_i copyBlock = ^(int return_code) {
         BOOL flag = (return_code > 0);
         block(flag);
     };
     
-    _set_lemon_firewall_port_pf_async([strTcpPort UTF8String], [strUdpPort UTF8String], copyBlock);
+    _set_cleaner_firewall_port_pf_async([strTcpPort UTF8String], [strUdpPort UTF8String], copyBlock);
 }
 
 // stat port using info(through lsof)
-static NSMutableArray *packLemonPortInfo(int fun_ret, lemon_com_process_info *port_info) {
+static NSMutableArray *packCleanerPortInfo(int fun_ret, cleaner_com_process_info *port_info) {
     NSMutableArray * result = [[NSMutableArray alloc] init];
     for (int i = 0; i < fun_ret; i++) {
         NSMutableDictionary* dicItem = [[NSMutableDictionary alloc] init];
@@ -1041,21 +1041,21 @@ static NSMutableArray *packLemonPortInfo(int fun_ret, lemon_com_process_info *po
 
 - (NSArray *)statPortProcInfo
 {
-    __block lemon_com_process_info *port_proc_info = NULL;
+    __block cleaner_com_process_info *port_proc_info = NULL;
     int fun_ret = _stat_port_proc_info(&port_proc_info);
     if (fun_ret <= 0)
     {
         return nil;
     }
     
-    NSMutableArray * result = packLemonPortInfo(fun_ret, port_proc_info);
+    NSMutableArray * result = packCleanerPortInfo(fun_ret, port_proc_info);
     free(port_proc_info);
     return result;
 }
 
 - (void)statPortProcInfoAsync:(block_v_a)block_a
 {
-    __block lemon_com_process_info *port_proc_info = NULL;
+    __block cleaner_com_process_info *port_proc_info = NULL;
     block_v_i copyBlock = ^(int fun_ret) {
         if (fun_ret <= 0)
         {
@@ -1064,7 +1064,7 @@ static NSMutableArray *packLemonPortInfo(int fun_ret, lemon_com_process_info *po
         }
         
         // port_info 本身是个堆指针,不需要考虑__block 的问题.
-        NSMutableArray * result = packLemonPortInfo(fun_ret, port_proc_info);
+        NSMutableArray * result = packCleanerPortInfo(fun_ret, port_proc_info);
         free(port_proc_info);
         block_a(result);
     };

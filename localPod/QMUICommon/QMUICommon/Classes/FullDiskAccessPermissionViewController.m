@@ -1,6 +1,6 @@
 //
 //  FullDiskAccessPermissionViewController.m
-//  Lemon
+//  Cleaner
 //
 //  
 //  Copyright © 2019 Tencent. All rights reserved.
@@ -8,7 +8,7 @@
 
 #import "FullDiskAccessPermissionViewController.h"
 #import "LMAlertViewController.h"
-#import "LemonSuiteUserDefaults.h"
+#import "CleanerSuiteUserDefaults.h"
 #import "LMPermissionGuideWndController.h"
 #import "GetFullAccessWndController.h"
 #import <QMCoreFunction/LanguageHelper.h>
@@ -69,7 +69,7 @@
     
 }
 
-/// 如果没有授权Lemon，则弹出引导窗口，采用通用的title
+/// 如果没有授权Cleaner，则弹出引导窗口，采用通用的title
 /// @param parentController parentController
 +(BOOL)showFullDiskAccessRequestIfNeededWithParentController:(NSViewController *)parentController{
     return [self showFullDiskAccessRequestIfNeededWithParentController:parentController title:NSLocalizedStringFromTableInBundle(@"GetFullDiskPremission_Title_10_15", nil, [NSBundle bundleForClass:[self class]], @"") sourceType:SMALL_TOOLS_VIEW];

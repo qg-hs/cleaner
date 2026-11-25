@@ -1,6 +1,6 @@
 //
 //  OwlManager.h
-//  Lemon
+//  Cleaner
 //
 
 //  Copyright © 2018年 Tencent. All rights reserved.
@@ -29,7 +29,7 @@ extern NSNotificationName const OwlWatchAudioStateChange;
 - (NSMutableArray*)getAllAppInfoWithIndexArray:(NSArray*)indexArray;
 
 - (BOOL)isMonitorRunning;
-- (BOOL)isLemonRunning;
+- (BOOL)isCleanerRunning;
 - (void)startOwlProtect;
 - (void)stopOwlProtect;
 

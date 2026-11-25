@@ -1,6 +1,6 @@
 # QMAppLoginItemManage
 
-[![CI Status](https://img.shields.io/travis/lemon/QMAppLoginItemManage.svg?style=flat)](https://travis-ci.org/lemon/QMAppLoginItemManage)
+[![CI Status](https://img.shields.io/travis/cleaner/QMAppLoginItemManage.svg?style=flat)](https://travis-ci.org/cleaner/QMAppLoginItemManage)
 [![Version](https://img.shields.io/cocoapods/v/QMAppLoginItemManage.svg?style=flat)](https://cocoapods.org/pods/QMAppLoginItemManage)
 [![License](https://img.shields.io/cocoapods/l/QMAppLoginItemManage.svg?style=flat)](https://cocoapods.org/pods/QMAppLoginItemManage)
 [![Platform](https://img.shields.io/cocoapods/p/QMAppLoginItemManage.svg?style=flat)](https://cocoapods.org/pods/QMAppLoginItemManage)
@@ -22,7 +22,7 @@ pod 'QMAppLoginItemManage'
 
 ## Author
 
-lemon, lemon@tencent.com
+cleaner, cleaner@users.noreply.github.com
 
 ## License
 

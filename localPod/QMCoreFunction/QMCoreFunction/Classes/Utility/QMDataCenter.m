@@ -9,7 +9,7 @@
 #import "QMDataCenter.h"
 #import "QMCryptUtility.h"
 
-#define kQMDataCenterSaveKey @"LemonConfiguration"
+#define kQMDataCenterSaveKey @"CleanerConfiguration"
 NSString * const QMDataCenterDidChangeNotification = @"QMDataCenterDidChangeNotification";
 
 @interface QMDataCenter()

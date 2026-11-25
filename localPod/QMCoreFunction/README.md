@@ -1,6 +1,6 @@
 # QMCoreFunction
 
-[![CI Status](https://img.shields.io/travis/lemon/QMCoreFunction.svg?style=flat)](https://travis-ci.org/lemon/QMCoreFunction)
+[![CI Status](https://img.shields.io/travis/cleaner/QMCoreFunction.svg?style=flat)](https://travis-ci.org/cleaner/QMCoreFunction)
 [![Version](https://img.shields.io/cocoapods/v/QMCoreFunction.svg?style=flat)](https://cocoapods.org/pods/QMCoreFunction)
 [![License](https://img.shields.io/cocoapods/l/QMCoreFunction.svg?style=flat)](https://cocoapods.org/pods/QMCoreFunction)
 [![Platform](https://img.shields.io/cocoapods/p/QMCoreFunction.svg?style=flat)](https://cocoapods.org/pods/QMCoreFunction)
@@ -22,7 +22,7 @@ pod 'QMCoreFunction'
 
 ## Author
 
-lemon, lemon@tencent.com
+cleaner, cleaner@users.noreply.github.com
 
 ## License
 

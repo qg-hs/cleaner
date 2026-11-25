@@ -64,7 +64,7 @@
 - (NSImageView *)imageView {
     if (!_imageView) {
         _imageView = [[NSImageView alloc] init];
-        _imageView.image = [NSImage imageNamed:@"lemon_privacy_blank_placeholder"];
+        _imageView.image = [NSImage imageNamed:@"cleaner_privacy_blank_placeholder"];
     }
     return _imageView;
 }

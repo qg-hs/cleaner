@@ -1,6 +1,6 @@
 //
 //  MdlsToolsHelper.h
-//  LemonClener
+//  CleanerCore
 //
 //  
 //  Copyright © 2019 Tencent. All rights reserved.

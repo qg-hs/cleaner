@@ -1,0 +1,40 @@
+{
+  "name": "CleanerUninstaller",
+  "version": "0.1.0",
+  "summary": "A short description of CleanerUninstaller.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/qg-hs/CleanerUninstaller",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "cleaner": "cleaner@users.noreply.github.com"
+  },
+  "source": {
+    "git": "https://github.com/qg-hs/CleanerUninstaller.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "osx": "10.11"
+  },
+  "source_files": "CleanerUninstaller/Classes/**/*",
+  "resources": [
+    "CleanerUninstaller/Assets/**/*"
+  ],
+  "public_header_files": [
+    "CleanerUninstaller/Classes/Controller/McUninstallWindowController.h",
+    "CleanerUninstaller/Classes/TrashWatch/AppTrashDel.h"
+  ],
+  "dependencies": {
+    "Masonry": [
+      "1.1.0"
+    ],
+    "FMDB": [
+      "2.7.5"
+    ],
+    "QMCoreFunction": [],
+    "QMUICommon": [],
+    "CleanerStat": []
+  }
+}

@@ -1,6 +1,6 @@
 # QMUICommon
 
-[![CI Status](https://img.shields.io/travis/lemon/QMUICommon.svg?style=flat)](https://travis-ci.org/lemon/QMUICommon)
+[![CI Status](https://img.shields.io/travis/cleaner/QMUICommon.svg?style=flat)](https://travis-ci.org/cleaner/QMUICommon)
 [![Version](https://img.shields.io/cocoapods/v/QMUICommon.svg?style=flat)](https://cocoapods.org/pods/QMUICommon)
 [![License](https://img.shields.io/cocoapods/l/QMUICommon.svg?style=flat)](https://cocoapods.org/pods/QMUICommon)
 [![Platform](https://img.shields.io/cocoapods/p/QMUICommon.svg?style=flat)](https://cocoapods.org/pods/QMUICommon)
@@ -22,7 +22,7 @@ pod 'QMUICommon'
 
 ## Author
 
-lemon, lemon@tencent.com
+cleaner, cleaner@users.noreply.github.com
 
 ## License
 

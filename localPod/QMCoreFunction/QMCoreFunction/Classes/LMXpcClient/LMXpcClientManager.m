@@ -8,14 +8,14 @@
 
 #import "LMXpcClientManager.h"
 #import "LMDaemonXPCProtocol.h"
-#import "LMLemonXPCClient.h"
+#import "LMCleanerXPCClient.h"
 #import "LMMonitorXPCClient.h"
 #import "LMDaemonStartupHelper.h"
 
 @interface LMXpcClientManager ()
 
 @property (nonatomic, strong, readwrite) NSXPCConnection *connectionToService;
-@property (nonatomic, strong, readwrite) LMLemonXPCClient *lemonDelegate;
+@property (nonatomic, strong, readwrite) LMCleanerXPCClient *cleanerDelegate;
 @property (nonatomic, strong, readwrite) LMMonitorXPCClient *monitorDelegate;
 @property (nonatomic, strong, readwrite) dispatch_semaphore_t async_semaphore_3;
 @property (nonatomic, assign) BOOL isWantRetryDaemonActive;
@@ -41,9 +41,9 @@
     if (self)
     {
         // 主进程名统一为 cleaner
-        _strLemonName = @"cleaner";
-        _strLemonMonitorName = @"LemonMonitor";
-        _lemonDelegate = [LMLemonXPCClient new];
+        _strCleanerName = @"cleaner";
+        _strCleanerMonitorName = @"CleanerMonitor";
+        _cleanerDelegate = [LMCleanerXPCClient new];
         _monitorDelegate = [LMMonitorXPCClient new];
         self.async_semaphore_3 = dispatch_semaphore_create(3);
 
@@ -56,14 +56,14 @@
     @synchronized(self)
     {
         if (!_connectionToService) {
-            //_connectionToService = [[NSXPCConnection alloc] initWithServiceName:@"com.tencent.TestAgrent"];
-            _connectionToService = [[NSXPCConnection alloc] initWithMachServiceName:@"com.tencent.LemonDaemon" options:NSXPCConnectionPrivileged];
+            //_connectionToService = [[NSXPCConnection alloc] initWithServiceName:@"com.cleaner.testagent"];
+            _connectionToService = [[NSXPCConnection alloc] initWithMachServiceName:@"com.cleaner.daemon" options:NSXPCConnectionPrivileged];
             _connectionToService.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(LMDaemonXPCProtocol)];
             NSString *procName = [[NSProcessInfo processInfo] processName];
-            if ([procName containsString:_strLemonName] || [procName containsString:@"Tencent Lemon"]) {
-                _connectionToService.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(LMLemonXPCProtocol)];
-                _connectionToService.exportedObject = _lemonDelegate;
-            } else if ([procName containsString:_strLemonMonitorName]) {
+            if ([procName containsString:_strCleanerName] || [procName containsString:@"cleaner"]) {
+                _connectionToService.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(LMCleanerXPCProtocol)];
+                _connectionToService.exportedObject = _cleanerDelegate;
+            } else if ([procName containsString:_strCleanerMonitorName]) {
                 _connectionToService.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(LMMonitorXPCProtocol)];
                 _connectionToService.exportedObject = _monitorDelegate;
             }
@@ -82,14 +82,14 @@
                         });
                     }
                 }
-                NSLog(@"Lemon corefuction xpc connection has been invalidated");
+                NSLog(@"Cleaner corefuction xpc connection has been invalidated");
             };
             // interruption xpc connection not want to rebuid connection
             _connectionToService.interruptionHandler =
             ^{
                 //__strong typeof(weakSelf) strongSelf = weakSelf;
                 //strongSelf->_connectionToService = nil;
-                NSLog(@"Lemon corefuction xpc connection has been interruptionHandler");
+                NSLog(@"Cleaner corefuction xpc connection has been interruptionHandler");
             };
             [_connectionToService resume];
         }
@@ -105,7 +105,7 @@
             NSLog(@"self.connectionToService buildXPCConnectChannel remoteObjectProxyWithErrorHandler error: %@", error);
         }] buildXPCConnectChannel];
     } else {
-        NSLog(@"Lemon corefuction xpc connection buildXPCConnectChannel no selector");
+        NSLog(@"Cleaner corefuction xpc connection buildXPCConnectChannel no selector");
     }
 }
 
@@ -132,7 +132,7 @@
         }];
         dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(MaxTime * NSEC_PER_SEC)));
     } else {
-        NSLog(@"Lemon corefuction xpc connection executeXPCCommandSync self.connectionToService is nil");
+        NSLog(@"Cleaner corefuction xpc connection executeXPCCommandSync self.connectionToService is nil");
     }
     if (!isComplete) {
         int total_size = sizeof(mc_pipe_result);
@@ -141,7 +141,7 @@
         presult->size = total_size;
         presult->cmd_ret = -1;
         rpdata = [NSData dataWithBytes:(void*)presult length:presult->size];
-        NSLog(@"Lemon corefuction xpc connection command is timeout");
+        NSLog(@"Cleaner corefuction xpc connection command is timeout");
     }
     return rpdata;
 }
@@ -164,7 +164,7 @@
             complete(rdata);
         }];
     }else {
-        NSLog(@"Lemon corefuction xpc connection executeXPCCommand self.connectionToService is nil");
+        NSLog(@"Cleaner corefuction xpc connection executeXPCCommand self.connectionToService is nil");
     }
     //    dispatch_semaphore_wait() has only decremented the semaphore value if it returns 0.
     //    If the timeout expired (i.e. it returns non-zero), the semaphore value has NOT been decremented.

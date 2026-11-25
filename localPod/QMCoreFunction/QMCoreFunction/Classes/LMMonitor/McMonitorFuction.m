@@ -9,13 +9,13 @@
 #import "McMonitorFuction.h"
 #import <mach/mach_time.h>
 #import "McMonitorDefines.h"
-#import <LemonStat/McBatteryInfo.h>
-#import <LemonStat/McCpuInfo.h>
-#import <LemonStat/McGpuInfo.h>
-#import <LemonStat/McDiskInfo.h>
-#import <LemonStat/McMemoryInfo.h>
-#import <LemonStat/McNetInfo.h>
-#import <LemonStat/McNetInfo.h>
+#import <CleanerStat/McBatteryInfo.h>
+#import <CleanerStat/McCpuInfo.h>
+#import <CleanerStat/McGpuInfo.h>
+#import <CleanerStat/McDiskInfo.h>
+#import <CleanerStat/McMemoryInfo.h>
+#import <CleanerStat/McNetInfo.h>
+#import <CleanerStat/McNetInfo.h>
 #import "McCoreFunction.h"
 
 @interface McMonitorFuction ()

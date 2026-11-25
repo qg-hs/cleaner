@@ -1,6 +1,6 @@
 //
 //  LMBubbleWindow.m
-//  LemonGetText
+//  CleanerGetText
 //
 //
 

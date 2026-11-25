@@ -79,7 +79,7 @@ int change_owl_device_proc_info(int device_type,
 // get owl device process info
 int get_owl_device_proc_info(int device_type,
                              int device_state,
-                             lemon_com_process_info **odp_proc_info);
+                             cleaner_com_process_info **odp_proc_info);
 
 // changeNetworkInfo is chmod 644 /dev/bpf* for get network info
 int changeNetworkInfo(void);

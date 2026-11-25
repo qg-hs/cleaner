@@ -1,6 +1,6 @@
 //
 //  OwlViewController.m
-//  Lemon
+//  Cleaner
 //
 
 //  Copyright © 2018年 Tencent. All rights reserved.
@@ -18,7 +18,7 @@
 #import "QMUserNotificationCenter.h"
 #import <Masonry/Masonry.h>
 #import <QMUICommon/LMAppThemeHelper.h>
-#import "LemonDaemonConst.h"
+#import "CleanerDaemonConst.h"
 #import "OwlNotificationPermissionViewController.h"
 #import <QMCoreFunction/LMReferenceDefines.h>
 #import <QMUICommon/LMTitleButton.h>
@@ -357,16 +357,16 @@
 - (void)showToastForFirst:(BOOL)isVedio{
     BOOL isShow = NO;
     if (isVedio) {
-        NSString *strFirst = [[NSUserDefaults standardUserDefaults] objectForKey:@"kLemonVedioFirstUsing"];
+        NSString *strFirst = [[NSUserDefaults standardUserDefaults] objectForKey:@"kCleanerVedioFirstUsing"];
         if (!strFirst) {
             isShow = YES;
-            [[NSUserDefaults standardUserDefaults] setObject:@"strFirst" forKey:@"kLemonVedioFirstUsing"];
+            [[NSUserDefaults standardUserDefaults] setObject:@"strFirst" forKey:@"kCleanerVedioFirstUsing"];
         }
     } else {
-        NSString *strFirst = [[NSUserDefaults standardUserDefaults] objectForKey:@"kLemonAudioFirstUsing"];
+        NSString *strFirst = [[NSUserDefaults standardUserDefaults] objectForKey:@"kCleanerAudioFirstUsing"];
         if (!strFirst) {
             isShow = YES;
-            [[NSUserDefaults standardUserDefaults] setObject:@"strFirst" forKey:@"kLemonAudioFirstUsing"];
+            [[NSUserDefaults standardUserDefaults] setObject:@"strFirst" forKey:@"kCleanerAudioFirstUsing"];
         }
     }
     if (isShow) {

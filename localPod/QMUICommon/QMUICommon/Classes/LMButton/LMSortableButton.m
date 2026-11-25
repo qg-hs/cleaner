@@ -1,6 +1,6 @@
 //
 //  LMHeaderButton.m
-//  LemonUninstaller
+//  CleanerUninstaller
 //
 //  
 //  Copyright © 2018 Tencent. All rights reserved.

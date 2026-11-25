@@ -13,8 +13,8 @@
     
 }
 
-@property (nonatomic, strong) NSString *strLemonName;
-@property (nonatomic, strong) NSString *strLemonMonitorName;
+@property (nonatomic, strong) NSString *strCleanerName;
+@property (nonatomic, strong) NSString *strCleanerMonitorName;
 @property (nonatomic, weak) id<LMXPCInterfaceDelegate> delegate;
 
 + (LMXpcClientManager*)sharedInstance;

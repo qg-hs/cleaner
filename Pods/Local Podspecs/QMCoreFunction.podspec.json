@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "summary": "A short description of QMCoreFunction.",
   "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/lemon/QMCoreFunction",
+  "homepage": "https://github.com/qg-hs/QMCoreFunction",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
   },
   "authors": {
-    "lemon": "lemon@tencent.com"
+    "cleaner": "cleaner@users.noreply.github.com"
   },
   "source": {
-    "git": "https://github.com/lemon/QMCoreFunction.git",
+    "git": "https://github.com/qg-hs/QMCoreFunction.git",
     "tag": "0.1.0"
   },
   "platforms": {
@@ -25,7 +25,7 @@
     "QMCoreFunction/Classes/**/**/*.h"
   ],
   "dependencies": {
-    "LemonStat": []
+    "CleanerStat": []
   },
   "libraries": "pcap",
   "xcconfig": {

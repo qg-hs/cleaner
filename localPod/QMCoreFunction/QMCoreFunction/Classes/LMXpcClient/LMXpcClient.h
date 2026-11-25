@@ -109,10 +109,10 @@ void _change_owl_device_proc_info_async(int device_type, int device_state, block
 
 int _get_owl_device_proc_info(int device_type,
                               int device_state,
-                              lemon_com_process_info **odp_proc_info);
+                              cleaner_com_process_info **odp_proc_info);
 void _get_owl_device_proc_info_async(int device_type,
                                      int device_state,
-                                     lemon_com_process_info **odp_proc_info,
+                                     cleaner_com_process_info **odp_proc_info,
                                      block_v_i block);
 
 
@@ -142,17 +142,17 @@ void _dm_rm_pkg_info_with_bundleId_async(const char *kext, block_v_i block);
 int _dm_remove_login_item(const char *loginItem);
 void _dm_remove_login_item_async(const char *loginItem, block_v_i block);
 
-//get lemon loginfo
-int _collect_lemon_loginfo(const char *userName);
-void _collect_lemon_loginfo_async(const char *userName, block_v_i block);
+//get cleaner loginfo
+int _collect_cleaner_loginfo(const char *userName);
+void _collect_cleaner_loginfo_async(const char *userName, block_v_i block);
 
 //pf is control the ipfw(or iptable)
-int _set_lemon_firewall_port_pf(const char *srcTcpPort, const char *srcUdpPort);
-void _set_lemon_firewall_port_pf_async(const char *srcTcpPort, const char *srcUdpPort, block_v_i block);
+int _set_cleaner_firewall_port_pf(const char *srcTcpPort, const char *srcUdpPort);
+void _set_cleaner_firewall_port_pf_async(const char *srcTcpPort, const char *srcUdpPort, block_v_i block);
 
 // stat port using info(through lsof)
-int _stat_port_proc_info(lemon_com_process_info **odp_proc_info);
-void _stat_port_proc_info_async(lemon_com_process_info **odp_proc_info, block_v_i block);
+int _stat_port_proc_info(cleaner_com_process_info **odp_proc_info);
+void _stat_port_proc_info_async(cleaner_com_process_info **odp_proc_info, block_v_i block);
 
 int _manageLaunchSystemStatus(const char *path, const char *label, int action);
 void _manageLaunchSystemStatusAsync(const char *path, const char *label, int action, block_v_i block);

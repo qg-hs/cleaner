@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.cleaner.monitor</string>
+	<key>AssociatedBundleIdentifiers</key>
+	<array>
+		<string>com.cleaner.app</string>
+	</array>
+	<key>LimitLoadToSessionType</key>
+	<string>Aqua</string>
+	<key>WorkingDirectory</key>
+	<string>/Library/Application Support/Cleaner/</string>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/cleaner.app/Contents/Library/LoginItems/CleanerMonitor.app/Contents/MacOS/CleanerMonitor</string>
+		<string>1023</string>
+	</array>
+</dict>
+</plist>

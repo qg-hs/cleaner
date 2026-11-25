@@ -172,13 +172,13 @@ typedef enum: NSUInteger {
 - (BOOL)removeLoginItem:(NSString *)loginItem; //不要在主线程调用,内部有 applescript 操作.
 - (void)removeLoginItem:(NSString *)loginItem block:(block_v_b)block;
 
-//collect the lemon log info
-- (BOOL)collectLemonLogInfo:(NSString *)userName;
-- (void)collectLemonLogInfo:(NSString *)userName block:(block_v_b)block;
+//collect the cleaner log info
+- (BOOL)collectCleanerLogInfo:(NSString *)userName;
+- (void)collectCleanerLogInfo:(NSString *)userName block:(block_v_b)block;
 
 //pf is control the ipfw(or iptable)
-- (BOOL)setLemonFirewallPortPF:(NSString *)strTcpPort udpPort:(NSString *)strUdpPort;
-- (void)setLemonFirewallPortPF:(NSString *)strTcpPort udpPort:(NSString *)strUdpPort block:(block_v_b)block;
+- (BOOL)setCleanerFirewallPortPF:(NSString *)strTcpPort udpPort:(NSString *)strUdpPort;
+- (void)setCleanerFirewallPortPF:(NSString *)strTcpPort udpPort:(NSString *)strUdpPort block:(block_v_b)block;
 
 // stat port using info(through lsof)
 - (NSArray *)statPortProcInfo;

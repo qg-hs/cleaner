@@ -1,6 +1,6 @@
 //
 //  NSImage+ImageAdditions.h
-//  LemonPrivacyClean
+//  CleanerPrivacyClean
 //
 //  
 //  Copyright © 2018 tencent. All rights reserved.

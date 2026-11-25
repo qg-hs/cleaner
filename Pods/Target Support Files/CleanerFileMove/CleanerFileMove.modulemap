@@ -1,0 +1,6 @@
+framework module CleanerFileMove {
+  umbrella header "CleanerFileMove-umbrella.h"
+
+  export *
+  module * { export * }
+}

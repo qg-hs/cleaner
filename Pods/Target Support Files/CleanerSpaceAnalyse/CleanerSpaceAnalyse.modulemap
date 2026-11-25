@@ -1,0 +1,6 @@
+framework module CleanerSpaceAnalyse {
+  umbrella header "CleanerSpaceAnalyse-umbrella.h"
+
+  export *
+  module * { export * }
+}

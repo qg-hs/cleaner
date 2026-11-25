@@ -1,6 +1,6 @@
 //
 //  LMiCloudPathHelper.m
-//  LemonDuplicateFile
+//  CleanerDuplicateFile
 //
 //  
 //  Copyright © 2018年 tencent. All rights reserved.

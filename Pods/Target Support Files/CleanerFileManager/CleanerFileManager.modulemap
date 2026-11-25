@@ -1,0 +1,6 @@
+framework module CleanerFileManager {
+  umbrella header "CleanerFileManager-umbrella.h"
+
+  export *
+  module * { export * }
+}

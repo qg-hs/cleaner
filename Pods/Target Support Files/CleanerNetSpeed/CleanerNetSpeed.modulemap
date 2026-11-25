@@ -1,0 +1,6 @@
+framework module CleanerNetSpeed {
+  umbrella header "CleanerNetSpeed-umbrella.h"
+
+  export *
+  module * { export * }
+}

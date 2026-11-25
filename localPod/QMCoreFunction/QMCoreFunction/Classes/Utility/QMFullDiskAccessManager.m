@@ -11,8 +11,8 @@
 
 @implementation QMFullDiskAccessManager
 
-// app store 模式下一次探测，【完全磁盘访问权限】应用列表无lemon lite
-// macos 13.0以下 一次探测，【完全磁盘访问权限】应用列表无lemon monitor
+// app store 模式下一次探测，【完全磁盘访问权限】应用列表无cleaner lite
+// macos 13.0以下 一次探测，【完全磁盘访问权限】应用列表无cleaner monitor
 // 最初修改为单例的原因是UI上调用getFullDiskAuthorationStatus时，日志过多
 +(QMFullDiskAuthorationStatus)getFullDiskAuthorationStatus{
     return [self __getFullDiskAuthorationStatusWithLog:YES];

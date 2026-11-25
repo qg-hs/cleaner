@@ -7,7 +7,7 @@
 
 #import "Owl2Manager.h"
 #import "OwlConstant.h"
-#import "LemonDaemonConst.h"
+#import "CleanerDaemonConst.h"
 #import "Client.h"
 #import "AVMonitor.h"
 #import <QMCoreFunction/McCoreFunction.h>
@@ -316,12 +316,12 @@ typedef void (^OwlCompleteBlock)(void);
 
 #pragma mark manager db data：
 //a->启动设备保护逻辑
-//Lemon和Monitor都在running，始终默认优先在Lemon中执行a，新方案Lemon和Monitor间不会通信，两者中只会在其中一个执行保护
-//①Lemon启动，Monitor还未运行，Lemon中执行a
-//②Monitor启动，Lemon在运行，Monitor不执行a
-//③Monitor启动，Lemon没在运行，Monitor执行a
-//④当前在②状态下，Lemon退出，Lemon发送通知给正在运行的Monitor执行a
-//⑤当前在③状态下，Lemon启动，Lemon发送通知给Monitor停止执行设备保护逻辑，然后在Lemon中执行a
+//Cleaner和Monitor都在running，始终默认优先在Cleaner中执行a，新方案Cleaner和Monitor间不会通信，两者中只会在其中一个执行保护
+//①Cleaner启动，Monitor还未运行，Cleaner中执行a
+//②Monitor启动，Cleaner在运行，Monitor不执行a
+//③Monitor启动，Cleaner没在运行，Monitor执行a
+//④当前在②状态下，Cleaner退出，Cleaner发送通知给正在运行的Monitor执行a
+//⑤当前在③状态下，Cleaner启动，Cleaner发送通知给Monitor停止执行设备保护逻辑，然后在Cleaner中执行a
 - (BOOL)isMonitorRunning
 {
     if ([NSRunningApplication runningApplicationsWithBundleIdentifier:MONITOR_APP_BUNDLEID].count==0)
@@ -331,7 +331,7 @@ typedef void (^OwlCompleteBlock)(void);
     return YES;
 }
 
-- (BOOL)isLemonRunning
+- (BOOL)isCleanerRunning
 {
     if ([NSRunningApplication runningApplicationsWithBundleIdentifier:MAIN_APP_BUNDLEID].count==0)
     {

@@ -5,11 +5,11 @@ platform :osx, '12.0'
 
 install! 'cocoapods', :disable_input_output_paths => true
 
-workspace 'Lemon'
+workspace 'Cleaner'
 
-project 'Lemon.xcodeproj'
-project 'Tools/LemonMonitor/LemonMonitor.xcodeproj'
-project 'Tools/LemonDaemon/LemonDaemon.xcodeproj'
+project 'Cleaner.xcodeproj'
+project 'Tools/CleanerMonitor/CleanerMonitor.xcodeproj'
+project 'Tools/CleanerDaemon/CleanerDaemon.xcodeproj'
 project 'Tools/PrivacyProtect/PrivacyProtect.xcodeproj'
 
 #use_frameworks!
@@ -18,47 +18,47 @@ def available_pods
     pod 'QMCoreFunction',:path => './localPod/QMCoreFunction'
     pod 'Masonry', '= 1.1.0'
     pod 'FMDB', '= 2.7.5'
-    pod 'LemonFileManager',:path => './localPod/LemonFileManager'
+    pod 'CleanerFileManager',:path => './localPod/CleanerFileManager'
 end
-target 'Lemon' do
+target 'Cleaner' do
    use_frameworks!
    inherit! :search_paths
-  project 'Lemon.xcodeproj'
+  project 'Cleaner.xcodeproj'
   available_pods
   pod 'QMAppLoginItemManage',:path => './localPod/QMAppLoginItemManage'
-  pod 'LemonSpaceAnalyse',:path => './localPod/LemonSpaceAnalyse'
-  pod 'LemonSpaceAnalyse',:path => './localPod/LemonSpaceAnalyse'
-  pod 'LemonBigOldFile',:path => './localPod/LemonBigOldFile'
-  pod 'LemonPhotoClean',:path => './localPod/LemonPhotoClean'
-  pod 'LemonDuplicateFile',:path => './localPod/LemonDuplicateFile'
-  pod 'LemonPrivacyClean',:path => './localPod/LemonPrivacyClean'
-  pod 'LemonUninstaller',:path => './localPod/LemonUninstaller'
-  pod 'LemonLoginItemManager',:path => './localPod/LemonLoginItemManager'
-  pod 'LemonFileMove',:path => './localPod/LemonFileMove'
+  pod 'CleanerSpaceAnalyse',:path => './localPod/CleanerSpaceAnalyse'
+  pod 'CleanerSpaceAnalyse',:path => './localPod/CleanerSpaceAnalyse'
+  pod 'CleanerBigOldFile',:path => './localPod/CleanerBigOldFile'
+  pod 'CleanerPhotoClean',:path => './localPod/CleanerPhotoClean'
+  pod 'CleanerDuplicateFile',:path => './localPod/CleanerDuplicateFile'
+  pod 'CleanerPrivacyClean',:path => './localPod/CleanerPrivacyClean'
+  pod 'CleanerUninstaller',:path => './localPod/CleanerUninstaller'
+  pod 'CleanerLoginItemManager',:path => './localPod/CleanerLoginItemManager'
+  pod 'CleanerFileMove',:path => './localPod/CleanerFileMove'
 end
 
-target 'LemonMonitor' do
+target 'CleanerMonitor' do
     use_frameworks!
     inherit! :search_paths
-    project 'Tools/LemonMonitor/LemonMonitor.xcodeproj'
+    project 'Tools/CleanerMonitor/CleanerMonitor.xcodeproj'
     available_pods
-    pod 'LemonStat',:path => './localPod/LemonStat'
-    pod 'LemonUninstaller',:path => './localPod/LemonUninstaller'
-    pod 'LemonHardware',:path => './localPod/LemonHardware'
-    pod 'LemonNetSpeed',:path => './localPod/LemonNetSpeed'
-    pod 'LemonFileMove',:path => './localPod/LemonFileMove'
+    pod 'CleanerStat',:path => './localPod/CleanerStat'
+    pod 'CleanerUninstaller',:path => './localPod/CleanerUninstaller'
+    pod 'CleanerHardware',:path => './localPod/CleanerHardware'
+    pod 'CleanerNetSpeed',:path => './localPod/CleanerNetSpeed'
+    pod 'CleanerFileMove',:path => './localPod/CleanerFileMove'
 end
 
-target 'LemonDaemon' do
+target 'CleanerDaemon' do
     inherit! :search_paths
-    project 'Tools/LemonDaemon/LemonDaemon.xcodeproj'
+    project 'Tools/CleanerDaemon/CleanerDaemon.xcodeproj'
 end
 
-target 'LemonClener' do
+target 'CleanerCore' do
     use_frameworks!
     inherit! :search_paths
-    project 'LemonClener/LemonClener.xcodeproj'
-    pod 'LemonFileMove',:path => './localPod/LemonFileMove'
+    project 'CleanerCore/CleanerCore.xcodeproj'
+    pod 'CleanerFileMove',:path => './localPod/CleanerFileMove'
     available_pods
 end
 

@@ -30,8 +30,8 @@ dispatch_queue_t xpcSyncQueue; //同步异步队列
 dispatch_queue_t xpcAsyncQueue;
 
 void init_xpc(void){
-    xpcSyncQueue = dispatch_queue_create("lemon_xpc_to_daemon_sync", DISPATCH_QUEUE_SERIAL);
-    xpcAsyncQueue = dispatch_queue_create("lemon_xpc_to_daemon_async", DISPATCH_QUEUE_SERIAL);
+    xpcSyncQueue = dispatch_queue_create("cleaner_xpc_to_daemon_sync", DISPATCH_QUEUE_SERIAL);
+    xpcAsyncQueue = dispatch_queue_create("cleaner_xpc_to_daemon_async", DISPATCH_QUEUE_SERIAL);
 }
 
 void clean_after(mc_pipe_cmd *pcmd, mc_pipe_result *presult, xpc_operation *poperation)
@@ -70,7 +70,7 @@ static int pack_normal_return_data(mc_pipe_cmd *pcmd, mc_pipe_result *presult,xp
     return ret;
 }
 
-static int pack_lemon_com_proc_info(lemon_com_process_info **odp_proc_info, mc_pipe_cmd *pcmd, mc_pipe_result *presult, xpc_operation *poperation, int return_code) {
+static int pack_cleaner_com_proc_info(cleaner_com_process_info **odp_proc_info, mc_pipe_cmd *pcmd, mc_pipe_result *presult, xpc_operation *poperation, int return_code) {
     if (return_code == -1 || presult == NULL )
     {
         clean_after(pcmd, presult, poperation);
@@ -81,8 +81,8 @@ static int pack_lemon_com_proc_info(lemon_com_process_info **odp_proc_info, mc_p
     int ret = presult->cmd_ret;
     if (ret > 0)
     {
-        lemon_com_result *pcmd_result = (lemon_com_result *)(presult + 1);
-        lemon_com_process_info *pinfo = (lemon_com_process_info *)malloc(pcmd_result->info_size);
+        cleaner_com_result *pcmd_result = (cleaner_com_result *)(presult + 1);
+        cleaner_com_process_info *pinfo = (cleaner_com_process_info *)malloc(pcmd_result->info_size);
         memcpy(pinfo, pcmd_result->odp_info, pcmd_result->info_size);
         
         *odp_proc_info = pinfo;
@@ -984,7 +984,7 @@ static void get_owl_device_proc_info_prepare( mc_pipe_cmd ** ppcmd,int device_st
 
 int _get_owl_device_proc_info(int device_type,
                               int device_state,
-                              lemon_com_process_info **odp_proc_info)
+                              cleaner_com_process_info **odp_proc_info)
 {
     if (odp_proc_info == NULL)
         return -1;
@@ -996,12 +996,12 @@ int _get_owl_device_proc_info(int device_type,
     __block mc_pipe_result *presult = NULL;
     
     int return_code = executeXPCCommandQueueSync(pcmd, &presult, operation);
-    return pack_lemon_com_proc_info(odp_proc_info, pcmd, presult, operation, return_code);
+    return pack_cleaner_com_proc_info(odp_proc_info, pcmd, presult, operation, return_code);
 }
 
 void _get_owl_device_proc_info_async(int device_type,
                                      int device_state,
-                                     lemon_com_process_info **odp_proc_info,
+                                     cleaner_com_process_info **odp_proc_info,
                                      block_v_i block)
 {
     if (odp_proc_info == NULL)
@@ -1014,7 +1014,7 @@ void _get_owl_device_proc_info_async(int device_type,
     __block mc_pipe_result *presult = NULL;
     
     block_v_i copyBlock = ^(int return_code) {
-        return_code = pack_lemon_com_proc_info(odp_proc_info, pcmd, presult, operation,return_code);
+        return_code = pack_cleaner_com_proc_info(odp_proc_info, pcmd, presult, operation,return_code);
         block(return_code);
     };
     executeXPCCommandQueueAsync(pcmd, &presult, operation, copyBlock);
@@ -1455,8 +1455,8 @@ void _dm_remove_login_item_async(const char *loginItem, block_v_i block)
     executeXPCCommandQueueAsync(pcmd, &presult, operation, copyBlock);
 }
 
-//get lemon loginfo
-static void get_lemon_log_info_prepare(mc_pipe_cmd ** ppcmd, const char *homeDir, xpc_operation **ppoperation) {
+//get cleaner loginfo
+static void get_cleaner_log_info_prepare(mc_pipe_cmd ** ppcmd, const char *homeDir, xpc_operation **ppoperation) {
     op_file_path param = {0};
     strncpy(param.szPath, homeDir, sizeof(param.szPath) - 1);
     
@@ -1466,28 +1466,28 @@ static void get_lemon_log_info_prepare(mc_pipe_cmd ** ppcmd, const char *homeDir
     
     // set parameters
     pcmd->size = cmd_size;
-    pcmd->cmd_magic = MCCMD_COLLECT_LEMON_LOGINFO;
+    pcmd->cmd_magic = MCCMD_COLLECT_CLEANER_LOGINFO;
     memcpy(pcmd + 1, &param, sizeof(op_file_path));
     *ppcmd = pcmd;
     
     operation_prepare(ppoperation);
 }
-int _collect_lemon_loginfo(const char *homeDir)
+int _collect_cleaner_loginfo(const char *homeDir)
 {
     mc_pipe_cmd *pcmd = NULL;
     xpc_operation *operation = NULL;
-    get_lemon_log_info_prepare(&pcmd, homeDir, &operation);
+    get_cleaner_log_info_prepare(&pcmd, homeDir, &operation);
     
     __block mc_pipe_result *presult = NULL;
     
     int return_code = executeXPCCommandQueueSync(pcmd, &presult, operation);
     return pack_normal_return_data(pcmd, presult, operation, return_code);
 }
-void _collect_lemon_loginfo_async(const char *homeDir, block_v_i block)
+void _collect_cleaner_loginfo_async(const char *homeDir, block_v_i block)
 {
     mc_pipe_cmd *pcmd = NULL;
     xpc_operation *operation = NULL;
-    get_lemon_log_info_prepare(&pcmd, homeDir, &operation);
+    get_cleaner_log_info_prepare(&pcmd, homeDir, &operation);
     
     __block mc_pipe_result *presult = NULL;
     
@@ -1499,7 +1499,7 @@ void _collect_lemon_loginfo_async(const char *homeDir, block_v_i block)
 }
 
 //pf is control the ipfw(or iptable)
-static void lemon_firewall_port_pf_prepare(mc_pipe_cmd ** ppcmd ,const char *srcTcpPort, const char *srcUdpPort, xpc_operation **ppoperation) {
+static void cleaner_firewall_port_pf_prepare(mc_pipe_cmd ** ppcmd ,const char *srcTcpPort, const char *srcUdpPort, xpc_operation **ppoperation) {
     lm_sz_com_param param = {0};
     strncpy(param.szParam1, srcTcpPort, sizeof(param.szParam1) - 1);
     strncpy(param.szParam2, srcUdpPort, sizeof(param.szParam2) - 1);
@@ -1517,21 +1517,21 @@ static void lemon_firewall_port_pf_prepare(mc_pipe_cmd ** ppcmd ,const char *src
     operation_prepare(ppoperation);
     
 }
-int _set_lemon_firewall_port_pf(const char *srcTcpPort, const char *srcUdpPort)
+int _set_cleaner_firewall_port_pf(const char *srcTcpPort, const char *srcUdpPort)
 {
     mc_pipe_cmd *pcmd = NULL;
     xpc_operation *operation = NULL;
-    lemon_firewall_port_pf_prepare(&pcmd, srcTcpPort, srcUdpPort, &operation);
+    cleaner_firewall_port_pf_prepare(&pcmd, srcTcpPort, srcUdpPort, &operation);
     mc_pipe_result *presult = NULL;
     
     int return_code = executeXPCCommandQueueSync(pcmd, &presult, operation);
     return pack_normal_return_data(pcmd, presult, operation, return_code);
 }
-void _set_lemon_firewall_port_pf_async(const char *srcTcpPort, const char *srcUdpPort, block_v_i block)
+void _set_cleaner_firewall_port_pf_async(const char *srcTcpPort, const char *srcUdpPort, block_v_i block)
 {
     mc_pipe_cmd *pcmd = NULL;
     xpc_operation *operation = NULL;
-    lemon_firewall_port_pf_prepare(&pcmd, srcTcpPort, srcUdpPort, &operation);
+    cleaner_firewall_port_pf_prepare(&pcmd, srcTcpPort, srcUdpPort, &operation);
     mc_pipe_result *presult = NULL;
     
     block_v_i copyBlock = ^(int return_code) {
@@ -1543,7 +1543,7 @@ void _set_lemon_firewall_port_pf_async(const char *srcTcpPort, const char *srcUd
 }
 
 // stat port using info(through lsof)
-int _stat_port_proc_info(lemon_com_process_info **odp_proc_info)
+int _stat_port_proc_info(cleaner_com_process_info **odp_proc_info)
 {
     if (odp_proc_info == NULL)
         return -1;
@@ -1555,10 +1555,10 @@ int _stat_port_proc_info(lemon_com_process_info **odp_proc_info)
     __block mc_pipe_result *presult = NULL;
     
     int return_code = executeXPCCommandQueueSync(pcmd, &presult, operation);
-    return pack_lemon_com_proc_info(odp_proc_info, pcmd, presult, operation, return_code);
+    return pack_cleaner_com_proc_info(odp_proc_info, pcmd, presult, operation, return_code);
 }
 
-void _stat_port_proc_info_async(lemon_com_process_info **odp_proc_info,
+void _stat_port_proc_info_async(cleaner_com_process_info **odp_proc_info,
                                 block_v_i block)
 {
     if (odp_proc_info == NULL)
@@ -1572,7 +1572,7 @@ void _stat_port_proc_info_async(lemon_com_process_info **odp_proc_info,
     __block mc_pipe_result *presult = NULL;
     
     block_v_i copyBlock = ^(int return_code) {
-        return_code = pack_lemon_com_proc_info(odp_proc_info, pcmd, presult, operation,return_code);
+        return_code = pack_cleaner_com_proc_info(odp_proc_info, pcmd, presult, operation,return_code);
         block(return_code);
     };
     executeXPCCommandQueueAsync(pcmd, &presult, operation, copyBlock);

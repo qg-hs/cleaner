@@ -1,6 +1,6 @@
 //
 //  LMToastWindow.m
-//  LemonGetText
+//  CleanerGetText
 //
 //
 

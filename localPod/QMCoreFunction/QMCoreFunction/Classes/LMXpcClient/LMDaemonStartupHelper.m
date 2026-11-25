@@ -1,6 +1,6 @@
 //
 //  LMDaemonStartupHelper.m
-//  Lemon
+//  Cleaner
 //
 //  Created by klkgogo on 2018/12/14.
 //  Copyright © 2018 Tencent. All rights reserved.
@@ -12,8 +12,8 @@
 #import "LMDaemonXPCProtocol.h"
 #import <QMCoreFunction/McCoreFunction.h>
 
-#define DAEMON_MACH_SERVICE_NAME @"com.tencent.LemonDaemon"
-#define DAEMON_PLIST_PATH @"/Library/LaunchDaemons/com.tencent.Lemon.plist"
+#define DAEMON_MACH_SERVICE_NAME @"com.cleaner.daemon"
+#define DAEMON_PLIST_PATH @"/Library/LaunchDaemons/com.cleaner.daemon.plist"
 
 @implementation LMDaemonStartupHelper
 

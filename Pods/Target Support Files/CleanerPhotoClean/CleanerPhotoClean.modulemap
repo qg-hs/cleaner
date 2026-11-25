@@ -1,0 +1,6 @@
+framework module CleanerPhotoClean {
+  umbrella header "CleanerPhotoClean-umbrella.h"
+
+  export *
+  module * { export * }
+}

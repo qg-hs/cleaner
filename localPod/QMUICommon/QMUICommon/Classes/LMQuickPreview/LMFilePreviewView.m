@@ -1,8 +1,8 @@
 //
 //  LMFilePreviewView.m
-//  LemonBigOldFile
+//  CleanerBigOldFile
 //
-//  Created by tencent on 2025/9/25.
+//  Created by cleaner on 2025/9/25.
 //
 
 #import "LMFilePreviewView.h"
