@@ -10,7 +10,83 @@
 #import "QMFilterItem.h"
 #import "QMActionItem.h"
 #import "QMCleanUtils.h"
+#import <AppKit/AppKit.h>
 #import <QMCoreFunction/McCoreFunction.h>
+
+static BOOL LMBundleSpecMatchesRunningApp(NSString *bundleSpec, NSArray<NSRunningApplication *> *runningApps)
+{
+    if (bundleSpec.length == 0 || runningApps.count == 0) {
+        return NO;
+    }
+    NSArray<NSString *> *tokens = [bundleSpec componentsSeparatedByString:@","];
+    for (NSString *rawToken in tokens) {
+        NSString *token = [rawToken stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (token.length == 0) {
+            continue;
+        }
+        if ([token hasSuffix:@"."]) {
+            for (NSRunningApplication *app in runningApps) {
+                if ([app.bundleIdentifier hasPrefix:token]) {
+                    return YES;
+                }
+            }
+        } else {
+            if ([NSRunningApplication runningApplicationsWithBundleIdentifier:token].count > 0) {
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
+static BOOL LMIsActionTargetAppRunning(QMActionItem *item)
+{
+    if (item == nil || (item.bundleID.length == 0 && item.appstoreBundleID.length == 0)) {
+        return NO;
+    }
+    NSArray<NSRunningApplication *> *runningApps = [[NSWorkspace sharedWorkspace] runningApplications];
+    return LMBundleSpecMatchesRunningApp(item.bundleID, runningApps) ||
+           LMBundleSpecMatchesRunningApp(item.appstoreBundleID, runningApps);
+}
+
+static BOOL LMIsProtectedServiceWorkerPath(NSString *path)
+{
+    if (path.length == 0) {
+        return NO;
+    }
+    // Service Worker/ScriptCache 与 CacheStorage 和 Database(LevelDB) 强绑定，孤立删除会导致 MV3 扩展后台报错
+    return ([path rangeOfString:@"/Service Worker/"].location != NSNotFound ||
+            [path hasSuffix:@"/Service Worker"]);
+}
+
+static BOOL LMShouldSkipLiveRuntimeCachePath(NSString *path)
+{
+    if (path.length == 0) {
+        return NO;
+    }
+    NSArray<NSString *> *components = [path pathComponents];
+    // V8 Code Cache / GPU / Dawn 着色器缓存仅在宿主进程退出后清理，避免运行期 SimpleCache/DiskCache 句柄失配
+    NSSet<NSString *> *liveProtectedDirs = [NSSet setWithArray:@[
+        @"Code Cache",
+        @"GPUCache",
+        @"DawnCache",
+        @"GraphiteDawnCache",
+        @"ShaderCache",
+        @"GrShaderCache",
+        @"CachedData"
+    ]];
+    for (NSString *component in components) {
+        if ([liveProtectedDirs containsObject:component]) {
+            return YES;
+        }
+    }
+    // 宿主进程存活时跳过 Application Support 下的内部 Cache（保留 ~/Library/Caches 下纯 HTTP 缓存可清理）
+    if ([path containsString:@"/Library/Application Support/"] &&
+        [components containsObject:@"Cache"]) {
+        return YES;
+    }
+    return NO;
+}
 
 @implementation QMFilterParse
 
@@ -394,6 +470,7 @@
     
     NSUInteger scanFileNum = 0;
     NSMutableArray * retPathArray = [NSMutableArray array];
+    BOOL targetAppRunning = LMIsActionTargetAppRunning(item);
     for (QMActionPathItem * pathItem in scanPathArray)
     {
         // 创建扫描过滤
@@ -445,6 +522,12 @@
         
         for (NSString * scanPath in scanPathArray)
         {
+            if (LMIsProtectedServiceWorkerPath(scanPath)) {
+                continue;
+            }
+            if (targetAppRunning && LMShouldSkipLiveRuntimeCachePath(scanPath)) {
+                continue;
+            }
             if ([self baseFilterWithPath:scanPath withItem:pathItem]
                 && [self filterPathWithFilters:scanPath filter:scanFilterItemArray])
                 if (scanPath != nil) {

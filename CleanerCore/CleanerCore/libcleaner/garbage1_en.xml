@@ -1,4 +1,4 @@
-<garbage version="2026.11.20.2">
+<garbage version="2026.11.27.1">
     <filters>
         <!--临时目录下的缓存过滤-->
         <filter id="1" column="filename" relation="is" value="com.apple.dock" action="exclude"/>
@@ -453,15 +453,13 @@
             <title><![CDATA[Chrome]]></title>
             <tips><![CDATA[Multi-profile web caches, V8 code caches, and GPU caches of Chrome]]></tips>
             <action id="3071" type="file" recommend="YES">
-                <path type="abs" level="0" value="~/Library/Caches/Google/Chrome/(Default|Profile .+)/Cache/"/>
+                <path type="abs" level="0" value="~/Library/Caches/Google/Chrome/(Default|Profile .+)/Cache/Cache_Data/"/>
                 <path type="abs" level="0" value="~/Library/Caches/Google/Chrome/(Default|Profile .+)/Code Cache/"/>
                 <path type="abs" level="1" value="~/Library/Caches/com.google.Chrome/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/Code Cache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/GPUCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/DawnCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/GraphiteDawnCache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/Service Worker/CacheStorage/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/(Default|Profile .+)/Service Worker/ScriptCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/ShaderCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Google/Chrome/GrShaderCache/"/>
             </action>
@@ -477,8 +475,6 @@
                 <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/GPUCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/DawnCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/GraphiteDawnCache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/Service Worker/CacheStorage/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/(Default|Profile .+)/Service Worker/ScriptCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/ShaderCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Microsoft Edge/GrShaderCache/"/>
             </action>
@@ -494,8 +490,6 @@
                 <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/GPUCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/DawnCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/GraphiteDawnCache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/Service Worker/CacheStorage/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/(Default|Profile .+)/Service Worker/ScriptCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Arc/User Data/ShaderCache/"/>
             </action>
         </item>
@@ -510,8 +504,6 @@
                 <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/GPUCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/DawnCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/GraphiteDawnCache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/Service Worker/CacheStorage/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/(Default|Profile .+)/Service Worker/ScriptCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/BraveSoftware/Brave-Browser/ShaderCache/"/>
             </action>
         </item>
@@ -533,7 +525,6 @@
                 <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/GPUCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/Code Cache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/DawnCache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/Service Worker/CacheStorage/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/com.operasoftware.Opera/ShaderCache/"/>
             </action>
         </item>
@@ -547,7 +538,6 @@
                 <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/(Default|Profile .+)/Code Cache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/(Default|Profile .+)/GPUCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/(Default|Profile .+)/DawnCache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/(Default|Profile .+)/Service Worker/CacheStorage/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Vivaldi/ShaderCache/"/>
             </action>
         </item>
@@ -561,7 +551,6 @@
                 <path type="abs" level="0" value="~/Library/Application Support/Quark/(Default|Profile .+)/Code Cache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Quark/(Default|Profile .+)/GPUCache/"/>
                 <path type="abs" level="0" value="~/Library/Application Support/Quark/(Default|Profile .+)/DawnCache/"/>
-                <path type="abs" level="0" value="~/Library/Application Support/Quark/(Default|Profile .+)/Service Worker/CacheStorage/"/>
             </action>
         </item>
         <item id="317" recommend="YES" showresult="YES" fastmode="YES" bundleid="app.zen-browser.zen">

@@ -52,6 +52,12 @@
 
 ## 版本更新日志 (Changelog)
 
+### `v2.0.2` (2026-11-27)
+
+- **修复浏览器垃圾清理引发 Chrome 控制台扩展报错的问题**：
+  - **移除 `Service Worker` 缓存目录误删规则**：从 `garbage1_zh.xml` / `garbage1_en.xml`（`2026.11.27.1`）中移除 Chrome、Edge、Arc、Brave、Opera、Vivaldi、夸克浏览器的 `Service Worker/CacheStorage/` 与 `Service Worker/ScriptCache/` 清理路径，并将 Chrome `Cache` 规则精确收窄至 `Cache/Cache_Data/`，避免与 `Service Worker/Database`（LevelDB）索引失配导致 Manifest V3 扩展后台脚本持续加载失败。
+  - **增加代码级硬防护与运行期缓存保护**：在 `QMFilterParse` 扫描枚举阶段强制屏蔽所有 `Service Worker` 相关路径；当目标应用处于运行态时，自动跳过 `Code Cache`、`GPUCache`、`DawnCache`、`GraphiteDawnCache`、`ShaderCache`、`GrShaderCache`、`CachedData` 及 `Application Support` 内部缓存目录，仅在宿主应用退出后清理。
+
 ### `v2.0.1` (2026-11-25)
 
 - **守护进程加载链路与状态栏拉起稳定性修复**：
@@ -208,17 +214,17 @@ pod install
 
 项目通过 [`.github/workflows/package.yml`](.github/workflows/package.yml) 配置了完整的 GitHub Actions 流水线：
 
-1. 修改 [`Cleaner/Info.plist`](Cleaner/Info.plist) 与 [`Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist`](Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist) 中的 `CFBundleShortVersionString`（当前版本 `2.0.1`）。
+1. 修改 [`Cleaner/Info.plist`](Cleaner/Info.plist) 与 [`Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist`](Tools/CleanerMonitor/CleanerMonitor/CleanerMonitor-Info.plist) 中的 `CFBundleShortVersionString`（当前版本 `2.0.2`）。
 2. 提交代码并推送带有 `v` 前缀的 Git Tag：
    ```bash
    git add -A
-   git commit -m "release: v2.0.1"
-   git tag v2.0.1
+   git commit -m "release: v2.0.2"
+   git tag v2.0.2
    git push origin master
-   git push origin v2.0.1
+   git push origin v2.0.2
    ```
-3. GitHub Actions 将自动触发并行构建矩阵（`arm64` / `x86_64` / `universal`），并在构建完成后自动创建 `v2.0.1` GitHub Release 挂载全部 `.dmg`、`.zip` 和 `SHA256SUMS.txt`。
-4. 已运行的 `cleaner` 状态栏客户端 (`LMGitHubUpdater`) 检测到新版本后将自动亮起设置红点，用户点击 **`发现新版本 v2.0.1（点击热更）`** 即可直接完成流式下载、解压替换与自动重启。
+3. GitHub Actions 将自动触发并行构建矩阵（`arm64` / `x86_64` / `universal`），并在构建完成后自动创建 `v2.0.2` GitHub Release 挂载全部 `.dmg`、`.zip` 和 `SHA256SUMS.txt`。
+4. 已运行的 `cleaner` 状态栏客户端 (`LMGitHubUpdater`) 检测到新版本后将自动亮起设置红点，用户点击 **`发现新版本 v2.0.2（点击热更）`** 即可直接完成流式下载、解压替换与自动重启。
 
 ---
 
